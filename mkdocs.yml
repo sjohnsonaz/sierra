@@ -1,0 +1,7 @@
+site_name: Sierra
+site_url: https://sjohnsonaz.github.io/sierra
+repo_url: https://github.com/sjohnsonaz/sierra
+copyright: Copyright &copy; 2017 Sean Johnson
+pages:
+    - Home: index.md
+theme: readthedocs
