@@ -13,6 +13,9 @@ describe('route decorator`', () => {
         class TestController extends Controller<express.Router, express.RequestHandler> {
             @route('get', '')
             get(req: express.Request, res: express.Response, next: express.NextFunction) {
+                res.status(200);
+                res.setHeader('Content-Type', 'application/json');
+                res.send(JSON.stringify({ value: true }));
             }
         }
 
