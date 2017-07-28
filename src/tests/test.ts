@@ -9,7 +9,7 @@ import { Controller, middleware, route } from '../scripts/Sierra';
 import TestApplication from './TestApplication';
 
 describe('route decorator`', () => {
-    it('should generate get routes', (done) => {
+    it('should generate get routes', () => {
         class TestController extends Controller<express.Router, express.RequestHandler> {
             @route('get', '')
             get(req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -20,22 +20,13 @@ describe('route decorator`', () => {
         let testApplication = new TestApplication({ port: port });
         testApplication.addController(new TestController());
         testApplication.init();
-        testApplication.listen();
-        chai.request('localhost:' + port)
-            .get('/api/test')
-            .end((err, res) => {
-                if (err) {
-                    console.log(err);
-                    testApplication.close();
-                    done(err);
-                } else {
+        testApplication.listen().then(() => {
+            chai.request('localhost:' + port)
+                .get('/test')
+                .end((err, res) => {
                     res.should.have.status(200);
                     testApplication.close();
-                    done();
-                }
-            }).catch((err) => {
-                done(err);
-                testApplication.close();
-            });
+                });
+        });
     });
 });
