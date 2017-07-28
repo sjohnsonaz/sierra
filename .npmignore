@@ -26,6 +26,7 @@ tsconfig.json
 webpack.config.js
 webpack.dev.config.js
 .travis.yml
+nodemon.json
 
 # Editor configuration files
 .vscode/

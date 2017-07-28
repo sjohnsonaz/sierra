@@ -6,7 +6,7 @@ let expect = chai.expect;
 import * as http from 'http';
 import * as express from 'express';
 
-import { Application, Controller, middleware, route } from '../scripts/modules/Sierra';
+import { Application, Controller, middleware, route } from '../scripts/Sierra';
 
 describe('route decorator`', () => {
     it('should generate get routes', () => {
