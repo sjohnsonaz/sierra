@@ -25,6 +25,14 @@ describe('route decorator`', () => {
                 this.addController(new TestController());
             }
 
+            connectDatabase() {
+
+            }
+
+            addMiddleware() {
+
+            }
+
             buildRoute(controller: Controller<express.Router, express.RequestHandler>) {
                 let expressRouter = express.Router();
                 controller.build(expressRouter, (app, verb, name, middleware, method) => {

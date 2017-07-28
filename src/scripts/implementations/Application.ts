@@ -3,7 +3,7 @@ import { IServerIntegration } from '../interfaces/IServerIntegration';
 
 import Controller from '../implementations/Controller';
 
-export default class Application<T, U extends IMiddleware> {
+export default abstract class Application<T, U extends IMiddleware> {
     controllers: Controller<T, U>[] = [];
 
     addController(controller: Controller<T, U>) {
@@ -16,23 +16,15 @@ export default class Application<T, U extends IMiddleware> {
         this.buildRoutes();
     }
 
-    addMiddleware() {
-
-    }
-
-    connectDatabase() {
-
-    }
-
     buildRoutes() {
         this.controllers.forEach(this.buildRoute.bind(this));
     }
 
-    buildRoute(controller: Controller<T, U>) {
+    abstract addMiddleware(): void;
 
-    }
+    abstract connectDatabase(): void;
 
-    listen() {
+    abstract buildRoute(controller: Controller<T, U>): void;
 
-    }
+    abstract listen(): void;
 }
