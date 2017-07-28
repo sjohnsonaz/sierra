@@ -1,7 +1,7 @@
 {
   "name": "sierra",
   "version": "0.0.0",
-  "description": "",
+  "description": "A service framework for Node.js.",
   "repository": "https://www.github.com/sjohnsonaz/sierra.git",
   "license": "MIT",
   "author": "Sean Johnson <sjohnson@sjohnsonaz.com>",
@@ -36,5 +36,11 @@
     "ts-loader": "2.3.2",
     "typescript": "2.4.2",
     "webpack": "3.4.1"
-  }
+  },
+  "keywords": [
+    "service",
+    "framework",
+    "node",
+    "express"
+  ]
 }
