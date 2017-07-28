@@ -3,7 +3,7 @@ import { IServerIntegration } from '../interfaces/IServerIntegration';
 
 import Controller from '../implementations/Controller';
 
-export default abstract class Application<T, U extends IMiddleware> {
+export default class Application<T, U extends IMiddleware> {
     controllers: Controller<T, U>[] = [];
 
     addController(controller: Controller<T, U>) {
@@ -17,14 +17,27 @@ export default abstract class Application<T, U extends IMiddleware> {
     }
 
     buildRoutes() {
+        console.log('Building routes: ' + this.controllers.length);
         this.controllers.forEach(this.buildRoute.bind(this));
     }
 
-    abstract addMiddleware(): void;
+    connectDatabase(): Promise<boolean> {
+        return Promise.resolve(true);
+    }
 
-    abstract connectDatabase(): void;
+    addMiddleware(): void {
 
-    abstract buildRoute(controller: Controller<T, U>): void;
+    }
 
-    abstract listen(): void;
+    buildRoute(controller: Controller<T, U>): void {
+
+    }
+
+    listen(): Promise<boolean> {
+        return Promise.resolve(true);
+    }
+
+    close(): Promise<boolean> {
+        return Promise.resolve(true);
+    }
 }
