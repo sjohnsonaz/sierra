@@ -45,11 +45,11 @@ export default class RouteBuilder<T, U extends IMiddleware> {
                         verb = index as any;
                     }
                     if (!name) {
-                        name = '/' + RouteBuilder.getBase(controller) + '/';
+                        name = '/' + RouteBuilder.getBase(controller, base) + '/';
                     }
                 }
                 if (!name) {
-                    name = '/' + RouteBuilder.getBase(controller) + '/' + index + '/';
+                    name = '/' + RouteBuilder.getBase(controller, base) + '/' + index + '/';
                 }
                 var method = controller[index];
                 if (method) {
