@@ -1,5 +1,3 @@
-import * as express from 'express';
-
 import { VerbType } from '../interfaces/Verb';
 import { IMiddleware } from '../interfaces/IMiddleware';
 

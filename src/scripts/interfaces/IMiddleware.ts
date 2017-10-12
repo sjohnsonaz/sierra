@@ -1,3 +1,6 @@
-import * as express from 'express';
+//import * as express from 'express';
+//express.RequestHandler;
 
-export type IMiddleware = express.RequestHandler;
+export interface IMiddleware {
+    (...args: any[]): any;
+}
