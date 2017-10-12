@@ -6,10 +6,11 @@ let expect = chai.expect;
 import * as express from 'express';
 
 import { Controller, middleware, route } from '../scripts/Sierra';
+import { wait } from '../scripts/utils/TestUtil';
 import TestApplication from './TestApplication';
 
 describe('route decorator`', () => {
-    it('should generate get routes', () => {
+    it('should generate get routes', async () => {
         class TestController extends Controller<express.Router, express.RequestHandler> {
             @route('get', '')
             get(req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -23,13 +24,22 @@ describe('route decorator`', () => {
         let testApplication = new TestApplication({ port: port });
         testApplication.addController(new TestController());
         testApplication.init();
-        testApplication.listen().then(() => {
+        await testApplication.listen();
+        await wait(0);
+        try {
             chai.request('localhost:' + port)
                 .get('/test')
                 .end((err, res) => {
+                    if (err) {
+                        throw err;
+                    }
                     res.should.have.status(200);
-                    testApplication.close();
                 });
-        });
+        } catch (e) {
+
+        } finally {
+            testApplication.close().then(() => {
+            });
+        }
     });
 });
