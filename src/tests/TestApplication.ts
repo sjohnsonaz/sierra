@@ -55,7 +55,7 @@ export default class TestApplication extends Application<express.Router, express
                     break;
             }
         });
-        this.app.use('/api', expressRouter);
+        this.app.use([controller.service ? '/api' : '', controller.base].join('/'), expressRouter);
     }
 
     listen() {

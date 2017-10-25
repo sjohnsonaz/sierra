@@ -12,6 +12,8 @@ import TestApplication from './TestApplication';
 describe('route decorator`', () => {
     it('should generate get routes', async () => {
         class TestController extends Controller<express.Router, express.RequestHandler> {
+            service = true;
+
             @route('get', '')
             get(req: express.Request, res: express.Response, next: express.NextFunction) {
                 res.status(200);
@@ -27,19 +29,22 @@ describe('route decorator`', () => {
         await testApplication.listen();
         await wait(0);
         try {
-            chai.request('localhost:' + port)
-                .get('/test')
-                .end((err, res) => {
-                    if (err) {
-                        throw err;
-                    }
-                    res.should.have.status(200);
-                });
-        } catch (e) {
-
-        } finally {
-            testApplication.close().then(() => {
+            await new Promise((resolve, reject) => {
+                chai.request('localhost:' + port)
+                    .get('/api/test')
+                    .end((err, res) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            expect(res).to.have.status(200);
+                            resolve(true);
+                        }
+                    });
             });
+        } catch (e) {
+            expect(e).to.be.null;
+        } finally {
+            await testApplication.close();
         }
     });
 });
