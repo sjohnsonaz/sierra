@@ -1,6 +1,6 @@
 import * as express from 'express';
 
-import { Controller, middleware, route, Context, Application } from '../scripts/Sierra';
+import Sierra, { Controller, middleware, route, Context } from '../scripts/Sierra';
 
 class TestController extends Controller {
     constructor() {
@@ -16,8 +16,8 @@ class TestController extends Controller {
 }
 
 let port = 3001;
-let testApplication = new Application();
-testApplication.requestHandler.view = async function (context, data) {
+let testApplication = new Sierra();
+testApplication.view(async function (context, data) {
     return '\
         <!DOCTYPE html>\
         <html>\
@@ -32,7 +32,7 @@ testApplication.requestHandler.view = async function (context, data) {
         </body>\
         </html>\
     ';
-}
+});
 testApplication.addController(new TestController());
 testApplication.init();
 testApplication.listen(port).then(() => {

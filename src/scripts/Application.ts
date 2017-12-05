@@ -6,6 +6,7 @@ import Controller from './router/Controller';
 
 import RequestHandler from './server/RequestHandler';
 import RouteMiddleware from './router/RouteMiddleware';
+import { error } from 'util';
 
 export default class Application {
     requestHandler: RequestHandler = new RequestHandler();
@@ -44,6 +45,14 @@ export default class Application {
 
     addMiddleware(): void {
 
+    }
+
+    view(viewMiddlware: IMiddleware<any, string>) {
+        this.requestHandler.view = viewMiddlware;
+    }
+
+    error(errorMiddleware: IMiddleware<any, any>) {
+        this.requestHandler.error = errorMiddleware;
     }
 
     createServer() {
