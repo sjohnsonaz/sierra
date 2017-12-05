@@ -1,9 +1,8 @@
-import { IConfig } from './interfaces/IConfig';
-export { IMiddleware } from './interfaces/IMiddleware';
-export { IServerIntegration } from './interfaces/IServerIntegration';
-export { Verb } from './interfaces/Verb';
+import { IConfig } from './server/IConfig';
+export { IMiddleware } from './server/IMiddleware';
+export { Verb } from './router/Verb';
 
-export { default as Application } from './router/Application';
+export { default as Application } from './Application';
 export { default as Controller } from './router/Controller';
 export { default as RouteBuilder, RouteDefinition, IRouteNames } from './router/RouteBuilder';
 

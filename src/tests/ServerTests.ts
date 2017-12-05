@@ -31,7 +31,7 @@ handler.view = async function (context, data) {
     ';
 }
 
-let server = http.createServer(handler.create());
+let server = http.createServer(handler.callback);
 
 let port = 3001;
 server.listen(port, () => {

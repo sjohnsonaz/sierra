@@ -1,20 +1,21 @@
-import { IServerIntegration } from '../interfaces/IServerIntegration';
-import { IMiddleware } from '../interfaces/IMiddleware';
-import { Verb, VerbLookup } from '../interfaces/Verb';
+import { IMiddleware } from '../server/IMiddleware';
+import { Verb, VerbLookup } from '../router/Verb';
 
 import { getArgumentNames, wrapMethod } from '../utils/FunctionUtil';
-
+import RouteUtil from '../utils/RouteUtil';
 import Controller from './Controller';
+import Route from './Route';
+import RequestHandler from '../server/RequestHandler';
 
-export default class RouteBuilder<T, U extends IMiddleware<any, any>> {
-    routeNames: IRouteNames<U> = {};
-    parent: RouteBuilder<T, U>;
+export default class RouteBuilder {
+    routeNames: IRouteNames<IMiddleware<any, any>> = {};
+    parent: RouteBuilder;
 
-    constructor(parent?: RouteBuilder<T, U>) {
+    constructor(parent?: RouteBuilder) {
         this.parent = parent;
     }
 
-    addMiddleware(methodName: string, middleware: U) {
+    addMiddleware(methodName: string, middleware: IMiddleware<any, any>) {
         if (!this.routeNames[methodName]) {
             this.routeNames[methodName] = new RouteDefinition();
         }
@@ -30,9 +31,12 @@ export default class RouteBuilder<T, U extends IMiddleware<any, any>> {
         this.routeNames[methodName].pipeArgs = pipeArgs;
     }
 
-    build(app: T, controller: Controller<T, U>, integration: IServerIntegration<T, U>, base?: string) {
+    build(controller: Controller, base?: string) {
+        let routes: Route<any, any>[];
         if (this.parent) {
-            this.parent.build(app, controller, integration);
+            routes = this.parent.build(controller);
+        } else {
+            routes = [];
         }
         for (var index in this.routeNames) {
             if (this.routeNames.hasOwnProperty(index)) {
@@ -40,35 +44,53 @@ export default class RouteBuilder<T, U extends IMiddleware<any, any>> {
                 var middleware = routeName.middleware;
                 var name = routeName.name;
                 var verb = routeName.verb;
+                let nameParts = [];
+                // If we don't have a name, use controller name
+                if (!name) {
+                    if (base) {
+                        nameParts.push(base);
+                    }
+                    nameParts.push(RouteBuilder.getBase(controller));
+                }
+                // Are we using a verb method name
                 if (VerbLookup.indexOf(index as any) >= 0) {
+                    // Do we have a verb already
                     if (!verb) {
                         verb = index as any;
                     }
-                    if (!name) {
-                        name = '/' + RouteBuilder.getBase(controller, base) + '/';
-                    }
+                } else {
+                    // If we have a non-verb name, use name in route
+                    nameParts.push(index);
                 }
+                // Build name
                 if (!name) {
-                    name = '/' + RouteBuilder.getBase(controller, base) + '/' + index + '/';
+                    let tempName = nameParts.join('/');
+                    if (!tempName.startsWith('/')) {
+                        tempName = '/' + tempName;
+                    }
+                    name = tempName;
                 }
                 var method = controller[index];
                 if (method) {
                     if (routeName.pipeArgs) {
-                        name = name + getArgumentNames(method).map(function (value) {
+                        name = name + '/' + getArgumentNames(method).map(function (value) {
                             return ':' + value;
                         }).join('/');
-                        console.log(name);
                         method = wrapMethod(method, controller);
                     } else {
                         method = method.bind(controller);
                     }
                 }
-                integration(app, verb, name, middleware, method);
+                if (!(name instanceof RegExp) {
+                    name = RouteUtil.stringToRegex(name);
+                }
+                routes.push(new Route(verb, name, middleware, method));
             }
         }
+        return routes;
     }
 
-    static getRouteBuilder<T, U extends IMiddleware<any, any>>(target: Controller<T, U>) {
+    static getRouteBuilder<T, U extends IMiddleware<any, any>>(target: Controller) {
         if (target._routeBuilder) {
             if (!target.hasOwnProperty('_routeBuilder')) {
                 target._routeBuilder = new RouteBuilder(target._routeBuilder);
@@ -79,9 +101,9 @@ export default class RouteBuilder<T, U extends IMiddleware<any, any>> {
         return target._routeBuilder;
     }
 
-    static getBase<T, U extends IMiddleware<any, any>, W extends Controller<T, U>>(controller: W, base?: string) {
-        if (base) {
-            return base;
+    static getBase<T, U extends IMiddleware<any, any>, W extends Controller>(controller: W) {
+        if (controller.base) {
+            return controller.base;
         } else {
             var name = (controller.constructor as any).name;
             if (name) {

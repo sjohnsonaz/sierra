@@ -1,18 +1,18 @@
-import { IMiddleware } from '../interfaces/IMiddleware';
-import { IServerIntegration } from '../interfaces/IServerIntegration';
+import { IMiddleware } from '../server/IMiddleware';
 
 import RouteBuilder from './RouteBuilder';
+import RequestHandler from '../server/RequestHandler';
 
-export default class Controller<T, U extends IMiddleware<any, any>> {
+export default class Controller {
     base: string;
     service: boolean = false;
-    _routeBuilder: RouteBuilder<T, U>;
+    _routeBuilder: RouteBuilder;
 
     constructor(base?: string) {
         this.base = base;
     }
 
-    build(app: T, integration: IServerIntegration<T, U>) {
-        this._routeBuilder.build(app, this, integration);
+    build() {
+        return this._routeBuilder.build(this);
     }
 }

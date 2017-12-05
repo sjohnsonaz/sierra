@@ -13,8 +13,8 @@
     "prepublishOnly": "tsc --declaration",
     "test": "tsc && node src/mocha/NodeRunner.js",
     "watch": "tsc --watch",
-    "node": "node ./dist/scripts/Sierra.js",
-    "nodemon": "nodemon ./dist/scripts/Sierra.js",
+    "node": "node ./dist/tests/SierraTest.js",
+    "nodemon": "nodemon ./dist/tests/SierraTest.js",
     "mkdocs": "mkdocs build",
     "mkdocs-serve": "mkdocs serve",
     "mkdocs-deploy": "mkdocs gh-deploy"

@@ -3,30 +3,23 @@ import chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 let expect = chai.expect;
 
-import * as express from 'express';
-
-import { Controller, middleware, route } from '../scripts/Sierra';
+import { Controller, middleware, route, Application, Context } from '../scripts/Sierra';
 import { wait } from '../scripts/utils/TestUtil';
-import TestApplication from './TestApplication';
 
 describe('route decorator`', () => {
     it('should generate get routes', async () => {
-        class TestController extends Controller<express.Router, express.RequestHandler> {
-            service = true;
-
+        class TestController extends Controller {
             @route('get', '')
-            get(req: express.Request, res: express.Response, next: express.NextFunction) {
-                res.status(200);
-                res.setHeader('Content-Type', 'application/json');
-                res.send(JSON.stringify({ value: true }));
+            async get(context: Context, value: any) {
+                return { value: true };
             }
         }
 
         let port = 3003;
-        let testApplication = new TestApplication({ port: port });
+        let testApplication = new Application();
         testApplication.addController(new TestController());
         testApplication.init();
-        await testApplication.listen();
+        await testApplication.listen(port);
         await wait(0);
         try {
             await new Promise((resolve, reject) => {
