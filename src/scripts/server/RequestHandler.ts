@@ -38,6 +38,8 @@ export default class RequestHandler {
                 catch (e) {
                     this.send(context, e, 500);
                 }
+            } else {
+                this.send(context, e, 500);
             }
         }
     };
@@ -58,7 +60,7 @@ export default class RequestHandler {
 
     send<T>(context: Context, data: any, status: number = 200) {
         let accept = context.request.headers.accept.split(',');
-        if (accept.indexOf('text/html') > -1) {
+        if (this.view && accept.indexOf('text/html') > -1) {
             this.sendView(context, data, status);
         } else {
             this.sendJson(context, data, status);

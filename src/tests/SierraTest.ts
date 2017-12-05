@@ -30,9 +30,6 @@ testApplication.requestHandler.view = async function (context, data) {
         </html>\
     ';
 }
-testApplication.requestHandler.error = async function (context, error) {
-    throw error;
-};
 testApplication.addController(new TestController());
 testApplication.init();
 testApplication.listen(port).then(() => {
