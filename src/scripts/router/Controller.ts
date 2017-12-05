@@ -2,6 +2,7 @@ import { IMiddleware } from '../server/IMiddleware';
 
 import RouteBuilder from './RouteBuilder';
 import RequestHandler from '../server/RequestHandler';
+import Route from './Route';
 
 export default class Controller {
     base: string;
@@ -12,7 +13,7 @@ export default class Controller {
         this.base = base;
     }
 
-    build() {
+    build(): Route<any, any>[] {
         return this._routeBuilder.build(this);
     }
 }
