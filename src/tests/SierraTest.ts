@@ -7,8 +7,11 @@ class TestController extends Controller {
         super('/');
     }
     @route('get')
-    async get(context: Context) {
+    @middleware(async (context: Context) => {
         return { value: true };
+    })
+    async get(context: Context, value: any) {
+        return value;
     }
 }
 
