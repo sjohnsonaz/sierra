@@ -12,9 +12,7 @@
     "build": "tsc",
     "prepublishOnly": "tsc --declaration",
     "test": "tsc && node src/mocha/NodeRunner.js",
-    "min": "webpack --config webpack.config.js --progress",
-    "dev": "webpack --config webpack.dev.config.js --progress",
-    "watch": "webpack --config webpack.dev.config.js --watch --progress",
+    "watch": "tsc --watch",
     "node": "node ./dist/scripts/Sierra.js",
     "nodemon": "nodemon ./dist/scripts/Sierra.js",
     "mkdocs": "mkdocs build",
@@ -30,12 +28,9 @@
     "chai": "4.0.2",
     "chai-http": "^3.0.0",
     "express": "^4.15.3",
-    "jsdom": "11.1.0",
     "mocha": "3.4.2",
     "nodemon": "1.11.0",
-    "ts-loader": "2.3.2",
-    "typescript": "2.4.2",
-    "webpack": "3.4.1"
+    "typescript": "2.4.2"
   },
   "keywords": [
     "service",

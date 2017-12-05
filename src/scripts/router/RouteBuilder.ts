@@ -6,7 +6,7 @@ import { getArgumentNames, wrapMethod } from '../utils/FunctionUtil';
 
 import Controller from './Controller';
 
-export default class RouteBuilder<T, U extends IMiddleware> {
+export default class RouteBuilder<T, U extends IMiddleware<any, any>> {
     routeNames: IRouteNames<U> = {};
     parent: RouteBuilder<T, U>;
 
@@ -68,7 +68,7 @@ export default class RouteBuilder<T, U extends IMiddleware> {
         }
     }
 
-    static getRouteBuilder<T, U extends IMiddleware>(target: Controller<T, U>) {
+    static getRouteBuilder<T, U extends IMiddleware<any, any>>(target: Controller<T, U>) {
         if (target._routeBuilder) {
             if (!target.hasOwnProperty('_routeBuilder')) {
                 target._routeBuilder = new RouteBuilder(target._routeBuilder);
@@ -79,7 +79,7 @@ export default class RouteBuilder<T, U extends IMiddleware> {
         return target._routeBuilder;
     }
 
-    static getBase<T, U extends IMiddleware, W extends Controller<T, U>>(controller: W, base?: string) {
+    static getBase<T, U extends IMiddleware<any, any>, W extends Controller<T, U>>(controller: W, base?: string) {
         if (base) {
             return base;
         } else {
@@ -95,13 +95,13 @@ export default class RouteBuilder<T, U extends IMiddleware> {
     }
 }
 
-export class RouteDefinition<U extends IMiddleware> {
+export class RouteDefinition<U extends IMiddleware<any, any>> {
     verb: Verb;
     name: string | RegExp;
     middleware: U[] = [];
     pipeArgs: boolean = false;
 }
 
-export interface IRouteNames<U extends IMiddleware> {
+export interface IRouteNames<U extends IMiddleware<any, any>> {
     [index: string]: RouteDefinition<U>;
 }

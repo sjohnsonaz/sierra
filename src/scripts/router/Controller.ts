@@ -3,7 +3,7 @@ import { IServerIntegration } from '../interfaces/IServerIntegration';
 
 import RouteBuilder from './RouteBuilder';
 
-export default class Controller<T, U extends IMiddleware> {
+export default class Controller<T, U extends IMiddleware<any, any>> {
     base: string;
     service: boolean = false;
     _routeBuilder: RouteBuilder<T, U>;

@@ -1,7 +1,7 @@
 import { Verb } from './Verb';
 import { IMiddleware } from './IMiddleware';
 
-export interface IServerIntegration<T, U extends IMiddleware> {
+export interface IServerIntegration<T, U extends IMiddleware<any, any>> {
     (
         app: T,
         verb: Verb,

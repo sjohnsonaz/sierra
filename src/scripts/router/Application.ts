@@ -1,9 +1,9 @@
 import { IMiddleware } from '../interfaces/IMiddleware';
 import { IServerIntegration } from '../interfaces/IServerIntegration';
 
-import Controller from '../implementations/Controller';
+import Controller from './Controller';
 
-export default class Application<T, U extends IMiddleware> {
+export default class Application<T, U extends IMiddleware<any, any>> {
     controllers: Controller<T, U>[] = [];
 
     addController(controller: Controller<T, U>) {
