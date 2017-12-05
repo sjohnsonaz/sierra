@@ -3,8 +3,6 @@ var path = require('path');
 
 var Mocha = require('mocha');
 
-var DomIntegration = require('./DomIntegration');
-
 // Instantiate a Mocha instance.
 var mocha = new Mocha();
 
@@ -19,8 +17,6 @@ fs.readdirSync(testDir).filter(function (file) {
         path.join(testDir, file)
     );
 });
-
-DomIntegration.init();
 
 // Run the tests.
 mocha.run(function (failures) {
