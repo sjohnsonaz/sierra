@@ -81,7 +81,7 @@ export default class RouteBuilder {
                         method = method.bind(controller);
                     }
                 }
-                if (!(name instanceof RegExp) {
+                if (!(name instanceof RegExp)) {
                     name = RouteUtil.stringToRegex(name);
                 }
                 routes.push(new Route(verb, name, middleware, method));

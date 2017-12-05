@@ -21,7 +21,7 @@ export default class RequestHandler {
                     break;
                 }
             }
-            if (!(result instanceof OutgoingMessage) {
+            if (!(result instanceof OutgoingMessage)) {
                 this.send(context, result);
             }
         }
