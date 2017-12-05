@@ -59,8 +59,8 @@ export default class RequestHandler {
     }
 
     send<T>(context: Context, data: any, status: number = 200) {
-        let accept = context.request.headers.accept.split(',');
-        if (this.view && accept.indexOf('text/html') > -1) {
+        let accept = context.request.headers.accept;
+        if (this.view && accept && accept.indexOf('text/html') > -1) {
             this.sendView(context, data, status);
         } else {
             this.sendJson(context, data, status);

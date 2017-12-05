@@ -9,13 +9,13 @@ import { wait } from '../scripts/utils/TestUtil';
 describe('route decorator`', () => {
     it('should generate get routes', async () => {
         class TestController extends Controller {
-            @route('get', '')
+            @route('get')
             async get(context: Context, value: any) {
                 return { value: true };
             }
         }
 
-        let port = 3003;
+        let port = 3001;
         let testApplication = new Sierra();
         testApplication.addController(new TestController());
         testApplication.init();
@@ -24,7 +24,7 @@ describe('route decorator`', () => {
         try {
             await new Promise((resolve, reject) => {
                 chai.request('localhost:' + port)
-                    .get('/api/test')
+                    .get('/test')
                     .end((err, res) => {
                         if (err) {
                             reject(err);
