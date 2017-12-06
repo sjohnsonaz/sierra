@@ -12,6 +12,10 @@ export default class OutgoingMessage<T>{
     }
 }
 
+export function send<T>(data: T, status: number = 200, template?: string, json?: boolean) {
+    return new OutgoingMessage(data, status, template, json);
+}
+
 export function view<T>(data: T, template?: string) {
     return new OutgoingMessage(data, 200, template, false);
 }

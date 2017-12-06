@@ -1,10 +1,8 @@
-import Sierra, { Controller, middleware, route, Context, bodyParse, method, view, json } from '../scripts/Sierra';
+import Sierra, { Controller, middleware, route, Context, BodyParser, Session, method, view, json } from '../scripts/Sierra';
 
 import { request } from 'http';
 import * as fs from 'fs';
 import Handlebars from 'handlebars';
-
-import { session } from '../scripts/middleware/Session';
 
 class TestController extends Controller {
     constructor() {
@@ -62,8 +60,8 @@ testApplication.view(async function (context, data, template) {
     return compiledTemplate(data);
 });
 testApplication.addMiddleware = function (requestHandler) {
-    requestHandler.use(bodyParse);
-    requestHandler.use(session);
+    requestHandler.use(BodyParser.handle);
+    requestHandler.use(Session.handle);
 };
 testApplication.addController(new TestController());
 testApplication.init();
