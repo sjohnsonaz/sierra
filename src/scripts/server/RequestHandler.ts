@@ -53,7 +53,7 @@ export default class RequestHandler {
     sendJson(context: Context, data: any, status: number = 200) {
         context.response.statusCode = status;
         context.response.setHeader('Content-Type', 'application/json');
-        context.response.write(JSON.stringify(data));
+        context.response.write(JSON.stringify(data || null));
         context.response.end();
     }
 
@@ -66,27 +66,23 @@ export default class RequestHandler {
             context.response.end();
         }
         catch (e) {
-            this.sendViewError(context, e);
+            console.error(e);
+            context.response.statusCode = 500;
+            context.response.setHeader('Content-Type', 'text/html');
+            context.response.write('\
+                <!DOCTYPE html>\
+                <html>\
+                <head>\
+                <title>Sierra Error</title>\
+                </head>\
+                <body>\
+                <h1>Sierra Error</h1>\
+                <pre><code>' + e + '</code></pre>\
+                </body>\
+                </html>\
+            ');
+            context.response.end();
         }
-    }
-
-    sendViewError(context: Context, error: any, status: number = 500) {
-        console.error(error);
-        context.response.statusCode = status;
-        context.response.setHeader('Content-Type', 'text/html');
-        context.response.write('\
-            <!DOCTYPE html>\
-            <html>\
-            <head>\
-            <title>Sierra Error</title>\
-            </head>\
-            <body>\
-            <h1>Sierra Error</h1>\
-            <pre><code>' + error + '</code></pre>\
-            </body>\
-            </html>\
-        ');
-        context.response.end();
     }
 
     send<T>(context: Context, data: any, status: number = 200, template?: string, json?: boolean) {
