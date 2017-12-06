@@ -6,16 +6,22 @@ export default class Route<T, U> {
     name: string | RegExp;
     middlewares: IMiddleware<any, any>[];
     method: IMiddleware<T, U>;
+    pipeArgs: boolean;
+    argumentNames: string[];
 
     constructor(
         verb: Verb,
         name: string | RegExp,
         middlewares: IMiddleware<any, any>[],
-        method: IMiddleware<T, U>
+        method: IMiddleware<T, U>,
+        pipeArgs: boolean = false,
+        argumentNames: string[] = []
     ) {
         this.verb = verb;
         this.name = name;
         this.middlewares = middlewares;
         this.method = method;
+        this.pipeArgs = pipeArgs;
+        this.argumentNames = argumentNames;
     }
 }

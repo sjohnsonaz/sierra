@@ -44,10 +44,11 @@ export default class RouteBuilder {
                 var middleware = routeName.middleware;
                 var name = routeName.name;
                 var verb = routeName.verb;
+                var pipeArgs = routeName.pipeArgs;
                 let nameParts = [];
                 // If we don't have a name, use controller name
                 if (!name) {
-                    if (base) {
+                    if (base && base !== '/') {
                         nameParts.push(base);
                     }
                     nameParts.push(RouteBuilder.getBase(controller));
@@ -73,10 +74,11 @@ export default class RouteBuilder {
                 var method = controller[index];
                 if (method) {
                     if (routeName.pipeArgs) {
-                        name = name + '/' + getArgumentNames(method).map(function (value) {
+                        var argumentNames = getArgumentNames(method);
+                        name = name + '/' + argumentNames.map(function (value) {
                             return ':' + value;
                         }).join('/');
-                        method = wrapMethod(method, controller);
+                        method = method.bind(controller);
                     } else {
                         method = method.bind(controller);
                     }
@@ -84,7 +86,7 @@ export default class RouteBuilder {
                 if (!(name instanceof RegExp)) {
                     name = RouteUtil.stringToRegex(name.toLowerCase());
                 }
-                routes.push(new Route(verb, name, middleware, method));
+                routes.push(new Route(verb, name, middleware, method, pipeArgs, argumentNames));
             }
         }
         return routes;
@@ -103,7 +105,7 @@ export default class RouteBuilder {
 
     static getBase<T, U extends IMiddleware<any, any>, W extends Controller>(controller: W) {
         if (controller.base) {
-            return controller.base;
+            return controller.base === '/' ? '' : controller.base;
         } else {
             var name = (controller.constructor as any).name;
             if (name) {

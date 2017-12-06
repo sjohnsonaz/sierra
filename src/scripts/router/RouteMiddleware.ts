@@ -8,20 +8,31 @@ import Route from './Route';
 export default class RouteMiddleware {
     routes: Route<any, any>[] = [];
     handler: IMiddleware<any, void> = async (context: Context, value: any) => {
-        let verb = context.request.method.toLowerCase();
-        let pathname = Url.parse(context.request.url).pathname.toLowerCase();
         let routes = this.routes.filter(route => {
-            return (verb === route.verb || route.verb === 'all') && !!pathname.match(route.name);
+            return (context.method === route.verb || route.verb === 'all') && !!context.pathname.match(route.name);
         });
         if (routes.length) {
             let route = routes[0];
+            context.params = createParams(context.pathname.match(route.name), route.argumentNames);
             let result = value;
             for (let index = 0, length = route.middlewares.length; index < length; index++) {
                 result = await route.middlewares[index](context, result);
             }
-            return await route.method(context, result);
+            if (route.pipeArgs) {
+                return await route.method.apply(route, route.argumentNames.map(name => context.params[name]));
+            } else {
+                return await route.method(context, result);
+            }
         } else {
             throw 'No route found';
         }
     }
+}
+
+function createParams(matches: string[], argumentNames: string[]) {
+    let params = {};
+    argumentNames.forEach((name, index) => {
+        params[name] = matches[index + 1];
+    });
+    return params;
 }

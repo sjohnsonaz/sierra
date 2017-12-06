@@ -1,6 +1,6 @@
 import * as express from 'express';
 
-import Sierra, { Controller, middleware, route, Context, bodyParse } from '../scripts/Sierra';
+import Sierra, { Controller, middleware, route, Context, bodyParse, method } from '../scripts/Sierra';
 import { request } from 'http';
 import { session } from '../scripts/middleware/Session';
 
@@ -19,6 +19,11 @@ class TestController extends Controller {
     @route('post')
     async post(context: Context, value: any) {
         return context.body;
+    }
+
+    @method('get')
+    async test(id: string) {
+        return { id: id };
     }
 }
 

@@ -11,6 +11,13 @@ export function route<U extends IMiddleware<any, any>>(verb?: VerbType, name?: s
     }
 }
 
+export function method<U extends Function>(verb?: VerbType, name?: string | RegExp) {
+    return function (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<U>) {
+        var routeBuilder = RouteBuilder.getRouteBuilder(target);
+        routeBuilder.addDefinition(propertyKey, verb as any, name, true);
+    }
+}
+
 export function middleware<T extends IMiddleware<any, any>, U extends IMiddleware<any, any>>(middleware: T) {
     return function (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<U>) {
         var routeBuilder = RouteBuilder.getRouteBuilder(target);

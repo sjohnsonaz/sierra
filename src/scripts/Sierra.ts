@@ -12,6 +12,6 @@ export { Verb } from './router/Verb';
 
 export { bodyParse } from './middleware/BodyParser';
 
-export { route, middleware } from './modules/Decorators';
+export { route, method, middleware } from './modules/Decorators';
 
 export { default as default } from './Application';
