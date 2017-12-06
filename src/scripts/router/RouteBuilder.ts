@@ -64,11 +64,11 @@ export default class RouteBuilder {
                 }
                 // Build name
                 if (!name) {
-                    let tempName = nameParts.join('/');
-                    if (!tempName.startsWith('/')) {
-                        tempName = '/' + tempName;
-                    }
-                    name = tempName;
+                    name = nameParts.join('/');
+                }
+                // Ensure preceeding '/'
+                if (typeof name === 'string' && !name.startsWith('/')) {
+                    name = '/' + name;
                 }
                 var method = controller[index];
                 if (method) {
@@ -81,6 +81,7 @@ export default class RouteBuilder {
                         method = method.bind(controller);
                     }
                 }
+                console.log('route: ' + name);
                 if (!(name instanceof RegExp)) {
                     name = RouteUtil.stringToRegex(name);
                 }

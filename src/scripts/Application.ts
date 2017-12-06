@@ -21,7 +21,7 @@ export default class Application {
     init() {
         this.server = this.createServer();
         this.connectDatabase();
-        this.addMiddleware();
+        this.addMiddleware(this.requestHandler);
         this.buildControllers();
     }
 
@@ -43,7 +43,7 @@ export default class Application {
         return Promise.resolve(true);
     }
 
-    addMiddleware(): void {
+    addMiddleware(requestHandler: RequestHandler): void {
 
     }
 

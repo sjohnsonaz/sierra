@@ -10,6 +10,8 @@ export { default as RouteBuilder, RouteDefinition, IRouteNames } from './router/
 export { default as RouteMiddleware } from './router/RouteMiddleware';
 export { Verb } from './router/Verb';
 
+export { bodyParse } from './middleware/BodyParser';
+
 export { route, middleware } from './modules/Decorators';
 
 export { default as default } from './Application';
