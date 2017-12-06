@@ -1,6 +1,10 @@
 import { expect } from 'chai';
 
 import * as http from 'http';
+import * as fs from 'fs';
+
+import Handlebars from 'handlebars';
+
 import RequestHandler from '../scripts/server/RequestHandler';
 
 let handler = new RequestHandler();
@@ -15,20 +19,19 @@ handler.error = async function (context, error) {
 };
 
 handler.view = async function (context, data) {
-    return '\
-        <!DOCTYPE html>\
-        <html>\
-        <head>\
-        <title>Sierra</title>\
-        </head>\
-        <body>\
-        <h1>Sierra</h1>\
-        <p>\
-        ' + JSON.stringify(data) + '\
-        </p>\
-        </body>\
-        </html>\
-    ';
+    var template = await new Promise((resolve, reject) => {
+        fs.readFile('./view/index.handlebars', {
+            encoding: 'utf8'
+        }, (err, data: string) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(data);
+            }
+        });
+    });
+    var compiledTemplate = Handlebars.compile(template);
+    return compiledTemplate(data);
 }
 
 let server = http.createServer(handler.callback);

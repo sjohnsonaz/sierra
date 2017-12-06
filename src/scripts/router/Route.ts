@@ -8,6 +8,7 @@ export default class Route<T, U> {
     method: IMiddleware<T, U>;
     pipeArgs: boolean;
     argumentNames: string[];
+    template: string;
 
     constructor(
         verb: Verb,
@@ -15,7 +16,8 @@ export default class Route<T, U> {
         middlewares: IMiddleware<any, any>[],
         method: IMiddleware<T, U>,
         pipeArgs: boolean = false,
-        argumentNames: string[] = []
+        argumentNames: string[] = [],
+        template: string
     ) {
         this.verb = verb;
         this.name = name;
@@ -23,5 +25,6 @@ export default class Route<T, U> {
         this.method = method;
         this.pipeArgs = pipeArgs;
         this.argumentNames = argumentNames;
+        this.template = template;
     }
 }

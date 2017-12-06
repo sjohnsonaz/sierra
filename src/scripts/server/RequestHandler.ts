@@ -1,6 +1,7 @@
 import * as http from 'http';
 
 import { IMiddleware } from './IMiddleware';
+import { IViewMiddleware } from './IViewMiddleware';
 import Context from './Context';
 import OutgoingMessage from './OutgoingMessage';
 
@@ -9,7 +10,7 @@ import ConsoleUtil from '../utils/ConsoleUtil';
 export default class RequestHandler {
     middlewares: IMiddleware<any, any>[] = [];
     error: IMiddleware<any, any>;
-    view: IMiddleware<any, string>;
+    view: IViewMiddleware<any>;
 
     callback = async (request: http.IncomingMessage, response: http.ServerResponse) => {
         let context = new Context(request, response);
@@ -18,7 +19,7 @@ export default class RequestHandler {
             for (let index = 0, length = this.middlewares.length; index < length; index++) {
                 result = await this.middlewares[index](context, result);
                 if (result instanceof OutgoingMessage) {
-                    this.send(context, result.data, result.status);
+                    this.send(context, result.data, result.status, result.template, result.json);
                     break;
                 }
             }
@@ -31,7 +32,7 @@ export default class RequestHandler {
                 try {
                     let result = await this.error(context, e);
                     if (result instanceof OutgoingMessage) {
-                        this.send(context, result.data, result.status);
+                        this.send(context, result.data, result.status, result.template, result.json);
                     } else {
                         this.send(context, e, 500);
                     }
@@ -52,18 +53,43 @@ export default class RequestHandler {
         context.response.end();
     }
 
-    async sendView(context: Context, data: any, status: number = 200) {
+    async sendView(context: Context, data: any, status: number = 200, template: string) {
+        try {
+            let output = await this.view(context, data, template || context.template);
+            context.response.statusCode = status;
+            context.response.setHeader('Content-Type', 'text/html');
+            context.response.write(output);
+            context.response.end();
+        }
+        catch (e) {
+            this.sendViewError(context, e);
+        }
+    }
+
+    sendViewError(context: Context, error: any, status: number = 500) {
+        console.log(error);
         context.response.statusCode = status;
         context.response.setHeader('Content-Type', 'text/html');
-        context.response.write(await this.view(context, data));
+        context.response.write('\
+            <!DOCTYPE html>\
+            <html>\
+            <head>\
+            <title>Sierra Error</title>\
+            </head>\
+            <body>\
+            <h1>Sierra Error</h1>\
+            <pre><code>' + error + '</code></pre>\
+            </body>\
+            </html>\
+        ');
         context.response.end();
     }
 
-    send<T>(context: Context, data: any, status: number = 200) {
+    send<T>(context: Context, data: any, status: number = 200, template?: string, json?: boolean) {
         console.log(context.request.method, context.request.url, colorStatus(status));
         let accept = context.request.headers.accept;
-        if (this.view && accept && accept.indexOf('text/html') > -1) {
-            this.sendView(context, data, status);
+        if (this.view && !json && accept && accept.indexOf('text/html') > -1) {
+            this.sendView(context, data, status, template);
         } else {
             this.sendJson(context, data, status);
         }

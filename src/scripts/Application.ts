@@ -1,6 +1,7 @@
 import * as http from 'http';
 
 import { IMiddleware } from './server/IMiddleware';
+import { IViewMiddleware } from './server/IViewMiddleware';
 
 import Controller from './router/Controller';
 
@@ -47,7 +48,7 @@ export default class Application {
 
     }
 
-    view(viewMiddlware: IMiddleware<any, string>) {
+    view(viewMiddlware: IViewMiddleware<any>) {
         this.requestHandler.view = viewMiddlware;
     }
 

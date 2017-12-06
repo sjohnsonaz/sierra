@@ -13,6 +13,7 @@ export default class RouteMiddleware {
         });
         if (routes.length) {
             let route = routes[0];
+            context.template = route.template;
             context.params = createParams(context.pathname.match(route.name), route.argumentNames);
             let result = value;
             for (let index = 0, length = route.middlewares.length; index < length; index++) {

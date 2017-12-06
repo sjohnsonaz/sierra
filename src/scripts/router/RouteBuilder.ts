@@ -88,7 +88,8 @@ export default class RouteBuilder {
                 if (!(name instanceof RegExp)) {
                     name = RouteUtil.stringToRegex(name.toLowerCase());
                 }
-                routes.push(new Route(verb, name, middleware, method, pipeArgs, argumentNames));
+                let template = RouteBuilder.getTemplate(controller, index);
+                routes.push(new Route(verb, name, middleware, method, pipeArgs, argumentNames, template));
             }
         }
         return routes;
@@ -118,6 +119,18 @@ export default class RouteBuilder {
             }
             return name;
         }
+    }
+
+
+    static getTemplate<T, U extends IMiddleware<any, any>, W extends Controller>(controller: W, index: string) {
+        var name = (controller.constructor as any).name;
+        if (name) {
+            var results = name.match(/(.*)([sS]ervice|[cC]ontroller|[rR]outer)/);
+            if (results && results[1]) {
+                name = results[1].toLowerCase();
+            }
+        }
+        return name + '/' + index;
     }
 }
 

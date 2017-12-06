@@ -1,11 +1,16 @@
-import Sierra, { Controller, middleware, route, Context, bodyParse, method } from '../scripts/Sierra';
+import Sierra, { Controller, middleware, route, Context, bodyParse, method, view, json } from '../scripts/Sierra';
+
 import { request } from 'http';
+import * as fs from 'fs';
+import Handlebars from 'handlebars';
+
 import { session } from '../scripts/middleware/Session';
 
 class TestController extends Controller {
     constructor() {
         super('/');
     }
+
     @route('get')
     @middleware(async (context: Context) => {
         return { value: true };
@@ -31,25 +36,30 @@ class TestController extends Controller {
             name: name
         };
     }
+
+    @route('get')
+    async getJson(context: Context, value: any) {
+        return json({ value: true });
+    }
 }
 
 let port = 3001;
 let testApplication = new Sierra();
-testApplication.view(async function (context, data) {
-    return '\
-        <!DOCTYPE html>\
-        <html>\
-        <head>\
-        <title>Sierra</title>\
-        </head>\
-        <body>\
-        <h1>Sierra</h1>\
-        <p>\
-        ' + JSON.stringify(data) + '\
-        </p>\
-        </body>\
-        </html>\
-    ';
+testApplication.view(async function (context, data, template) {
+    let templateFile = './src/testApplications/views/' + template + '.handlebars';
+    var templateText = await new Promise((resolve, reject) => {
+        fs.readFile(templateFile, {
+            encoding: 'utf8'
+        }, (err, data: string) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(data);
+            }
+        });
+    });
+    var compiledTemplate = Handlebars.compile(templateText);
+    return compiledTemplate(data);
 });
 testApplication.addMiddleware = function (requestHandler) {
     requestHandler.use(bodyParse);

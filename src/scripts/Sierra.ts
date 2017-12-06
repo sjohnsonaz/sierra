@@ -1,7 +1,8 @@
 export { default as Context } from './server/Context';
-import { IConfig } from './server/IConfig';
+export { IConfig } from './server/IConfig';
 export { IMiddleware } from './server/IMiddleware';
-export { default as OutgoingMessage } from './server/OutgoingMessage';
+export { IViewMiddleware } from './server/IViewMiddleware';
+export { default as OutgoingMessage, view, json } from './server/OutgoingMessage';
 export { default as RequestHandler } from './server/RequestHandler';
 
 export { default as Controller } from './router/Controller';

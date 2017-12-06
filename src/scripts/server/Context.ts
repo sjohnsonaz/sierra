@@ -13,6 +13,7 @@ export default class Context {
     pathname: string;
     query: any;
     params: any;
+    template: string;
 
     constructor(request: http.IncomingMessage, response: http.ServerResponse) {
         this.request = request;
