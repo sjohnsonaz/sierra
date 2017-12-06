@@ -67,10 +67,6 @@ export default class RouteBuilder {
                 if (!name) {
                     name = nameParts.join('/');
                 }
-                // Ensure preceeding '/'
-                if (typeof name === 'string' && !name.startsWith('/')) {
-                    name = '/' + name;
-                }
                 var method = controller[index];
                 if (method) {
                     if (routeName.pipeArgs && !(name instanceof RegExp)) {
@@ -86,6 +82,10 @@ export default class RouteBuilder {
                     }
                 }
                 if (!(name instanceof RegExp)) {
+                    // Ensure preceeding '/'
+                    if (typeof name === 'string' && !name.startsWith('/')) {
+                        name = '/' + name;
+                    }
                     name = RouteUtil.stringToRegex(name.toLowerCase());
                 }
                 let template = RouteBuilder.getTemplate(controller, index);
