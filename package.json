@@ -1,6 +1,6 @@
 {
   "name": "sierra",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A service framework for Node.js.",
   "repository": "https://www.github.com/sjohnsonaz/sierra.git",
   "license": "MIT",
