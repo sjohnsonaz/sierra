@@ -19,7 +19,7 @@ export default class RouteMiddleware {
                 result = await route.middlewares[index](context, result);
             }
             if (route.pipeArgs) {
-                return await route.method.apply(route, route.argumentNames.map(name => context.params[name]));
+                return await route.method.apply(route, route.argumentNames.map(name => context.params[name] || context.query[name]));
             } else {
                 return await route.method(context, result);
             }

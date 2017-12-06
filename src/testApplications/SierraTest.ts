@@ -25,6 +25,14 @@ class TestController extends Controller {
     async test(id: string) {
         return { id: id };
     }
+
+    @method('get', 'testPipe/:id')
+    async testPipe(id: string, name: string) {
+        return {
+            id: id,
+            name: name
+        };
+    }
 }
 
 let port = 3001;

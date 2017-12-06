@@ -73,11 +73,13 @@ export default class RouteBuilder {
                 }
                 var method = controller[index];
                 if (method) {
-                    if (routeName.pipeArgs) {
+                    if (routeName.pipeArgs && !(name instanceof RegExp)) {
                         var argumentNames = getArgumentNames(method);
-                        name = name + '/' + argumentNames.map(function (value) {
-                            return ':' + value;
-                        }).join('/');
+                        if (name.indexOf(':') === -1) {
+                            name = name + '/' + argumentNames.map(function (value) {
+                                return ':' + value;
+                            }).join('/');
+                        }
                         method = method.bind(controller);
                     } else {
                         method = method.bind(controller);
