@@ -4,13 +4,14 @@ import { IMiddleware } from './IMiddleware';
 import Context from './Context';
 import OutgoingMessage from './OutgoingMessage';
 
+import ConsoleUtil from '../utils/ConsoleUtil';
+
 export default class RequestHandler {
     middlewares: IMiddleware<any, any>[] = [];
     error: IMiddleware<any, any>;
     view: IMiddleware<any, string>;
 
     callback = async (request: http.IncomingMessage, response: http.ServerResponse) => {
-        console.log(request.url);
         let context = new Context(request, response);
         try {
             let result = undefined;
@@ -59,6 +60,7 @@ export default class RequestHandler {
     }
 
     send<T>(context: Context, data: any, status: number = 200) {
+        console.log(context.request.method, context.request.url, colorStatus(status));
         let accept = context.request.headers.accept;
         if (this.view && accept && accept.indexOf('text/html') > -1) {
             this.sendView(context, data, status);
@@ -69,5 +71,22 @@ export default class RequestHandler {
 
     use<T, U>(middlware: IMiddleware<T, U>) {
         this.middlewares.push(middlware);
+    }
+}
+
+function colorStatus(status: number) {
+    switch (Math.floor(status / 100)) {
+        case 1:
+            return ConsoleUtil.white(status);
+        case 2:
+            return ConsoleUtil.green(status);
+        case 3:
+            return ConsoleUtil.blue(status);
+        case 4:
+            return ConsoleUtil.yellow(status);
+        case 5:
+            return ConsoleUtil.red(status);
+        default:
+            return ConsoleUtil.gray(status);
     }
 }

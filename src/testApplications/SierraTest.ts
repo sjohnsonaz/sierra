@@ -16,7 +16,7 @@ class TestController extends Controller {
         return value;
     }
 
-    @route('post', 'post')
+    @route('post')
     async post(context: Context, value: any) {
         return context.body;
     }
