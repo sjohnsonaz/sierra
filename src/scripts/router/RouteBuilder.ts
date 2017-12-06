@@ -82,7 +82,7 @@ export default class RouteBuilder {
                     }
                 }
                 if (!(name instanceof RegExp)) {
-                    name = RouteUtil.stringToRegex(name);
+                    name = RouteUtil.stringToRegex(name.toLowerCase());
                 }
                 routes.push(new Route(verb, name, middleware, method));
             }

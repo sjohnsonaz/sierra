@@ -9,9 +9,9 @@ export default class RouteMiddleware {
     routes: Route<any, any>[] = [];
     handler: IMiddleware<any, void> = async (context: Context, value: any) => {
         let verb = context.request.method.toLowerCase();
-        let pathname = Url.parse(context.request.url).pathname;
+        let pathname = Url.parse(context.request.url).pathname.toLowerCase();
         let routes = this.routes.filter(route => {
-            return verb === route.verb && !!pathname.match(route.name);
+            return (verb === route.verb || route.verb === 'all') && !!pathname.match(route.name);
         });
         if (routes.length) {
             let route = routes[0];
