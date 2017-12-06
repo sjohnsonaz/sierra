@@ -2,6 +2,7 @@ import * as express from 'express';
 
 import Sierra, { Controller, middleware, route, Context, bodyParse } from '../scripts/Sierra';
 import { request } from 'http';
+import { session } from '../scripts/middleware/Session';
 
 class TestController extends Controller {
     constructor() {
@@ -17,7 +18,7 @@ class TestController extends Controller {
 
     @route('post', 'post')
     async post(context: Context, value: any) {
-        return value;
+        return context.body;
     }
 }
 
@@ -41,6 +42,7 @@ testApplication.view(async function (context, data) {
 });
 testApplication.addMiddleware = function (requestHandler) {
     requestHandler.use(bodyParse);
+    requestHandler.use(session);
 };
 testApplication.addController(new TestController());
 testApplication.init();

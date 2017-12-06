@@ -11,7 +11,6 @@ export default class RouteMiddleware {
         let verb = context.request.method.toLowerCase();
         let pathname = Url.parse(context.request.url).pathname;
         let routes = this.routes.filter(route => {
-            console.log('matches: ' + route.name + ' - ' + pathname.match(route.name));
             return verb === route.verb && !!pathname.match(route.name);
         });
         if (routes.length) {

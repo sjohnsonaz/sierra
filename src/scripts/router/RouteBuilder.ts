@@ -81,7 +81,6 @@ export default class RouteBuilder {
                         method = method.bind(controller);
                     }
                 }
-                console.log('route: ' + name);
                 if (!(name instanceof RegExp)) {
                     name = RouteUtil.stringToRegex(name);
                 }
