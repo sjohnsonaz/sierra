@@ -48,6 +48,10 @@ export default class Application {
 
     }
 
+    use(middleware: IMiddleware<any, any>) {
+        this.requestHandler.use(middleware);
+    }
+
     view(viewMiddlware: IViewMiddleware<any>) {
         this.requestHandler.view = viewMiddlware;
     }
