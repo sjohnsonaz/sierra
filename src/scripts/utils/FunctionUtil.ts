@@ -1,5 +1,3 @@
-import * as express from 'express';
-
 export function getArgumentNames(func: Function) {
     // First match everything inside the function argument parens.
     var args = func.toString().match(/function\s.*?\(([^)]*)\)/)[1];
@@ -29,7 +27,7 @@ export function injectVariables(method: Function, context: Object) {
 
 export function wrapMethod(method: Function, thisArg: any) {
     var argumentNames = getArgumentNames(method);
-    var wrappedMethod = function (req: express.Request, res: express.Response, next: express.NextFunction) {
+    var wrappedMethod = function (req, res, next) {
         var args = [];
         for (var index = 0, length = argumentNames.length; index < length; index++) {
             var argumentName = argumentNames[index];

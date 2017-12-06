@@ -1,5 +1,3 @@
-import * as express from 'express';
-
 import Sierra, { Controller, middleware, route, Context, bodyParse, method } from '../scripts/Sierra';
 import { request } from 'http';
 import { session } from '../scripts/middleware/Session';
