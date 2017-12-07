@@ -3,7 +3,18 @@ import * as Crypto from 'crypto';
 import Context from '../server/Context';
 import { ICookie } from '../server/ICookie';
 
-export default class Session {
+export default class Session<T> {
+    data: T;
+
+    load(context: Context, uuid: string): Promise<T> {
+        this.data = {} as any;
+        return Promise.resolve(this.data);
+    }
+
+    save(context: Context, uuid: string): Promise<boolean> {
+        return Promise.resolve(true);
+    }
+
     static async handle(context: Context) {
         let cookie = context.request.headers.cookie;
         let cookies = Session.cookieToHash(cookie);
@@ -11,6 +22,10 @@ export default class Session {
             cookies['sierra_id'] = Session.uuid();
         }
         context.response.setHeader('Set-Cookie', Session.hashToCookie(cookies));
+        let session = new Session();
+        await session.load(context, cookies['sierra_id']);
+        context.session = session;
+        return session;
     }
 
     static cookieToHash(cookie: string) {

@@ -2,11 +2,13 @@ import * as http from 'http';
 import * as Url from 'url';
 
 import OutgoingMessage from './OutgoingMessage';
+import Session from '../middleware/Session';
 import { Verb } from '../router/Verb';
 
 export default class Context {
     request: http.IncomingMessage;
     response: http.ServerResponse;
+    session: Session<any>
     body: any;
     method: Verb;
     url: string;
