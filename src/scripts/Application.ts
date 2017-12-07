@@ -51,8 +51,8 @@ export default class Application {
 
         // Sort string Routes
         stringRoutes.sort((routeA, routeB) => {
-            let a = routeA.name;
-            let b = routeB.name;
+            let a = routeA.name as string;
+            let b = routeB.name as string;
             let aParts = a.substr(1).split('/');
             let bParts = b.substr(1).split('/');
             let length = Math.max(aParts.length, bParts.length);
