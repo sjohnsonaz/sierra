@@ -51,6 +51,11 @@ class TestController extends Controller {
     async getJson(context: Context, value: any) {
         return json({ value: true });
     }
+
+    @method('get', /\/regex/)
+    async regex() {
+        return 'regex';
+    }
 }
 
 let port = 3001;

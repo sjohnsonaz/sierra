@@ -4,6 +4,7 @@ import { IMiddleware } from './server/IMiddleware';
 import { IViewMiddleware } from './server/IViewMiddleware';
 
 import Controller from './router/Controller';
+import Route from './router/Route';
 
 import RequestHandler from './server/RequestHandler';
 import RouteMiddleware from './middleware/RouteMiddleware';
@@ -35,10 +36,23 @@ export default class Application {
             });
         });
 
-        // Sort routes
-        this.routeMiddleware.routes.sort((routeA, routeB) => {
-            let a = (routeA.name instanceof RegExp) ? '' : routeA.name;
-            let b = (routeB.name instanceof RegExp) ? '' : routeB.name;
+        // Sort Routes
+
+        // Separate string Routes
+        let regexRoutes: Route<any, any>[] = [];
+        let stringRoutes: Route<any, any>[] = [];
+        this.routeMiddleware.routes.forEach(route => {
+            if (route.name instanceof RegExp) {
+                regexRoutes.push(route);
+            } else {
+                stringRoutes.push(route);
+            }
+        });
+
+        // Sort string Routes
+        stringRoutes.sort((routeA, routeB) => {
+            let a = routeA.name;
+            let b = routeB.name;
             let aParts = a.substr(1).split('/');
             let bParts = b.substr(1).split('/');
             let length = Math.max(aParts.length, bParts.length);
@@ -53,6 +67,9 @@ export default class Application {
             }
             return result;
         });
+
+        // Concat all Routes
+        this.routeMiddleware.routes = regexRoutes.concat(stringRoutes);
 
         console.log('Routes: ' + this.routeMiddleware.routes.length);
 
