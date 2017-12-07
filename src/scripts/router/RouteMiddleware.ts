@@ -10,7 +10,7 @@ export default class RouteMiddleware {
     routes: Route<any, any>[] = [];
     handler: IMiddleware<any, void> = async (context: Context, value: any) => {
         let routes = this.routes.filter(route => {
-            return (context.method === route.verb || route.verb === 'all') && !!context.pathname.toLowerCase().match(route.name);
+            return (context.method === route.verb || route.verb === 'all') && !!context.pathname.match(route.name);
         });
         if (routes.length) {
             let route = routes[0];
@@ -21,7 +21,11 @@ export default class RouteMiddleware {
                 result = await route.middlewares[index](context, result);
             }
             if (route.pipeArgs) {
-                return await route.method.apply(route, route.argumentNames.map(name => context.params[name] || context.query[name]));
+                let contextParams = {
+                    $context: context,
+                    $body: context.body
+                };
+                return await route.method.apply(route, route.argumentNames.map(name => contextParams[name] || context.params[name] || context.query[name]));
             } else {
                 return await route.method(context, result);
             }
@@ -33,8 +37,10 @@ export default class RouteMiddleware {
 
 function createParams(matches: string[], argumentNames: string[]) {
     let params = {};
-    argumentNames.forEach((name, index) => {
-        params[name] = matches[index + 1];
-    });
+    if (matches) {
+        argumentNames.forEach((name, index) => {
+            params[name] = matches[index + 1];
+        });
+    }
     return params;
 }

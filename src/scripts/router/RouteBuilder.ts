@@ -69,6 +69,8 @@ export default class RouteBuilder {
                 }
                 var method = controller[index];
                 if (method) {
+                    // TODO: Auto generate params?
+                    /*
                     if (routeName.pipeArgs && !(name instanceof RegExp)) {
                         var argumentNames = getArgumentNames(method);
                         if (name.indexOf(':') === -1) {
@@ -80,13 +82,18 @@ export default class RouteBuilder {
                     } else {
                         method = method.bind(controller);
                     }
+                    */
+                    if (routeName.pipeArgs) {
+                        var argumentNames = getArgumentNames(method);
+                    }
+                    method = method.bind(controller);
                 }
                 if (!(name instanceof RegExp)) {
                     // Ensure preceeding '/'
                     if (typeof name === 'string' && !name.startsWith('/')) {
                         name = '/' + name;
                     }
-                    name = RouteUtil.stringToRegex(name.toLowerCase());
+                    name = RouteUtil.stringToRegex(name);
                 }
                 let template = RouteBuilder.getTemplate(controller, index);
                 routes.push(new Route(verb, name, middleware, method, pipeArgs, argumentNames, template));

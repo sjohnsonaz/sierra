@@ -21,6 +21,11 @@ class TestController extends Controller {
         return context.body;
     }
 
+    @method('put')
+    async put(id: string, $body: any) {
+        return $body;
+    }
+
     @method('get')
     async test(id: string) {
         return { id: id };
