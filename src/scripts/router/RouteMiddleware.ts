@@ -10,7 +10,7 @@ export default class RouteMiddleware {
     routes: Route<any, any>[] = [];
     handler: IMiddleware<any, void> = async (context: Context, value: any) => {
         let routes = this.routes.filter(route => {
-            return (context.method === route.verb || route.verb === 'all') && !!context.pathname.match(route.name);
+            return (context.method === route.verb || route.verb === 'all') && !!context.pathname.toLowerCase().match(route.name);
         });
         if (routes.length) {
             let route = routes[0];

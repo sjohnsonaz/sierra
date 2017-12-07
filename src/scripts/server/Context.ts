@@ -21,9 +21,8 @@ export default class Context {
         this.method = request.method.toLowerCase() as any;
         this.url = request.url;
         let url = Url.parse(request.url, true);
-        this.pathname = url.pathname.toLowerCase();
+        this.pathname = url.pathname;
         this.query = url.query;
-
     }
 
     send<U>(data: U, status: number = 200) {
