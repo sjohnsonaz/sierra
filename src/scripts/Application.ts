@@ -6,7 +6,7 @@ import { IViewMiddleware } from './server/IViewMiddleware';
 import Controller from './router/Controller';
 
 import RequestHandler from './server/RequestHandler';
-import RouteMiddleware from './router/RouteMiddleware';
+import RouteMiddleware from './middleware/RouteMiddleware';
 import { error } from 'util';
 
 export default class Application {

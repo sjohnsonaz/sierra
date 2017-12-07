@@ -4,7 +4,7 @@ import { IMiddleware } from '../server/IMiddleware';
 import Context from '../server/Context';
 import { Errors } from '../server/Errors';
 
-import Route from './Route';
+import Route from '../router/Route';
 
 export default class RouteMiddleware {
     routes: Route<any, any>[] = [];

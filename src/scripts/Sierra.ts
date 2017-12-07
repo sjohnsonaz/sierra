@@ -9,9 +9,9 @@ export { default as RequestHandler } from './server/RequestHandler';
 export { default as Controller } from './router/Controller';
 export { default as Route } from './router/Route';
 export { default as RouteBuilder, RouteDefinition, IRouteNames } from './router/RouteBuilder';
-export { default as RouteMiddleware } from './router/RouteMiddleware';
 export { Verb } from './router/Verb';
 
+export { default as RouteMiddleware } from './middleware/RouteMiddleware';
 export { default as BodyParser } from './middleware/BodyParser';
 export { default as Session } from './middleware/Session';
 
