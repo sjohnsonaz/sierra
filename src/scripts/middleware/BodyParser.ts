@@ -12,10 +12,15 @@ export default class BodyParse {
                     }).on('data', (data) => {
                         body.push(data);
                     }).on('end', () => {
-                        let bufferedData = Buffer.concat(body).toString();
-                        let result = JSON.parse(bufferedData);
-                        context.body = result;
-                        resolve(result);
+                        try {
+                            let bufferedData = Buffer.concat(body).toString();
+                            let result = JSON.parse(bufferedData);
+                            context.body = result;
+                            resolve(result);
+                        }
+                        catch (e) {
+                            reject(e);
+                        }
                     });
                 }
                 catch (e) {
