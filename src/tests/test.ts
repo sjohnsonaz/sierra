@@ -54,15 +54,24 @@ describe('Route.sort', () => {
             '/findit/:name',
             '/getsomething/:id/:name',
             '/getsomething/:name/:id',
-            '/getsomething/:another/:id'
+            '/getsomething/:another/:id',
+            '/getsomething/:id/fixed'
         ];
 
         routes.sort((a, b) => {
-            let index = a.indexOf(':') - b.indexOf(':');
-            if (index == 0) {
-                index = (a > b) ? 1 : 0;
+            let aParts = a.substr(1).split('/');
+            let bParts = b.substr(1).split('/');
+            let length = Math.max(aParts.length, bParts.length);
+            let result = 0;
+            for (let index = 0; index < length; index++) {
+                let aPart = aParts[index] || '';
+                let bPart = bParts[index] || '';
+                result = ((aPart[0] === ':') as any) - ((bPart[0] === ':') as any);
+                if (result) {
+                    break;
+                }
             }
-            return index;
+            return result;
         });
         expect(true).to.equal(true);
     })
