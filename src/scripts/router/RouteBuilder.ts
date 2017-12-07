@@ -46,6 +46,15 @@ export default class RouteBuilder {
                 var verb = routeName.verb;
                 var pipeArgs = routeName.pipeArgs;
 
+                // Get argument names, and bind method
+                var method = controller[index];
+                if (method) {
+                    if (routeName.pipeArgs) {
+                        var argumentNames = getArgumentNames(method);
+                    }
+                    method = method.bind(controller);
+                }
+
                 // Ensure index is lower case
                 index = index.toLowerCase();
 
@@ -94,14 +103,7 @@ export default class RouteBuilder {
                     }
                     name = RouteUtil.stringToRegex(name);
                 }
-                // Get argument names, and bind method
-                var method = controller[index];
-                if (method) {
-                    if (routeName.pipeArgs) {
-                        var argumentNames = getArgumentNames(method);
-                    }
-                    method = method.bind(controller);
-                }
+
                 let template = RouteBuilder.getTemplate(controller, index);
                 routes.push(new Route(verb, name, middleware, method, pipeArgs, argumentNames, template));
             }
