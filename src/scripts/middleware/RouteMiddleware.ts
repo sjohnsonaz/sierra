@@ -10,12 +10,12 @@ export default class RouteMiddleware {
     routes: Route<any, any>[] = [];
     handler: IMiddleware<any, void> = async (context: Context, value: any) => {
         let routes = this.routes.filter(route => {
-            return (context.method === route.verb || route.verb === 'all') && !!context.pathname.match(route.name);
+            return (context.method === route.verb || route.verb === 'all') && !!context.pathname.match(route.regex);
         });
         if (routes.length) {
             let route = routes[0];
             context.template = route.template;
-            context.params = createParams(context.pathname.match(route.name), route.argumentNames);
+            context.params = createParams(context.pathname.match(route.regex), route.argumentNames);
             let result = value;
             for (let index = 0, length = route.middlewares.length; index < length; index++) {
                 result = await route.middlewares[index](context, result);

@@ -35,6 +35,17 @@ export default class Application {
             });
         });
 
+        // Sort routes
+        this.routeMiddleware.routes.sort((routeA, routeB) => {
+            let a = (routeA.name instanceof RegExp) ? '' : routeA.name;
+            let b = (routeB.name instanceof RegExp) ? '' : routeB.name;
+            let index = a.indexOf(':') - b.indexOf(':');
+            if (index == 0) {
+                index = (a > b) ? 1 : 0;
+            }
+            return index;
+        });
+
         console.log('Routes: ' + this.routeMiddleware.routes.length);
 
         this.requestHandler.use(this.routeMiddleware.handler);

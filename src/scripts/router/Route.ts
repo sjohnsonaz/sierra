@@ -4,6 +4,7 @@ import { Verb } from './Verb';
 export default class Route<T, U> {
     verb: Verb;
     name: string | RegExp;
+    regex: RegExp;
     middlewares: IMiddleware<any, any>[];
     method: IMiddleware<T, U>;
     pipeArgs: boolean;
@@ -13,6 +14,7 @@ export default class Route<T, U> {
     constructor(
         verb: Verb,
         name: string | RegExp,
+        regex: RegExp,
         middlewares: IMiddleware<any, any>[],
         method: IMiddleware<T, U>,
         pipeArgs: boolean = false,
@@ -21,6 +23,7 @@ export default class Route<T, U> {
     ) {
         this.verb = verb;
         this.name = name;
+        this.regex = regex;
         this.middlewares = middlewares;
         this.method = method;
         this.pipeArgs = pipeArgs;

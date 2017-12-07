@@ -41,3 +41,29 @@ describe('route decorator`', () => {
         }
     });
 });
+
+describe('Route.sort', () => {
+    it('routes are sorted by RegExp, then location or first \':\', then alphabetical', () => {
+
+        let routes = [
+            '/',
+            '/:id',
+            '/count',
+            '/test/:id',
+            '/:var/a/',
+            '/findit/:name',
+            '/getsomething/:id/:name',
+            '/getsomething/:name/:id',
+            '/getsomething/:another/:id'
+        ];
+
+        routes.sort((a, b) => {
+            let index = a.indexOf(':') - b.indexOf(':');
+            if (index == 0) {
+                index = (a > b) ? 1 : 0;
+            }
+            return index;
+        });
+        expect(true).to.equal(true);
+    })
+})

@@ -65,9 +65,9 @@ export default class RouteBuilder {
                     }
                 }
 
-                // If name is a RegEp, we are done
+                // If name is a RegExp, we are done
                 if (!(name instanceof RegExp)) {
-                    // If name starts with ~/, we must turn it into a RegExp, and we are done
+                    // If name starts with ~/, we must only remove the ~, and we are done
                     if (name.startsWith('~/')) {
                         name = name.substr(1);
                     } else {
@@ -101,13 +101,16 @@ export default class RouteBuilder {
                             name = '/' + name;
                         }
                     }
-                    name = RouteUtil.stringToRegex(name);
+                    var regex = RouteUtil.stringToRegex(name);
+                } else {
+                    var regex = name;
                 }
 
                 let template = RouteBuilder.getTemplate(controller, index);
-                routes.push(new Route(verb, name, middleware, method, pipeArgs, argumentNames, template));
+                routes.push(new Route(verb, name, regex, middleware, method, pipeArgs, argumentNames, template));
             }
         }
+
         return routes;
     }
 
