@@ -7,8 +7,7 @@ export default class Session<T> {
     data: T;
 
     load(context: Context, uuid: string): Promise<T> {
-        this.data = {} as any;
-        return Promise.resolve(this.data);
+        return Promise.resolve({} as any);
     }
 
     save(context: Context, uuid: string): Promise<boolean> {
@@ -23,7 +22,7 @@ export default class Session<T> {
         }
         context.response.setHeader('Set-Cookie', Session.hashToCookie(cookies));
         let session = new Session();
-        await session.load(context, cookies['sierra_id']);
+        session.data = await session.load(context, cookies['sierra_id']);
         context.session = session;
         return session;
     }
