@@ -8,22 +8,30 @@ class TestController extends Controller {
         super('/');
     }
 
-    @route('get')
+    @route('get', '/')
     @middleware(async (context: Context) => {
         return { value: true };
     })
-    async get(context: Context, value: any) {
+    async list(context: Context, value: any) {
         return value;
     }
 
-    @route('post')
-    async post(context: Context, value: any) {
-        return context.body;
+    @method('post')
+    async post($body: any) {
+        return $body;
     }
 
-    @method('put')
+    @method('get', '/:id')
+    async get(id: string) {
+        return { value: id };
+    }
+
+    @method('put', '/:id')
     async put(id: string, $body: any) {
-        return $body;
+        return {
+            id: id,
+            body: $body
+        };
     }
 
     @method('get')
@@ -49,12 +57,11 @@ let port = 3001;
 let testApplication = new Sierra();
 HandlebarsView.viewRoot = './src/testApplications/views/';
 testApplication.view(HandlebarsView.handle);
-testApplication.addMiddleware = function (requestHandler) {
-    requestHandler.use(BodyParser.handle);
-    requestHandler.use(Session.handle);
-};
+testApplication.use(BodyParser.handle);
+testApplication.use(Session.handle);
 testApplication.addController(new TestController());
 testApplication.init();
+console.log(testApplication.routeMiddleware.routes);
 testApplication.listen(port).then(() => {
     console.log('Listening to port: ' + port);
 });

@@ -31,7 +31,7 @@ export default class RouteBuilder {
         this.routeNames[methodName].pipeArgs = pipeArgs;
     }
 
-    build(controller: Controller, base?: string) {
+    build(controller: Controller) {
         let routes: Route<any, any>[];
         if (this.parent) {
             routes = this.parent.build(controller);
@@ -42,58 +42,65 @@ export default class RouteBuilder {
             if (this.routeNames.hasOwnProperty(index)) {
                 var routeName = this.routeNames[index];
                 var middleware = routeName.middleware;
-                var name = routeName.name;
+                var name = routeName.name || '';
                 var verb = routeName.verb;
                 var pipeArgs = routeName.pipeArgs;
-                let nameParts = [];
-                // If we don't have a name, use controller name
-                if (!name) {
-                    if (base && base !== '/') {
-                        nameParts.push(base);
-                    }
-                    nameParts.push(RouteBuilder.getBase(controller));
-                }
-                // Are we using a verb method name
-                if (VerbLookup.indexOf(index as any) >= 0) {
-                    // Do we have a verb already
-                    if (!verb) {
+
+                // Ensure index is lower case
+                index = index.toLowerCase();
+
+                // Do we have a verb already
+                if (!verb) {
+                    if (VerbLookup.indexOf(index as any) >= 0) {
                         verb = index as any;
                     }
-                } else {
-                    // If we have a non-verb name, use name in route
-                    nameParts.push(index);
                 }
-                // Build name
-                if (!name) {
-                    name = nameParts.join('/');
+
+                // If name is a RegEp, we are done
+                if (!(name instanceof RegExp)) {
+                    // If name starts with ~/, we must turn it into a RegExp, and we are done
+                    if (name.startsWith('~/')) {
+                        name = name.substr(1);
+                    } else {
+                        // Else, assemble string
+                        let nameParts = [];
+
+                        // Use controller name
+                        nameParts.push(RouteBuilder.getBase(controller));
+
+                        // If we have no name, attempt to create one
+                        if (!name) {
+                            // If we have a non-verb name, use name in route
+                            if (verb !== index) {
+                                nameParts.push(index);
+                            }
+                        } else {
+                            // Ensure name does not start with /
+                            if (name[0] === '/') {
+                                name = name.substr(1);
+                            }
+
+                            // Use the name we have
+                            nameParts.push(name);
+                        }
+
+                        // Build name
+                        name = nameParts.join('/');
+
+                        // Ensure preceeding '/'
+                        if (typeof name === 'string' && !name.startsWith('/')) {
+                            name = '/' + name;
+                        }
+                    }
+                    name = RouteUtil.stringToRegex(name);
                 }
+                // Get argument names, and bind method
                 var method = controller[index];
                 if (method) {
-                    // TODO: Auto generate params?
-                    /*
-                    if (routeName.pipeArgs && !(name instanceof RegExp)) {
-                        var argumentNames = getArgumentNames(method);
-                        if (name.indexOf(':') === -1) {
-                            name = name + '/' + argumentNames.map(function (value) {
-                                return ':' + value;
-                            }).join('/');
-                        }
-                        method = method.bind(controller);
-                    } else {
-                        method = method.bind(controller);
-                    }
-                    */
                     if (routeName.pipeArgs) {
                         var argumentNames = getArgumentNames(method);
                     }
                     method = method.bind(controller);
-                }
-                if (!(name instanceof RegExp)) {
-                    // Ensure preceeding '/'
-                    if (typeof name === 'string' && !name.startsWith('/')) {
-                        name = '/' + name;
-                    }
-                    name = RouteUtil.stringToRegex(name);
                 }
                 let template = RouteBuilder.getTemplate(controller, index);
                 routes.push(new Route(verb, name, middleware, method, pipeArgs, argumentNames, template));
