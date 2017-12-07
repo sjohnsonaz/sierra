@@ -2,6 +2,7 @@ import * as Url from 'url';
 
 import { IMiddleware } from '../server/IMiddleware';
 import Context from '../server/Context';
+import { Errors } from '../server/Errors';
 
 import Route from './Route';
 
@@ -25,7 +26,7 @@ export default class RouteMiddleware {
                 return await route.method(context, result);
             }
         } else {
-            throw 'No route found';
+            throw Errors.noRouteFound;
         }
     }
 }

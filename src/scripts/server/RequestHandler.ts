@@ -4,6 +4,7 @@ import { IMiddleware } from './IMiddleware';
 import { IViewMiddleware } from './IViewMiddleware';
 import Context from './Context';
 import OutgoingMessage from './OutgoingMessage';
+import { Errors } from './Errors';
 
 import ConsoleUtil from '../utils/ConsoleUtil';
 
@@ -26,11 +27,17 @@ export default class RequestHandler {
             if (!(result instanceof OutgoingMessage)) {
                 this.send(context, result);
             }
+            if (result === undefined) {
+                throw Errors.notFound;
+            }
         }
         catch (e) {
             let errorStatus = 500;
-            if (e === 'No route found') {
-                errorStatus = 404;
+            switch (e) {
+                case Errors.noRouteFound:
+                case Errors.notFound:
+                    errorStatus = 404;
+                    break;
             }
             if (this.error) {
                 try {
