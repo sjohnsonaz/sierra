@@ -128,7 +128,6 @@ export default class RouteBuilder {
         }
     }
 
-
     static getTemplate<T, U extends IMiddleware<any, any>, W extends Controller>(controller: W, index: string) {
         var name = (controller.constructor as any).name;
         if (name) {

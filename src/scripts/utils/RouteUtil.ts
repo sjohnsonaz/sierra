@@ -7,7 +7,7 @@ export default class RouteUtils {
     }
 
     static stringToRegex(definition: string): RegExp {
-        return new RegExp('^' + definition.replace(/\//g, '\\/').replace(/:(\w*)/g, '([\^S\^\/]*)') + '$', 'i');
+        return new RegExp('^' + definition.replace(/\//g, '\\/').replace(/:(\w*)/g, '([\^\/]*)') + '$', 'i');
     }
 
     static functionToRegex(prefix: string, enter: Function): RegExp {
