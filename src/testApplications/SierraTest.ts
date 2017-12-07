@@ -61,7 +61,6 @@ testApplication.use(BodyParser.handle);
 testApplication.use(Session.handle);
 testApplication.addController(new TestController());
 testApplication.init();
-console.log(testApplication.routeMiddleware.routes);
 testApplication.listen(port).then(() => {
     console.log('Listening to port: ' + port);
 });
