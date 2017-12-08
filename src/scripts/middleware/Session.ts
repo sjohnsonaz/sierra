@@ -20,7 +20,7 @@ export default class Session<T> {
         if (!cookies['sierra_id']) {
             cookies['sierra_id'] = Session.uuid();
         }
-        context.response.setHeader('Set-Cookie', Session.hashToCookie(cookies));
+        context.response.setHeader('Set-Cookie', Session.hashToCookieArray(cookies));
         let session = new Session();
         session.data = await session.load(context, cookies['sierra_id']);
         context.session = session;
@@ -41,6 +41,10 @@ export default class Session<T> {
 
     static hashToCookie(hash: ICookie) {
         return Object.keys(hash).map(name => name + '=' + hash[name] + ';').join(' ');
+    }
+
+    static hashToCookieArray(hash: ICookie) {
+        return Object.keys(hash).map(name => name + '=' + hash[name]);
     }
 
     static uuid() {
