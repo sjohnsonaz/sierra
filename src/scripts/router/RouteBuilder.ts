@@ -79,8 +79,8 @@ export default class RouteBuilder {
 
                         // If we have no name, attempt to create one
                         if (!name) {
-                            // If we have a non-verb name, use name in route
-                            if (verb !== index) {
+                            // If the method isn't equal to the verb or 'index', use method in route
+                            if (verb !== index && index !== 'index') {
                                 nameParts.push(index);
                             }
                         } else {

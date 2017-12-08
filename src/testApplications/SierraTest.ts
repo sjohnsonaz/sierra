@@ -8,11 +8,11 @@ class TestController extends Controller {
         super('/');
     }
 
-    @route('get', '/')
+    @route('get')
     @middleware(async (context: Context) => {
         return { value: true };
     })
-    async list(context: Context, value: any) {
+    async index(context: Context, value: any) {
         return value;
     }
 
