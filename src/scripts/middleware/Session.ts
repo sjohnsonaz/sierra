@@ -19,8 +19,8 @@ export default class Session<T> {
         let cookies = Session.cookieToHash(cookie);
         if (!cookies['sierra_id']) {
             cookies['sierra_id'] = Session.uuid();
+            context.response.setHeader('Set-Cookie', 'sierra_id=' + cookies['sierra_id'] + ';');
         }
-        context.response.setHeader('Set-Cookie', Session.hashToCookieArray(cookies));
         let session = new Session();
         session.data = await session.load(context, cookies['sierra_id']);
         context.session = session;
