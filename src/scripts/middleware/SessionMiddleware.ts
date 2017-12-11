@@ -6,9 +6,13 @@ import { ISessionGateway } from '../server/ISessionGateway';
 import Uuid from '../utils/Uuid';
 
 export default class SessionMiddleware<T> {
-    static gateway: ISessionGateway<any>;
+    gateway: ISessionGateway<any>;
 
-    static async handle(context: Context) {
+    constructor(gateway: ISessionGateway<any>) {
+        this.gateway = gateway;
+    }
+
+    async handle(context: Context) {
         let cookie = context.request.headers.cookie;
         let cookies = Session.cookieToHash(cookie);
         if (!cookies['sierra_id']) {

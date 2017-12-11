@@ -62,8 +62,11 @@ let port = 3001;
 let testApplication = new Sierra();
 HandlebarsView.viewRoot = './src/testApplications/views/';
 testApplication.view(HandlebarsView.handle);
+
 testApplication.use(BodyMiddleware.handle);
-testApplication.use(SessionMiddleware.handle);
+let sessionMiddleware = new SessionMiddleware(undefined);
+testApplication.use(sessionMiddleware.handle);
+
 testApplication.addController(new TestController());
 testApplication.init();
 testApplication.listen(port).then(() => {

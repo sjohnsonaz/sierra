@@ -13,6 +13,7 @@ export default class Session<T> {
     constructor(context: Context, id: string, gateway: ISessionGateway<T>) {
         this.context = context;
         this.id = id;
+        this.gateway = gateway;
     }
 
     async load(): Promise<T> {
