@@ -9,7 +9,7 @@ class TestController extends Controller {
     }
 
     @route('get')
-    @middleware(async (context: Context) => {
+    @middleware(async (context) => {
         return { value: true };
     })
     async index(context: Context, value: any) {

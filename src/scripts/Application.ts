@@ -16,15 +16,23 @@ export default class Application {
     server: http.Server;
     controllers: Controller[] = [];
 
-    addController(controller: Controller) {
-        this.controllers.push(controller);
-    }
-
     init() {
-        this.server = this.createServer();
         this.connectDatabase();
         this.addMiddleware(this.requestHandler);
         this.buildControllers();
+        return this.requestHandler;
+    }
+
+    connectDatabase(): Promise<boolean> {
+        return Promise.resolve(true);
+    }
+
+    addMiddleware(requestHandler: RequestHandler): void {
+
+    }
+
+    addController(controller: Controller) {
+        this.controllers.push(controller);
     }
 
     buildControllers() {
@@ -76,14 +84,6 @@ export default class Application {
         this.requestHandler.use(this.routeMiddleware.handler);
     }
 
-    connectDatabase(): Promise<boolean> {
-        return Promise.resolve(true);
-    }
-
-    addMiddleware(requestHandler: RequestHandler): void {
-
-    }
-
     use(middleware: IMiddleware<any, any>) {
         this.requestHandler.use(middleware);
     }
@@ -100,11 +100,14 @@ export default class Application {
         return http.createServer(this.requestHandler.callback);
     }
 
-    listen(port: number): Promise<boolean> {
-        return new Promise<boolean>((resolve, reject) => {
+    listen(port: number): Promise<http.Server> {
+        if (!this.server) {
+            this.server = this.createServer();
+        }
+        return new Promise<http.Server>((resolve, reject) => {
             try {
                 this.server.listen(port, () => {
-                    resolve(true);
+                    resolve(this.server);
                 });
             }
             catch (e) {
@@ -116,6 +119,9 @@ export default class Application {
     close(): Promise<boolean> {
         return new Promise<boolean>((resolve, reject) => {
             try {
+                if (!this.server) {
+                    throw 'Server has never been started';
+                }
                 this.server.close(() => {
                     resolve(true);
                 });
