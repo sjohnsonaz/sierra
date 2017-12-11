@@ -12,7 +12,8 @@ export default class SessionMiddleware<T> {
         let cookie = context.request.headers.cookie;
         let cookies = Session.cookieToHash(cookie);
         if (!cookies['sierra_id']) {
-            cookies['sierra_id'] = Uuid.create();
+            let id = await this.gateway.getId(context);
+            cookies['sierra_id'] = id;
             context.response.setHeader('Set-Cookie', 'sierra_id=' + cookies['sierra_id'] + ';');
         }
         let session = new Session(context, cookies['sierra_id'], this.gateway);

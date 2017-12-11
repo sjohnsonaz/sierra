@@ -1,6 +1,7 @@
 import Context from './Context';
 
 export interface ISessionGateway<T> {
-    load(context: Context, uuid: string): Promise<T>;
-    save(context: Context, uuid: string): Promise<boolean>;
+    getId(context: Context): Promise<string>;
+    load(context: Context, id: string): Promise<T>;
+    save(context: Context, id: string, data: T): Promise<boolean>;
 }

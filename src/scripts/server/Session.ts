@@ -6,13 +6,13 @@ import { Errors } from './Errors';
 
 export default class Session<T> {
     context: Context;
-    uuid: string;
+    id: string;
     gateway: ISessionGateway<T>;
     private _data: T;
 
-    constructor(context: Context, uuid: string, gateway: ISessionGateway<T>) {
+    constructor(context: Context, id: string, gateway: ISessionGateway<T>) {
         this.context = context;
-        this.uuid = uuid;
+        this.id = id;
     }
 
     async load(): Promise<T> {
@@ -20,7 +20,7 @@ export default class Session<T> {
             if (!this.gateway) {
                 throw Errors.noSessionGateway
             }
-            this._data = await this.gateway.load(this.context, this.uuid);
+            this._data = await this.gateway.load(this.context, this.id);
         }
         return this._data;
     }
@@ -29,7 +29,7 @@ export default class Session<T> {
         if (!this.gateway) {
             throw Errors.noSessionGateway
         }
-        return await this.gateway.save(this.context, this.uuid);
+        return await this.gateway.save(this.context, this.id, this._data);
     }
 
     static cookieToHash(cookie: string) {
