@@ -13,6 +13,7 @@ class TestController extends Controller {
         return { value: true };
     })
     async index(context: Context, value: any) {
+        let data = await context.session.load();
         return value;
     }
 

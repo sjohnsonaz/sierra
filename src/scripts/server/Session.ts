@@ -2,30 +2,34 @@
 import Context from './Context';
 import { ICookie } from './ICookie';
 import { ISessionGateway } from './ISessionGateway'
+import { Errors } from './Errors';
 
 export default class Session<T> {
     context: Context;
     uuid: string;
     gateway: ISessionGateway<T>;
     private _data: T;
-    get data() {
-        return this.load(this.context, this.uuid);
-    }
 
     constructor(context: Context, uuid: string, gateway: ISessionGateway<T>) {
         this.context = context;
         this.uuid = uuid;
     }
 
-    async load(context: Context, uuid: string): Promise<T> {
+    async load(): Promise<T> {
         if (!this._data) {
-            this._data = await this.gateway.load(context, uuid);
+            if (!this.gateway) {
+                throw Errors.noSessionGateway
+            }
+            this._data = await this.gateway.load(this.context, this.uuid);
         }
         return this._data;
     }
 
-    async save(context: Context, uuid: string): Promise<boolean> {
-        return await this.gateway.save(context, uuid);
+    async save(): Promise<boolean> {
+        if (!this.gateway) {
+            throw Errors.noSessionGateway
+        }
+        return await this.gateway.save(this.context, this.uuid);
     }
 
     static cookieToHash(cookie: string) {
