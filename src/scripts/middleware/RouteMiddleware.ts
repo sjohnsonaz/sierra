@@ -23,7 +23,10 @@ export default class RouteMiddleware {
             if (route.pipeArgs) {
                 let contextParams = {
                     $context: context,
-                    $body: context.body
+                    $body: context.body,
+                    $session: context.session,
+                    $query: context.query,
+                    $params: context.params
                 };
                 return await route.method.apply(route, route.argumentNames.map(name => contextParams[name] || context.params[name] || context.query[name]));
             } else {
