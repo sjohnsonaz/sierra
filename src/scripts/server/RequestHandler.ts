@@ -114,7 +114,7 @@ export default class RequestHandler {
         if (this.view && accept && accept.indexOf('text/html') > -1) {
             this.sendView(context, data, status, 'error');
         } else {
-            this.sendJson(context, data, status);
+            this.sendJson(context, data.message || data.name, status);
         }
     }
 
