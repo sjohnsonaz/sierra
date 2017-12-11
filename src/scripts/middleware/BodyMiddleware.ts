@@ -1,6 +1,6 @@
 import Context from '../server/Context';
 
-export default class BodyParse {
+export default class BodyMiddleware {
     static handle(context: Context) {
         let verb = context.request.method.toLowerCase();
         if (verb === 'post' || verb === 'put') {

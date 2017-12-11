@@ -2,7 +2,7 @@ import * as http from 'http';
 import * as Url from 'url';
 
 import OutgoingMessage from './OutgoingMessage';
-import Session from '../middleware/Session';
+import Session from './Session';
 import { Verb } from '../router/Verb';
 
 export default class Context {

@@ -1,4 +1,4 @@
-import Sierra, { Controller, middleware, route, Context, BodyParser, Session, method, view, json } from '../scripts/Sierra';
+import Sierra, { Controller, middleware, route, Context, method, view, json, BodyMiddleware, SessionMiddleware } from '../scripts/Sierra';
 
 import { request } from 'http';
 import HandlebarsView from './HandlebarsView';
@@ -62,8 +62,8 @@ let port = 3001;
 let testApplication = new Sierra();
 HandlebarsView.viewRoot = './src/testApplications/views/';
 testApplication.view(HandlebarsView.handle);
-testApplication.use(BodyParser.handle);
-testApplication.use(Session.handle);
+testApplication.use(BodyMiddleware.handle);
+testApplication.use(SessionMiddleware.handle);
 testApplication.addController(new TestController());
 testApplication.init();
 testApplication.listen(port).then(() => {
