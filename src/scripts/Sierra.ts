@@ -17,7 +17,7 @@ export { default as RouteMiddleware } from './middleware/RouteMiddleware';
 export { default as BodyMiddleware } from './middleware/BodyMiddleware';
 export { default as SessionMiddleware } from './middleware/SessionMiddleware';
 
-export { default as UIuid } from './utils/Uuid';
+export { default as Uuid } from './utils/Uuid';
 
 export { route, method, middleware } from './modules/Decorators';
 
