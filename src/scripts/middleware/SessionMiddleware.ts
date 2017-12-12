@@ -12,7 +12,7 @@ export default class SessionMiddleware<T> {
         this.gateway = gateway;
     }
 
-    async handle(context: Context) {
+    handle = async (context: Context) => {
         let cookie = context.request.headers.cookie;
         let cookies = Session.cookieToHash(cookie);
         if (!cookies['sierra_id']) {

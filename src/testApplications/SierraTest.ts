@@ -1,4 +1,4 @@
-import Sierra, { Controller, middleware, route, Context, method, view, json, BodyMiddleware, SessionMiddleware } from '../scripts/Sierra';
+import Sierra, { Controller, middleware, route, Context, method, view, json, BodyMiddleware, SessionMiddleware, ISessionGateway, Uuid } from '../scripts/Sierra';
 
 import { request } from 'http';
 import HandlebarsView from './HandlebarsView';
@@ -13,6 +13,7 @@ class TestController extends Controller {
         return { value: true };
     })
     async index(context: Context, value: any) {
+        await context.session.load();
         return value;
     }
 
@@ -64,8 +65,23 @@ HandlebarsView.viewRoot = './src/testApplications/views/';
 testApplication.view(HandlebarsView.handle);
 
 testApplication.use(BodyMiddleware.handle);
-let sessionMiddleware = new SessionMiddleware(undefined);
-testApplication.use(sessionMiddleware.handle);
+
+class SessionGateway implements ISessionGateway<any> {
+    async getId(context: Context): Promise<string> {
+        return Uuid.create();
+    }
+    async load(context: Context, id: string): Promise<any> {
+        return {
+            id: id
+        };
+    }
+    async save(context: Context, id: string, data: any): Promise<boolean> {
+        return true;
+    }
+}
+
+let sessionMiddleware = new SessionMiddleware(new SessionGateway());
+testApplication.use(sessionMiddleware.handle.bind(sessionMiddleware));
 
 testApplication.addController(new TestController());
 testApplication.init();
