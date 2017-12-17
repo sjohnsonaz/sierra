@@ -19,7 +19,7 @@ export default class Session<T> {
     async load(): Promise<T> {
         if (!this._data) {
             if (!this.gateway) {
-                throw Errors.noSessionGateway
+                throw Errors.noSessionGateway;
             }
             this._data = await this.gateway.load(this.context, this.id);
         }
@@ -28,9 +28,37 @@ export default class Session<T> {
 
     async save(): Promise<boolean> {
         if (!this.gateway) {
-            throw Errors.noSessionGateway
+            throw Errors.noSessionGateway;
         }
         return await this.gateway.save(this.context, this.id, this._data);
+    }
+
+    async destroy(): Promise<boolean> {
+        if (!this.gateway) {
+            throw Errors.noSessionGateway;
+        }
+        return await this.gateway.destroy(this.context, this.id);
+    }
+
+    async regenerate(): Promise<T> {
+        if (!this.gateway) {
+            throw Errors.noSessionGateway;
+        }
+        return await this.gateway.regenerate(this.context, this.id);
+    }
+
+    async reload(): Promise<T> {
+        if (!this.gateway) {
+            throw Errors.noSessionGateway;
+        }
+        return await this.gateway.reload(this.context, this.id);
+    }
+
+    async touch(): Promise<boolean> {
+        if (!this.gateway) {
+            throw Errors.noSessionGateway;
+        }
+        return await this.gateway.touch(this.context, this.id);
     }
 
     static cookieToHash(cookie: string) {

@@ -78,6 +78,22 @@ class SessionGateway implements ISessionGateway<any> {
     async save(context: Context, id: string, data: any): Promise<boolean> {
         return true;
     }
+    async destroy(context: Context, id: string): Promise<boolean> {
+        return true;
+    }
+    async regenerate(context: Context, id: string): Promise<any> {
+        return {
+            id: id
+        };
+    }
+    async  reload(context: Context, id: string): Promise<any> {
+        return {
+            id: id
+        };
+    }
+    async  touch(context: Context, id: string): Promise<boolean> {
+        return true;
+    }
 }
 
 let sessionMiddleware = new SessionMiddleware(new SessionGateway());
