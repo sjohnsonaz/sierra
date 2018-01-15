@@ -23,6 +23,8 @@ export default class RouteMiddleware {
             if (route.pipeArgs) {
                 let contextParams = {
                     $context: context,
+                    $request: context.request,
+                    $response: context.response,
                     $body: context.body,
                     $session: context.session,
                     $query: context.query,
