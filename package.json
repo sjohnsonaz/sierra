@@ -14,6 +14,7 @@
     "prepublishOnly": "rimraf ./dist && tsc --declaration",
     "test": "tsc && node src/mocha/NodeRunner.js",
     "watch": "tsc --watch",
+    "watch-link": "tsc --declaration --watch",
     "node": "node ./dist/testApplications/SierraTest.js",
     "nodemon": "nodemon ./dist/testApplications/SierraTest.js",
     "mkdocs": "mkdocs build",
