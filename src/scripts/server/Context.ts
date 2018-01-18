@@ -23,7 +23,12 @@ export default class Context {
         this.method = request.method.toLowerCase() as any;
         this.url = request.url;
         let url = Url.parse(request.url, true);
-        this.pathname = url.pathname;
+        // Remove ending '/' from pathname
+        let pathname = url.pathname;
+        if (pathname.endsWith('/')) {
+            pathname = pathname.slice(0, -1);
+        }
+        this.pathname = pathname;
         this.query = url.query;
     }
 
