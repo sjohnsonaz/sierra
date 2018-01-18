@@ -12,12 +12,11 @@ class TestController extends Controller {
     }
 
     @route('get')
-    @middleware(SimpleMiddleware)    
+    @middleware(SimpleMiddleware)
     @middleware(async (context) => {
         return { value: true };
     })
     async index(context: Context, value: any) {
-        await context.session.load();
         return value;
     }
 
@@ -27,7 +26,7 @@ class TestController extends Controller {
     }
 
     @method('get', '/:id')
-    @middleware(SimpleMiddleware)    
+    @middleware(SimpleMiddleware)
     async get(id: string) {
         return { value: id };
     }

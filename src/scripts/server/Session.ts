@@ -8,57 +8,95 @@ export default class Session<T> {
     context: Context;
     id: string;
     gateway: ISessionGateway<T>;
-    private _data: T;
+    data: T;
+    expires: Date;
+    maxAge: number;
+    cookieIdentifier: string;
 
-    constructor(context: Context, id: string, gateway: ISessionGateway<T>) {
+    constructor(context: Context, id: string, gateway: ISessionGateway<T>, data?: T, cookieIdentifier?: string) {
         this.context = context;
         this.id = id;
         this.gateway = gateway;
-    }
-
-    async load(): Promise<T> {
-        if (!this._data) {
-            if (!this.gateway) {
-                throw Errors.noSessionGateway;
-            }
-            this._data = await this.gateway.load(this.context, this.id);
-        }
-        return this._data;
+        this.data = data;
+        this.cookieIdentifier = cookieIdentifier;
     }
 
     async save(): Promise<boolean> {
         if (!this.gateway) {
             throw Errors.noSessionGateway;
         }
-        return await this.gateway.save(this.context, this.id, this._data);
-    }
-
-    async destroy(): Promise<boolean> {
-        if (!this.gateway) {
-            throw Errors.noSessionGateway;
-        }
-        return await this.gateway.destroy(this.context, this.id);
-    }
-
-    async regenerate(): Promise<T> {
-        if (!this.gateway) {
-            throw Errors.noSessionGateway;
-        }
-        return await this.gateway.regenerate(this.context, this.id);
+        return await this.gateway.save(this.context, this.id, this.data);
     }
 
     async reload(): Promise<T> {
         if (!this.gateway) {
             throw Errors.noSessionGateway;
         }
-        return await this.gateway.reload(this.context, this.id);
+        this.data = await this.gateway.load(this.context, this.id);
+        return this.data;
     }
 
-    async touch(): Promise<boolean> {
+    async destroy(): Promise<boolean> {
         if (!this.gateway) {
             throw Errors.noSessionGateway;
         }
-        return await this.gateway.touch(this.context, this.id);
+
+        // Try to remove cookie from client
+        let cookie = Session.getCookie(this.context);
+        cookie[this.cookieIdentifier] = 'deleted';
+        cookie['expires'] = 'Thu, 01 Jan 1970 00:00:00 GMT';
+        Session.setCookie(this.context, cookie);
+
+        return await this.gateway.destroy(this.context, this.id);
+    }
+
+    async regenerate(): Promise<Session<T>> {
+        if (!this.gateway) {
+            throw Errors.noSessionGateway;
+        }
+        return Session.load(this.context, this.gateway, { regenerate: true });
+    }
+
+    touch(): string {
+        let cookie = Session.getCookie(this.context);
+        let expires = (new Date(Date.now() + 60 * 1000)).toUTCString();
+        cookie['expires'] = expires;
+        return expires;
+    }
+
+    static async load<T>(context: Context, gateway: ISessionGateway<T>, options?: Partial<{
+        data: T;
+        expires: Date;
+        maxAge: number;
+        cookieIdentifier: string;
+        regenerate: boolean;
+    }>) {
+        options = Object.assign({
+            cookieIdentifier: 'sierra_id'
+        }, options);
+        let {
+            cookieIdentifier,
+            regenerate
+        } = options;
+
+        let cookie = Session.getCookie(context);
+        let id = cookie[cookieIdentifier];
+
+        // Do we have a cookie?
+        if (regenerate || !id) {
+            id = await gateway.getId(context);
+            cookie[cookieIdentifier] = id;
+            Session.setCookie(context, cookie);
+        }
+
+        // Load data for this id
+        let data = await gateway.load(context, id);
+
+        // Create session object for this
+        let session = new Session(context, id, gateway, data, cookieIdentifier);
+        context.session = session;
+
+        return session;
     }
 
     static cookieToHash(cookie: string) {
@@ -79,5 +117,13 @@ export default class Session<T> {
 
     static hashToCookieArray(hash: ICookie) {
         return Object.keys(hash).map(name => name + '=' + hash[name]);
+    }
+
+    static getCookie(context: Context) {
+        return Session.cookieToHash(context.request.headers.cookie);
+    }
+
+    static setCookie(context: Context, hash: ICookie) {
+        context.response.setHeader('Set-Cookie', Session.hashToCookie(hash));
     }
 }
