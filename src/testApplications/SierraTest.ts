@@ -3,12 +3,16 @@ import Sierra, { Controller, middleware, route, Context, method, view, json, Bod
 import { request } from 'http';
 import HandlebarsView from './HandlebarsView';
 
+async function SimpleMiddleware() {
+    return true;
+}
 class TestController extends Controller {
     constructor() {
         super('/');
     }
 
     @route('get')
+    @middleware(SimpleMiddleware)    
     @middleware(async (context) => {
         return { value: true };
     })
@@ -23,6 +27,7 @@ class TestController extends Controller {
     }
 
     @method('get', '/:id')
+    @middleware(SimpleMiddleware)    
     async get(id: string) {
         return { value: id };
     }

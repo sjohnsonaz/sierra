@@ -1,5 +1,6 @@
 import { VerbType } from '../router/Verb';
 import { IMiddleware } from '../server/IMiddleware';
+import { IMethod } from '../server/IMethod';
 
 import RouteBuilder from '../router/RouteBuilder';
 import Controller from '../router/Controller';
@@ -17,7 +18,7 @@ export function route<U extends IMiddleware<any, any>>(verb?: VerbType | VerbTyp
     }
 }
 
-export function method<U extends Function>(verb?: VerbType | VerbType[], name?: string | RegExp) {
+export function method<U extends IMethod<any>>(verb?: VerbType | VerbType[], name?: string | RegExp) {
     return function (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<U>) {
         var routeBuilder = RouteBuilder.getRouteBuilder(target);
         if (verb instanceof Array) {
@@ -30,7 +31,7 @@ export function method<U extends Function>(verb?: VerbType | VerbType[], name?: 
     }
 }
 
-export function middleware<T extends IMiddleware<any, any>, U extends IMiddleware<any, any>>(middleware: T) {
+export function middleware<T extends IMiddleware<any, any>, U extends IMiddleware<any, any> | IMethod<any>>(middleware: T) {
     return function (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<U>) {
         var routeBuilder = RouteBuilder.getRouteBuilder(target);
         routeBuilder.addMiddleware(propertyKey, middleware);
