@@ -13,8 +13,8 @@ export default class BodyMiddleware {
                         body.push(data);
                     }).on('end', () => {
                         try {
-                            let bufferedData = Buffer.concat(body).toString();
-                            let result = JSON.parse(bufferedData);
+                            let bufferedData = Buffer.concat(body).toString().trim();
+                            let result = bufferedData ? JSON.parse(bufferedData) : null;
                             context.body = result;
                             resolve(result);
                         }
