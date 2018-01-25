@@ -44,7 +44,6 @@ export default class RouteBuilder {
             // Create merged object with values from this RouteBuilder
             let mergedRouteNames: IRouteNames<IMiddleware<any, any>> = {};
             let keys: string[] = RouteBuilder.getKeys(parentRouteNames, routeNames);
-            console.log(keys);
             keys.forEach(index => {
                 let routeName = routeNames[index];
                 let parentRouteName = parentRouteNames[index];
@@ -63,7 +62,6 @@ export default class RouteBuilder {
                 } else {
                     mergedRouteNames[index] = routeName || parentRouteName;
                 }
-                console.log(mergedRouteNames[index]);
             });
             return mergedRouteNames;
         } else {
@@ -145,7 +143,6 @@ export default class RouteBuilder {
             }
 
             let template = RouteBuilder.getTemplate(controller, index);
-            console.log('route:', verb, name, regex, middleware, method, pipeArgs, argumentNames, template);
 
             return new Route(verb, name, regex, middleware, method, pipeArgs, argumentNames, template);
         });
