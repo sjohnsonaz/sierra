@@ -14,6 +14,7 @@ export default class Controller {
     }
 
     build(): Route<any, any>[] {
-        return this._routeBuilder.build(this);
+        let routeHash = this._routeBuilder.build(this);
+        return Object.values(routeHash);
     }
 }

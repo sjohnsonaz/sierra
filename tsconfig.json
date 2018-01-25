@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "dist",
-    "target": "es6",
+    "target": "es2017",
     "module": "commonjs",
     "moduleResolution": "node",
     "isolatedModules": false,
@@ -18,8 +18,7 @@
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "lib": [
-      "es6",
-      "es2015.promise"
+      "es2017"
     ]
   },
   "include": [

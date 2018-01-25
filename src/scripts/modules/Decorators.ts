@@ -18,7 +18,7 @@ export function route<U extends IMiddleware<any, any>>(verb?: VerbType | VerbTyp
     }
 }
 
-export function method<U extends IMethod<any>>(verb?: VerbType | VerbType[], name?: string | RegExp) {
+export function method<U extends IMethod<any>>(verb?: VerbType | VerbType[], name?: string | RegExp, override: boolean = false) {
     return function (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<U>) {
         var routeBuilder = RouteBuilder.getRouteBuilder(target);
         if (verb instanceof Array) {
