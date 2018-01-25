@@ -11,7 +11,8 @@ export { default as Session } from './server/Session';
 
 export { default as Controller } from './router/Controller';
 export { default as Route } from './router/Route';
-export { default as RouteBuilder, RouteDefinition, IRouteNames } from './router/RouteBuilder';
+export { default as RouteDefinition, RouteMethod } from './router/RouteDefinition';
+export { default as RouteBuilder, IRouteNames } from './router/RouteBuilder';
 export { Verb } from './router/Verb';
 
 export { default as RouteMiddleware } from './middleware/RouteMiddleware';

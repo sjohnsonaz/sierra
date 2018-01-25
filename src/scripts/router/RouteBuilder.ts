@@ -7,6 +7,12 @@ import Controller from './Controller';
 import Route from './Route';
 import RequestHandler from '../server/RequestHandler';
 
+import RouteDefinition, { RouteMethod } from './RouteDefinition';
+
+export interface IRouteNames<U extends IMiddleware<any, any>> {
+    [index: string]: RouteDefinition<U>;
+}
+
 export default class RouteBuilder {
     routeNames: IRouteNames<IMiddleware<any, any>> = {};
     parent: RouteBuilder;
@@ -22,36 +28,42 @@ export default class RouteBuilder {
         this.routeNames[methodName].middleware.push(middleware);
     }
 
-    addDefinition(methodName: string, verb: Verb, name: string | RegExp, pipeArgs: boolean = false, override: boolean = false) {
+    addDefinition(methodName: string, verb: Verb, name: string | RegExp, pipeArgs?: boolean, override?: boolean) {
         if (!this.routeNames[methodName]) {
             this.routeNames[methodName] = new RouteDefinition();
         }
-        this.routeNames[methodName].verb = verb;
-        this.routeNames[methodName].name = name;
-        this.routeNames[methodName].pipeArgs = pipeArgs;
-        this.routeNames[methodName].override = override;
+        this.routeNames[methodName].method = new RouteMethod(verb, name, pipeArgs, override);;
     }
 
     getRouteNames() {
         if (this.parent) {
             // Merge with existing routes
             let routeNames = this.routeNames;
-            let parentRouteNames = this.parent.getRouteNames();
+            let parentRouteNames: IRouteNames<IMiddleware<any, any>> = this.parent.getRouteNames();
+
             // Create merged object with values from this RouteBuilder
-            let mergedRouteNames = Object.assign({}, parentRouteNames, routeNames);
-            Object.keys(mergedRouteNames).forEach(index => {
+            let mergedRouteNames: IRouteNames<IMiddleware<any, any>> = {};
+            let keys: string[] = RouteBuilder.getKeys(parentRouteNames, routeNames);
+            console.log(keys);
+            keys.forEach(index => {
                 let routeName = routeNames[index];
                 let parentRouteName = parentRouteNames[index];
+
                 // If a conflict exists, merge RouteDefinitions
-                if (parentRouteName && routeName && !routeName.override) {
+                if (parentRouteName && routeName) {
                     let routeDefinition = new RouteDefinition();
-                    routeDefinition.verb = RouteBuilder.getDefined(routeName.verb, parentRouteName.verb);
-                    routeDefinition.name = RouteBuilder.getDefined(routeName.name, parentRouteName.name);
-                    routeDefinition.pipeArgs = RouteBuilder.getDefined(routeName.pipeArgs, parentRouteName.pipeArgs);
-                    routeDefinition.override = RouteBuilder.getDefined(routeName.override, parentRouteName.override);
-                    routeDefinition.middleware = routeDefinition.middleware.concat(routeName.middleware, parentRouteName.middleware);
+                    if (routeName.method) {
+                        routeDefinition.method = routeName.method;
+                        routeDefinition.middleware = routeDefinition.middleware.concat(routeName.middleware);
+                    } else {
+                        routeDefinition.method = parentRouteName.method;
+                        routeDefinition.middleware = routeDefinition.middleware.concat(routeName.middleware, parentRouteName.middleware);
+                    }
                     mergedRouteNames[index] = routeDefinition;
+                } else {
+                    mergedRouteNames[index] = routeName || parentRouteName;
                 }
+                console.log(mergedRouteNames[index]);
             });
             return mergedRouteNames;
         } else {
@@ -64,14 +76,18 @@ export default class RouteBuilder {
         return Object.keys(routeNames).map(index => {
             let routeName = routeNames[index];
             var middleware = routeName.middleware;
-            var name = routeName.name || '';
-            var verb = routeName.verb;
-            var pipeArgs = routeName.pipeArgs;
+            var routeMethod = routeName.method;
+            if (!routeMethod) {
+                throw 'No method defined for this route: ' + index;
+            }
+            var name = routeMethod.name || '';
+            var verb = routeMethod.verb;
+            var pipeArgs = routeMethod.pipeArgs;
 
             // Get argument names, and bind method
             var method = controller[index];
             if (method) {
-                if (routeName.pipeArgs) {
+                if (pipeArgs) {
                     var argumentNames = getArgumentNames(method);
                 }
                 method = method.bind(controller);
@@ -129,6 +145,7 @@ export default class RouteBuilder {
             }
 
             let template = RouteBuilder.getTemplate(controller, index);
+            console.log('route:', verb, name, regex, middleware, method, pipeArgs, argumentNames, template);
 
             return new Route(verb, name, regex, middleware, method, pipeArgs, argumentNames, template);
         });
@@ -171,19 +188,15 @@ export default class RouteBuilder {
         return name + '/' + index;
     }
 
-    static getDefined(primary: any, secondary: any) {
-        return typeof primary === 'undefined' ? secondary : primary;
+    static getKeys(...objects: Object[]) {
+        let keyHash: {
+            [index: string]: string;
+        } = {};
+        objects.forEach(obj => {
+            Object.keys(obj).forEach(key => {
+                keyHash[key] = key;
+            });
+        });
+        return Object.keys(keyHash);
     }
-}
-
-export class RouteDefinition<U extends IMiddleware<any, any>> {
-    verb: Verb;
-    name: string | RegExp;
-    middleware: U[] = [];
-    pipeArgs: boolean = false;
-    override: boolean = false;
-}
-
-export interface IRouteNames<U extends IMiddleware<any, any>> {
-    [index: string]: RouteDefinition<U>;
 }
