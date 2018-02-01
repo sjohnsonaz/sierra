@@ -17,7 +17,7 @@ describe('route decorator`', () => {
                 return { value: true };
             }
         }
-    
+
         testApplication = new Sierra();
         testApplication.addController(new TestController());
         testApplication.init();
@@ -26,14 +26,9 @@ describe('route decorator`', () => {
     });
 
     it('should generate get routes', async () => {
-        try {
-            let res = await chai.request('localhost:' + port)
-                .get('/test');
-            console.log('response', res.body);
-            expect(res).to.have.status(200);
-        } catch (e) {
-            expect(e).to.be.null;
-        }
+        let res = await chai.request('localhost:' + port)
+            .get('/test');
+        expect(res).to.have.status(200);
     });
 
     after(() => {
