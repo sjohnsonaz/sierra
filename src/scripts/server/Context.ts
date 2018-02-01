@@ -15,6 +15,7 @@ export default class Context {
     pathname: string;
     query: any;
     params: any;
+    contentType: string;
     template: string;
 
     constructor(request: http.IncomingMessage, response: http.ServerResponse) {
@@ -30,6 +31,13 @@ export default class Context {
         }
         this.pathname = pathname;
         this.query = url.query;
+
+        let contentTypeHeader = (this.request.headers['content-type'] || '').toLowerCase();
+        let contentType = contentTypeHeader;
+        if (contentType) {
+            contentType = contentTypeHeader.split(';')[0];
+        }
+        this.contentType = contentType;
     }
 
     send<U>(data: U, status: number = 200) {

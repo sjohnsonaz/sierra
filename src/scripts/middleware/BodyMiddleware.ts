@@ -18,13 +18,8 @@ export default class BodyMiddleware {
                     }).on('end', () => {
                         try {
                             let bufferedData = Buffer.concat(body).toString().trim();
-                            let contentTypeHeader = (context.request.headers['content-type'] || '').toLowerCase();
-                            let contentType = contentTypeHeader;
-                            if (contentTypeHeader) {
-                                contentType = contentTypeHeader.split(';')[0];
-                            }
                             let result: any;
-                            switch (contentType) {
+                            switch (context.contentType) {
                                 case 'application/json':
                                     result = bufferedData ? JSON.parse(bufferedData) : null;
                                 case 'multipart/form-data':
