@@ -23,7 +23,6 @@ export default class BodyMiddleware {
                             if (contentTypeHeader) {
                                 contentType = contentTypeHeader.split(';')[0];
                             }
-                            console.log(contentType);
                             let result: any;
                             switch (contentType) {
                                 case 'application/json':
