@@ -7,38 +7,37 @@ import Sierra, { Controller, middleware, route, Context } from '../scripts/Sierr
 import { wait } from '../scripts/utils/TestUtil';
 
 describe('route decorator`', () => {
-    it('should generate get routes', async () => {
+    let port = 3001;
+    let testApplication: Sierra;
+
+    before(async () => {
         class TestController extends Controller {
             @route('get')
             async get(context: Context, value: any) {
                 return { value: true };
             }
         }
-
-        let port = 3001;
-        let testApplication = new Sierra();
+    
+        testApplication = new Sierra();
         testApplication.addController(new TestController());
         testApplication.init();
-        await testApplication.listen(port);
+        testApplication.listen(port);
         await wait(0);
+    });
+
+    it('should generate get routes', async () => {
         try {
-            await new Promise((resolve, reject) => {
-                chai.request('localhost:' + port)
-                    .get('/test')
-                    .end((err, res) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            expect(res).to.have.status(200);
-                            resolve(true);
-                        }
-                    });
-            });
+            let res = await chai.request('localhost:' + port)
+                .get('/test');
+            console.log('response', res.body);
+            expect(res).to.have.status(200);
         } catch (e) {
             expect(e).to.be.null;
-        } finally {
-            await testApplication.close();
         }
+    });
+
+    after(() => {
+        testApplication.close();
     });
 });
 
