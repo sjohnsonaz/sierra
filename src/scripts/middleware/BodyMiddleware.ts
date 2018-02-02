@@ -106,9 +106,6 @@ export default class BodyMiddleware {
         let dispositionRow = buffer.slice(dispositionIndex, dispositionEnd).toString().trim();
         let typeRow = buffer.slice(typeIndex, typeEnd).toString().trim();
 
-        //console.log('disposition:', dispositionIndex, dispositionEnd, dispositionRow);
-        //console.log('type:', typeIndex, typeEnd, typeRow);
-
         field = new Field(dispositionRow);
         field.setContentType(typeRow);
         field.addData(buffer.slice(typeEnd + 4));
