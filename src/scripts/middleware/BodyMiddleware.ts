@@ -17,19 +17,23 @@ export default class BodyMiddleware {
                         body.push(data);
                     }).on('end', () => {
                         try {
-                            let bufferedData = Buffer.concat(body).toString().trim();
                             let result: any;
+                            let bufferedData: string;
+                            let buffer = Buffer.concat(body);
                             switch (context.contentType) {
-                                case 'application/json':
-                                    result = bufferedData ? JSON.parse(bufferedData) : null;
                                 case 'multipart/form-data':
-                                    result = BodyMiddleware.decodeMultiPartForm(bufferedData);
+                                    result = BodyMiddleware.decodeMultiPartForm(buffer);
                                     break;
                                 case 'application/x-www-form-urlencoded':
+                                    bufferedData = buffer.toString().trim();
                                     result = bufferedData ? EncodeUtil.urlStringToObject(bufferedData) : null;
                                     break;
+                                case 'application/json':
+                                    bufferedData = buffer.toString().trim();
+                                    result = bufferedData ? JSON.parse(bufferedData) : null;
                                 case 'text/plain':
                                 default:
+                                    bufferedData = buffer.toString().trim();
                                     result = bufferedData;
                                     break;
                             }
@@ -47,22 +51,82 @@ export default class BodyMiddleware {
             });
         }
     }
-    static decodeMultiPartForm(data: string) {
+    static decodeMultiPartForm(buffer: Buffer) {
+        let data = buffer.toString().trim();
+
         let result: Object = {};
 
         let lines = data.split('\r\n');
-        for (let index = 0, length = lines.length / 4; index < length; index++) {
-            let nameRow = lines[index * 4 + 1];
-            let valueRow = lines[index * 4 + 3];
-            if (nameRow && valueRow) {
-                let match = nameRow.match(/.*name=\"(.*)\"/);
-                if (match && match[1]) {
-                    let name = match[1];
-                    result[name] = valueRow;
-                }
+
+        let fields: Field[] = [];
+        let field: Field;
+        for (let index = 0, length = lines.length; index < length; index++) {
+            let row = lines[index];
+            if (row.startsWith('Content-Disposition')) {
+                field = new Field(row);
+                fields.push(field);
+            } else if (row && !row.startsWith('--')) {
+                field.addData(row);
             }
         }
+
+        fields.forEach(field => {
+            if (field.name) {
+                if (field.filename) {
+                    result[field.name] = {
+                        filename: field.filename,
+                        data: field.data
+                    };
+                } else {
+                    result[field.name] = field.data;
+                }
+            }
+        });
+
         return result;
+    }
+}
+
+export class Field {
+    header: string;
+    name: string;
+    filename: string;
+    data: any;
+
+    constructor(header: string) {
+        this.header = header;
+
+        let hash = Field.headerToHash(header);
+        this.name = hash['name'];
+        this.filename = hash['filename'];
+        this.data = '';
+    }
+
+    addData(data: any) {
+        this.data += data;
+    }
+
+    static headerToHash(header: string) {
+        let hash = {};
+        let parts = header.split('; ');
+
+        // Header Name
+        if (parts && parts[0]) {
+            let nameParts = parts[0].split(': ');
+            if (nameParts && nameParts.length === 2) {
+                hash[nameParts[0]] = nameParts[1];
+            }
+            parts.shift();
+        }
+
+        // Header Data
+        parts.forEach(part => {
+            let match = part.trim().match(/(.*)=\"(.*)\"/);
+            if (match && match.length === 3) {
+                hash[match[1]] = match[2];
+            }
+        });
+        return hash;
     }
 }
 /*
