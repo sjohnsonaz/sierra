@@ -31,6 +31,7 @@ export default class BodyMiddleware {
                                 case 'application/json':
                                     bufferedData = buffer.toString().trim();
                                     result = bufferedData ? JSON.parse(bufferedData) : null;
+                                    break;
                                 case 'text/plain':
                                 default:
                                     bufferedData = buffer.toString().trim();
