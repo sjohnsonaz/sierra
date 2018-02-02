@@ -99,16 +99,26 @@ export default class BodyMiddleware {
 
         let dispositionIndex = buffer.indexOf('Content-Disposition');
         let dispositionEnd = buffer.indexOf('\r\n', dispositionIndex);
+        let dispositionRow = buffer.slice(dispositionIndex, dispositionEnd).toString().trim();
+
+        //console.log('disposition:', dispositionIndex, dispositionEnd, dispositionRow);
+        field = new Field(dispositionRow);
+
+        let contentStart;
 
         let typeIndex = buffer.indexOf('Content-Type');
-        let typeEnd = buffer.indexOf('\r\n', typeIndex);
+        if (typeIndex !== -1) {
+            let typeEnd = buffer.indexOf('\r\n', typeIndex);
+            let typeRow = buffer.slice(typeIndex, typeEnd).toString().trim();
 
-        let dispositionRow = buffer.slice(dispositionIndex, dispositionEnd).toString().trim();
-        let typeRow = buffer.slice(typeIndex, typeEnd).toString().trim();
+            field.setContentType(typeRow);
+            //console.log('type:', typeIndex, typeEnd, typeRow);
 
-        field = new Field(dispositionRow);
-        field.setContentType(typeRow);
-        field.addData(buffer.slice(typeEnd + 4));
+            contentStart = typeEnd + 4;
+        } else {
+            contentStart = dispositionEnd + 4;
+        }
+        field.addData(buffer.slice(contentStart));
 
         return field;
     }
