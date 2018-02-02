@@ -65,6 +65,8 @@ export default class BodyMiddleware {
             if (row.startsWith('Content-Disposition')) {
                 field = new Field(row);
                 fields.push(field);
+            } else if (row.startsWith('Content-Type')) {
+                field.setContentType(row);
             } else if (row && !row.startsWith('--')) {
                 field.addData(row);
             }
@@ -75,7 +77,8 @@ export default class BodyMiddleware {
                 if (field.filename) {
                     result[field.name] = {
                         filename: field.filename,
-                        data: field.data
+                        data: field.data,
+                        type: field.type
                     };
                 } else {
                     result[field.name] = field.data;
@@ -92,6 +95,7 @@ export class Field {
     name: string;
     filename: string;
     data: any;
+    type: string;
 
     constructor(header: string) {
         this.header = header;
@@ -104,6 +108,13 @@ export class Field {
 
     addData(data: any) {
         this.data += data;
+    }
+
+    setContentType(header: string) {
+        let nameParts = header.split(': ');
+        if (nameParts) {
+            this.type = nameParts[1];
+        }
     }
 
     static headerToHash(header: string) {
