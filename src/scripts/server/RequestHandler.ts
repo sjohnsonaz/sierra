@@ -3,7 +3,7 @@ import * as http from 'http';
 import { IMiddleware } from './IMiddleware';
 import { IViewMiddleware } from './IViewMiddleware';
 import Context from './Context';
-import OutgoingMessage from './OutgoingMessage';
+import OutgoingMessage, { OutputType } from './OutgoingMessage';
 import { Errors } from './Errors';
 
 import ConsoleUtil from '../utils/ConsoleUtil';
@@ -20,7 +20,7 @@ export default class RequestHandler {
             for (let index = 0, length = this.middlewares.length; index < length; index++) {
                 result = await this.middlewares[index](context, result);
                 if (result instanceof OutgoingMessage) {
-                    this.send(context, result.data, result.status, result.template, result.json);
+                    this.send(context, result.data, result.status, result.type, result.template, result.contentType);
                     break;
                 }
             }
@@ -43,9 +43,9 @@ export default class RequestHandler {
                 try {
                     let result = await this.error(context, e);
                     if (result instanceof OutgoingMessage) {
-                        this.send(context, result.data, result.status, result.template, result.json);
+                        this.send(context, result.data, result.status, result.type, result.template, result.contentType);
                     } else {
-                        this.send(context, result, errorStatus, 'error');
+                        this.send(context, result, errorStatus, 'auto', 'error');
                     }
                 }
                 catch (e) {
@@ -57,15 +57,30 @@ export default class RequestHandler {
         }
     };
 
-    sendJson(context: Context, data: any, status: number = 200) {
+    sendJson<T>(context: Context, data: T, status: number = 200) {
         context.response.statusCode = status;
         context.response.setHeader('Content-Type', 'application/json');
         context.response.write(JSON.stringify(data || null));
         context.response.end();
     }
 
-    async sendView(context: Context, data: any, status: number = 200, template: string) {
+    sendRaw<T>(context: Context, data: T, status: number = 200, contentType: string) {
+        context.response.statusCode = status;
+        if (typeof data === 'string') {
+            context.response.setHeader('Content-Type', contentType || 'text/plain');
+            context.response.write(data);
+        } else {
+            context.response.setHeader('Content-Type', contentType || 'application/json');
+            context.response.write(JSON.stringify(data || null));
+        }
+        context.response.end();
+    }
+
+    async sendView<T>(context: Context, data: T, status: number = 200, template: string) {
         try {
+            if (!this.view) {
+                throw 'No view middleware';
+            }
             let output = await this.view(context, data, template || context.template);
             context.response.statusCode = status;
             context.response.setHeader('Content-Type', 'text/html');
@@ -92,13 +107,35 @@ export default class RequestHandler {
         }
     }
 
-    send<T>(context: Context, data: any, status: number = 200, template?: string, json?: boolean) {
+    send<T>(context: Context, data: T, status: number = 200, type: OutputType = 'auto', template?: string, contentType?: string) {
         console.log(context.request.method, context.request.url, colorStatus(status));
-        let accept = context.request.headers.accept;
-        if (this.view && !json && accept && accept.indexOf('text/html') > -1) {
-            this.sendView(context, data, status, template);
-        } else {
-            this.sendJson(context, data, status);
+        let accept = context.accept;
+        console.log('accept:', accept);
+        switch (type) {
+            case 'auto':
+                if (this.view && accept.indexOf('text/html') > -1) {
+                    this.sendView(context, data, status, template);
+                } else if (accept.indexOf('application/json')) {
+                    this.sendJson(context, data, status);
+                } else {
+                    this.sendRaw(context, data, status, contentType);
+                }
+                break;
+            case 'json':
+                this.sendJson(context, data, status);
+                break;
+            case 'raw':
+                this.sendRaw(context, data, status, contentType);
+                break;
+            case 'text':
+                this.sendRaw(context, data, status, 'text/plain');
+                break;
+            case 'view':
+                this.sendView(context, data, status, template);
+                break;
+            default:
+                this.sendRaw(context, data, status, contentType);
+                break;
         }
     }
 

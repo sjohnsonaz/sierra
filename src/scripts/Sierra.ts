@@ -5,7 +5,7 @@ export { IMethod } from './server/IMethod';
 export { IMiddleware } from './server/IMiddleware';
 export { ISessionGateway } from './server/ISessionGateway';
 export { IViewMiddleware } from './server/IViewMiddleware';
-export { default as OutgoingMessage, send, view, json } from './server/OutgoingMessage';
+export { default as OutgoingMessage, send, view, json, raw, OutputType } from './server/OutgoingMessage';
 export { default as RequestHandler } from './server/RequestHandler';
 export { default as Session } from './server/Session';
 

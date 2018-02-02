@@ -1,25 +1,33 @@
+export type OutputType = 'auto' | 'json' | 'view' | 'text' | 'raw';
+
 export default class OutgoingMessage<T>{
     data: T;
     status: number;
+    type: OutputType;
     template: string;
-    json: boolean;
+    contentType: string;
 
-    constructor(data: any, status: number = 200, template?: string, json?: boolean) {
+    constructor(data: any, status: number = 200, type: OutputType = 'auto', template?: string, contentType?: string) {
         this.data = data;
         this.status = status;
+        this.type = type;
         this.template = template;
-        this.json = json;
+        this.contentType = contentType;
     }
 }
 
-export function send<T>(data: T, status: number = 200, template?: string, json?: boolean) {
-    return new OutgoingMessage(data, status, template, json);
+export function send<T>(data: T, status: number = 200, type: OutputType = 'auto', template?: string, contentType?: string) {
+    return new OutgoingMessage(data, status, type, template);
 }
 
 export function view<T>(data: T, template?: string) {
-    return new OutgoingMessage(data, 200, template, false);
+    return new OutgoingMessage(data, 200, 'view', template);
 }
 
 export function json<T>(data: T, status: number = 200) {
-    return new OutgoingMessage(data, status, undefined, true);
+    return new OutgoingMessage(data, status, 'json');
+}
+
+export function raw<T>(data: T, status: number = 200, contentType?: string) {
+    return new OutgoingMessage(data, status, 'raw', undefined, contentType);
 }

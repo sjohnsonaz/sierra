@@ -28,7 +28,9 @@ export default class RouteMiddleware {
                     $body: context.body,
                     $session: context.session,
                     $query: context.query,
-                    $params: context.params
+                    $params: context.params,
+                    $accept: context.accept,
+                    $contentType: context.contentType
                 };
                 return await route.method.apply(route, route.argumentNames.map(name => contextParams[name] || context.params[name] || context.query[name]));
             } else {
