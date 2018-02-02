@@ -22,7 +22,7 @@ export default class BodyMiddleware {
                             let buffer = Buffer.concat(body);
                             switch (context.contentType) {
                                 case 'multipart/form-data':
-                                    result = BodyMiddleware.decodeMultiPartForm(buffer);
+                                    result = BodyMiddleware.decodeMultiPartForm(context, buffer);
                                     break;
                                 case 'application/x-www-form-urlencoded':
                                     bufferedData = buffer.toString().trim();
@@ -51,25 +51,28 @@ export default class BodyMiddleware {
             });
         }
     }
-    static decodeMultiPartForm(buffer: Buffer) {
-        let data = buffer.toString().trim();
 
+    static decodeMultiPartForm(context: Context, buffer: Buffer) {
         let result: Object = {};
 
-        let lines = data.split('\r\n');
-
         let fields: Field[] = [];
-        let field: Field;
-        for (let index = 0, length = lines.length; index < length; index++) {
-            let row = lines[index];
-            if (row.startsWith('Content-Disposition')) {
-                field = new Field(row);
-                fields.push(field);
-            } else if (row.startsWith('Content-Type')) {
-                field.setContentType(row);
-            } else if (row && !row.startsWith('--')) {
-                field.addData(row);
+        let boundary = '--' + context.httpBoundary;
+        let boundaryEnd = boundary + '--';
+        let boundaryLength = boundary.length;
+
+        let length = buffer.length;
+        let index = buffer.indexOf(boundary, 0, 'ascii') + boundaryLength;
+        while (index < length) {
+            let nextIndex = buffer.indexOf(boundary, index, 'ascii');
+            if (nextIndex === -1) {
+                break;
             }
+            let bufferPart = buffer.slice(index, nextIndex - 1);
+
+            let field: Field = BodyMiddleware.createField(bufferPart);
+            fields.push(field);
+
+            index = nextIndex + boundaryLength;
         }
 
         fields.forEach(field => {
@@ -87,6 +90,30 @@ export default class BodyMiddleware {
         });
 
         return result;
+    }
+
+    static createField(buffer: Buffer) {
+        let field: Field;
+        let data = buffer.toString().trim();
+        let lines = data.split('\r\n');
+
+        let dispositionIndex = buffer.indexOf('Content-Disposition');
+        let dispositionEnd = buffer.indexOf('\r\n', dispositionIndex);
+
+        let typeIndex = buffer.indexOf('Content-Type');
+        let typeEnd = buffer.indexOf('\r\n', typeIndex);
+
+        let dispositionRow = buffer.slice(dispositionIndex, dispositionEnd).toString().trim();
+        let typeRow = buffer.slice(typeIndex, typeEnd).toString().trim();
+
+        //console.log('disposition:', dispositionIndex, dispositionEnd, dispositionRow);
+        //console.log('type:', typeIndex, typeEnd, typeRow);
+
+        field = new Field(dispositionRow);
+        field.setContentType(typeRow);
+        field.addData(buffer.slice(typeEnd + 4));
+
+        return field;
     }
 }
 
@@ -107,7 +134,7 @@ export class Field {
     }
 
     addData(data: any) {
-        this.data += data;
+        this.data = data;
     }
 
     setContentType(header: string) {
@@ -140,149 +167,3 @@ export class Field {
         return hash;
     }
 }
-/*
-
-export class MultiPart {
-
-    static handle(context: Context) {
-        let verb = context.request.method.toLowerCase();
-        if (verb === 'post' || verb === 'put') {
-            var form = new multiparty.Form();
-            var data = {};
-            var files = {};
-            var done;
-            return new Promise<any>((resolve, reject) => {
-                try {
-                    function ondata(name, val, data) {
-                        if (Array.isArray(data[name])) {
-                            data[name].push(val);
-                        } else if (data[name]) {
-                            data[name] = [data[name], val];
-                        } else {
-                            data[name] = val;
-                        }
-                    }
-
-                    context.request.on('field', function (name, val) {
-                        ondata(name, val, data);
-                    });
-
-                    context.request.on('file', function (name, val) {
-                        val.name = val.originalFilename;
-                        val.type = val.headers['content-type'] || null;
-                        ondata(name, val, files);
-                    });
-
-                    context.request.on('error', function (err) {
-                        err.status = 400;
-                        next(err);
-                        done = true;
-                    });
-
-                    context.request.on('close', function () {
-                        if (done) return;
-                        try {
-                            req.body = qs.parse(data);
-                            req.files = qs.parse(files);
-                        } catch (err) {
-                            form.emit('error', err);
-                            return;
-                        }
-                        next();
-                    });
-
-                    form.parse(req);
-                }
-                catch (e) {
-
-                }
-            }
-        }
-    }
-    static create() {
-
-        var limit = options.limit || '100mb';
-
-        return function multipart(req, res, next) {
-            if (req._body) return next();
-            req.body = req.body || {};
-            req.files = req.files || {};
-
-            if (!utils.hasBody(req)) return next();
-
-            // ignore GET
-            if ('GET' == req.method || 'HEAD' == req.method) return next();
-
-            // check Content-Type
-            if ('multipart/form-data' != utils.mime(req)) return next();
-
-            // flag as parsed
-            req._body = true;
-
-            // parse
-            limit(req, res, function (err) {
-                if (err) return next(err);
-
-                var form = new multiparty.Form(options)
-                    , data = {}
-                    , files = {}
-                    , done;
-
-                Object.keys(options).forEach(function (key) {
-                    form[key] = options[key];
-                });
-
-                function ondata(name, val, data) {
-                    if (Array.isArray(data[name])) {
-                        data[name].push(val);
-                    } else if (data[name]) {
-                        data[name] = [data[name], val];
-                    } else {
-                        data[name] = val;
-                    }
-                }
-
-                form.on('field', function (name, val) {
-                    ondata(name, val, data);
-                });
-
-                if (!options.defer) {
-                    form.on('file', function (name, val) {
-                        val.name = val.originalFilename;
-                        val.type = val.headers['content-type'] || null;
-                        ondata(name, val, files);
-                    });
-                }
-
-                form.on('error', function (err) {
-                    if (!options.defer) {
-                        err.status = 400;
-                        next(err);
-                    }
-                    done = true;
-                });
-
-                form.on('close', function () {
-                    if (done) return;
-                    try {
-                        req.body = qs.parse(data);
-                        req.files = qs.parse(files);
-                    } catch (err) {
-                        form.emit('error', err);
-                        return;
-                    }
-                    if (!options.defer) next();
-                });
-
-                form.parse(req);
-
-                if (options.defer) {
-                    req.form = form;
-                    next();
-                }
-            });
-        }
-    }
-}  
-
-*/

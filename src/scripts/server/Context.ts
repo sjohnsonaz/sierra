@@ -18,6 +18,7 @@ export default class Context {
     query: any;
     params: any;
     template: string;
+    httpBoundary: string;
 
     constructor(request: http.IncomingMessage, response: http.ServerResponse) {
         this.request = request;
@@ -25,25 +26,10 @@ export default class Context {
         this.method = request.method.toLowerCase() as any;
 
         // Content Type
-        let contentTypeHeader = (this.request.headers['content-type'] || '').toLowerCase();
-        let contentType = contentTypeHeader;
-        if (contentType) {
-            contentType = contentTypeHeader.split(';')[0];
-        }
-        this.contentType = contentType;
+        this.createContentType(request);
 
         // Accept Type
-        // TODO: Adjust for priority
-        let accept: string = request.headers['accept'];
-        if (accept) {
-            let types = accept.split(',');
-            this.accept = types.map(type => {
-                let parts = type.split(';');
-                return parts[0];
-            });
-        } else {
-            this.accept = [];
-        }
+        this.createAccept(request);
 
         this.url = request.url;
         let url = Url.parse(request.url, true);
@@ -54,6 +40,41 @@ export default class Context {
         }
         this.pathname = pathname;
         this.query = url.query;
+    }
+
+    private createContentType(request: http.IncomingMessage) {
+        let contentTypeHeader = (this.request.headers['content-type'] || '').toLowerCase();
+        let contentType = contentTypeHeader;
+        if (contentType) {
+            let parts = contentTypeHeader.split('; ');
+            contentType = parts[0];
+            if (parts.length > 1) {
+                let hash = {};
+                parts.shift();
+                parts.forEach(part => {
+                    let hashParts = part.split('=');
+                    if (hashParts.length > 1) {
+                        hash[hashParts[0]] = hashParts[1];
+                    }
+                });
+                this.httpBoundary = hash['boundary'];
+            }
+        }
+        this.contentType = contentType;
+    }
+
+    // TODO: Adjust for priority
+    private createAccept(request: http.IncomingMessage) {
+        let accept: string = request.headers['accept'];
+        if (accept) {
+            let types = accept.split(',');
+            this.accept = types.map(type => {
+                let parts = type.split(';');
+                return parts[0];
+            });
+        } else {
+            this.accept = [];
+        }
     }
 
     send<U>(data: U, status: number = 200) {

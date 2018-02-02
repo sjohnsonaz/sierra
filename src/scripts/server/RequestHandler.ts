@@ -69,6 +69,9 @@ export default class RequestHandler {
         if (typeof data === 'string') {
             context.response.setHeader('Content-Type', contentType || 'text/plain');
             context.response.write(data);
+        } else if (Buffer.isBuffer(data)) {
+            context.response.setHeader('Content-Type', contentType || 'octet-stream');
+            context.response.write(data);
         } else {
             context.response.setHeader('Content-Type', contentType || 'application/json');
             context.response.write(JSON.stringify(data || null));
