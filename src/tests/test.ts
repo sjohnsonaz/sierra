@@ -8,7 +8,7 @@ import { wait } from '../scripts/utils/TestUtil';
 
 describe('route decorator`', () => {
     let port = 3001;
-    let testApplication: Sierra;
+    let application: Sierra;
 
     before(async () => {
         class TestController extends Controller {
@@ -18,11 +18,10 @@ describe('route decorator`', () => {
             }
         }
 
-        testApplication = new Sierra();
-        testApplication.addController(new TestController());
-        testApplication.init();
-        testApplication.listen(port);
-        await wait(0);
+        application = new Sierra();
+        application.addController(new TestController());
+        application.init();
+        await application.listen(port);
     });
 
     it('should generate get routes', async () => {
@@ -31,8 +30,8 @@ describe('route decorator`', () => {
         expect(res).to.have.status(200);
     });
 
-    after(() => {
-        testApplication.close();
+    after(async () => {
+        await application.close();
     });
 });
 
