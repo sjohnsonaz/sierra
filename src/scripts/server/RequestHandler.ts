@@ -110,7 +110,6 @@ export default class RequestHandler {
     send<T>(context: Context, data: T, status: number = 200, type: OutputType = 'auto', template?: string, contentType?: string) {
         console.log(context.request.method, context.request.url, colorStatus(status));
         let accept = context.accept;
-        console.log('accept:', accept);
         switch (type) {
             case 'auto':
                 if (this.view && accept.indexOf('text/html') > -1) {
