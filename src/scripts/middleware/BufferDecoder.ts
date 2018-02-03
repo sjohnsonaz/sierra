@@ -6,6 +6,7 @@ export default class BuferDecoder {
     boundaryLength: number;
     bufferRemainder: Buffer;
     fields: Field[] = [];
+    currentField: Field;
     firstChunk: boolean = true;
 
     constructor(httpBoundary: string) {
@@ -57,8 +58,8 @@ export default class BuferDecoder {
             }
             let bufferPart = buffer.slice(firstIndex, nextIndex - 1);
 
-            let field: Field = this.createField(bufferPart);
-            this.fields.push(field);
+            this.currentField = this.createField(bufferPart);
+            this.fields.push(this.currentField);
 
             index = nextIndex + this.boundaryLength;
         }
