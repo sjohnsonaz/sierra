@@ -1,177 +1,142 @@
-//import * from 'http';
+import { request } from 'https';
 
 import Context from '../server/Context';
 import EncodeUtil from '../utils/EncodeUtil';
-import { request } from 'https';
+
+import Field from './Field';
+
+import BufferDecoder from './BufferDecoder';
 
 export default class BodyMiddleware {
-    static handle(context: Context) {
+    static async handle(context: Context) {
         let verb = context.request.method.toLowerCase();
         if (verb === 'post' || verb === 'put') {
-            let body = [];
-            return new Promise<any>((resolve, reject) => {
-                try {
-                    context.request.on('error', (e) => {
-                        reject(e);
-                    }).on('data', (data) => {
-                        body.push(data);
-                    }).on('end', () => {
-                        try {
-                            let result: any;
-                            let bufferedData: string;
-                            let buffer = Buffer.concat(body);
-                            switch (context.contentType) {
-                                case 'multipart/form-data':
-                                    result = BodyMiddleware.decodeMultiPartForm(context, buffer);
-                                    break;
-                                case 'application/x-www-form-urlencoded':
-                                    bufferedData = buffer.toString().trim();
-                                    result = bufferedData ? EncodeUtil.urlStringToObject(bufferedData) : null;
-                                    break;
-                                case 'application/json':
-                                    bufferedData = buffer.toString().trim();
-                                    result = bufferedData ? JSON.parse(bufferedData) : null;
-                                    break;
-                                case 'text/plain':
-                                default:
-                                    bufferedData = buffer.toString().trim();
-                                    result = bufferedData;
-                                    break;
-                            }
-                            context.body = result;
-                            resolve(result);
-                        }
-                        catch (e) {
-                            reject(e);
-                        }
-                    });
-                }
-                catch (e) {
+            switch (context.contentType) {
+                case 'multipart/form-data':
+                    return await BodyMiddleware.handleFormData(context);
+                case 'application/x-www-form-urlencoded':
+                    return await BodyMiddleware.handleUrlEncoded(context);
+                case 'application/json':
+                    return await BodyMiddleware.handleJson(context);
+                case 'text/plain':
+                default:
+                    return await BodyMiddleware.handleText(context);
+            }
+        }
+    }
+
+    static async handleJson(context: Context) {
+        let body: Buffer[] = [];
+        return new Promise<any>((resolve, reject) => {
+            try {
+                context.request.on('error', (e) => {
                     reject(e);
-                }
-            });
-        }
-    }
-
-    static decodeMultiPartForm(context: Context, buffer: Buffer) {
-        let result: Object = {};
-
-        let fields: Field[] = [];
-        let boundary = '--' + context.httpBoundary;
-        let boundaryEnd = boundary + '--';
-        let boundaryLength = boundary.length;
-
-        let length = buffer.length;
-        let index = buffer.indexOf(boundary, 0, 'ascii') + boundaryLength;
-        while (index < length) {
-            let nextIndex = buffer.indexOf(boundary, index, 'ascii');
-            if (nextIndex === -1) {
-                break;
+                }).on('data', (data) => {
+                    if (typeof data === 'string') {
+                        body.push(new Buffer(data));
+                    } else {
+                        body.push(data);
+                    }
+                }).on('end', () => {
+                    try {
+                        let bufferedData = Buffer.concat(body).toString().trim();
+                        context.body = bufferedData ? JSON.parse(bufferedData) : null;
+                        resolve(context.body);
+                    }
+                    catch (e) {
+                        reject(e);
+                    }
+                });
             }
-            let bufferPart = buffer.slice(index, nextIndex - 1);
-
-            let field: Field = BodyMiddleware.createField(bufferPart);
-            fields.push(field);
-
-            index = nextIndex + boundaryLength;
-        }
-
-        fields.forEach(field => {
-            if (field.name) {
-                if (field.filename) {
-                    result[field.name] = {
-                        filename: field.filename,
-                        data: field.data,
-                        type: field.type
-                    };
-                } else {
-                    result[field.name] = field.data;
-                }
+            catch (e) {
+                reject(e);
             }
         });
-
-        return result;
     }
 
-    static createField(buffer: Buffer) {
-        let field: Field;
-        let data = buffer.toString().trim();
-        let lines = data.split('\r\n');
-
-        let dispositionIndex = buffer.indexOf('Content-Disposition');
-        let dispositionEnd = buffer.indexOf('\r\n', dispositionIndex);
-        let dispositionRow = buffer.slice(dispositionIndex, dispositionEnd).toString().trim();
-
-        //console.log('disposition:', dispositionIndex, dispositionEnd, dispositionRow);
-        field = new Field(dispositionRow);
-
-        let contentStart;
-
-        let typeIndex = buffer.indexOf('Content-Type');
-        if (typeIndex !== -1) {
-            let typeEnd = buffer.indexOf('\r\n', typeIndex);
-            let typeRow = buffer.slice(typeIndex, typeEnd).toString().trim();
-
-            field.setContentType(typeRow);
-            //console.log('type:', typeIndex, typeEnd, typeRow);
-
-            contentStart = typeEnd + 4;
-        } else {
-            contentStart = dispositionEnd + 4;
-        }
-        field.addData(buffer.slice(contentStart));
-
-        return field;
-    }
-}
-
-export class Field {
-    header: string;
-    name: string;
-    filename: string;
-    data: any;
-    type: string;
-
-    constructor(header: string) {
-        this.header = header;
-
-        let hash = Field.headerToHash(header);
-        this.name = hash['name'];
-        this.filename = hash['filename'];
-        this.data = '';
-    }
-
-    addData(data: any) {
-        this.data = data;
-    }
-
-    setContentType(header: string) {
-        let nameParts = header.split(': ');
-        if (nameParts) {
-            this.type = nameParts[1];
-        }
-    }
-
-    static headerToHash(header: string) {
-        let hash = {};
-        let parts = header.split('; ');
-
-        // Header Name
-        if (parts && parts[0]) {
-            let nameParts = parts[0].split(': ');
-            if (nameParts && nameParts.length === 2) {
-                hash[nameParts[0]] = nameParts[1];
+    static async handleUrlEncoded(context: Context) {
+        let body: Buffer[] = [];
+        return new Promise<any>((resolve, reject) => {
+            try {
+                context.request.on('error', (e) => {
+                    reject(e);
+                }).on('data', (data) => {
+                    if (typeof data === 'string') {
+                        body.push(new Buffer(data));
+                    } else {
+                        body.push(data);
+                    }
+                }).on('end', () => {
+                    try {
+                        let bufferedData = Buffer.concat(body).toString().trim();
+                        context.body = bufferedData ? EncodeUtil.urlStringToObject(bufferedData) : null;
+                        resolve(context.body);
+                    }
+                    catch (e) {
+                        reject(e);
+                    }
+                });
             }
-            parts.shift();
-        }
-
-        // Header Data
-        parts.forEach(part => {
-            let match = part.trim().match(/(.*)=\"(.*)\"/);
-            if (match && match.length === 3) {
-                hash[match[1]] = match[2];
+            catch (e) {
+                reject(e);
             }
         });
-        return hash;
+    }
+
+    static async handleText(context: Context) {
+        let body: Buffer[] = [];
+        return new Promise<any>((resolve, reject) => {
+            try {
+                context.request.on('error', (e) => {
+                    reject(e);
+                }).on('data', (data) => {
+                    if (typeof data === 'string') {
+                        body.push(new Buffer(data));
+                    } else {
+                        body.push(data);
+                    }
+                }).on('end', () => {
+                    try {
+                        let bufferedData = Buffer.concat(body).toString().trim();
+                        context.body = bufferedData;
+                        resolve(context.body);
+                    }
+                    catch (e) {
+                        reject(e);
+                    }
+                });
+            }
+            catch (e) {
+                reject(e);
+            }
+        });
+    }
+
+    static async handleFormData(context: Context) {
+        let bufferDecoder = new BufferDecoder(context.httpBoundary);
+        return new Promise<any>((resolve, reject) => {
+            try {
+                context.request.on('error', (e) => {
+                    reject(e);
+                }).on('data', (data) => {
+                    if (typeof data === 'string') {
+                        bufferDecoder.addData(new Buffer(data));
+                    } else {
+                        bufferDecoder.addData(data);
+                    }
+                }).on('end', () => {
+                    try {
+                        context.body = bufferDecoder.decode();
+                        resolve(context.body);
+                    }
+                    catch (e) {
+                        reject(e);
+                    }
+                });
+            }
+            catch (e) {
+                reject(e);
+            }
+        });
     }
 }
