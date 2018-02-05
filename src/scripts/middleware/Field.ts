@@ -1,27 +1,38 @@
+import stream, { Stream, Duplex } from 'stream';
+
 export default class Field {
     header: string;
     name: string;
-    filename: string;
+    fileName: string;
+    fileType: string;
+    fileStream: Duplex;
     data: any;
-    type: string;
 
     constructor(header: string) {
         this.header = header;
 
         let hash = Field.headerToHash(header);
         this.name = hash['name'];
-        this.filename = hash['filename'];
+        this.fileName = hash['filename'];
         this.data = '';
+        this.fileStream = new Duplex();
+        this.fileStream.on('data', (data) => {
+            this.data = data;
+        });
     }
 
     addData(data: any) {
-        this.data = data;
+        if (this.fileName) {
+            this.fileStream.push(data)
+        } else {
+            this.data = data;
+        }
     }
 
     setContentType(header: string) {
         let nameParts = header.split(': ');
         if (nameParts) {
-            this.type = nameParts[1];
+            this.fileType = nameParts[1];
         }
     }
 

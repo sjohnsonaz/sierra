@@ -19,11 +19,11 @@ export default class BuferDecoder {
         let result: Object = {};
         this.fields.forEach(field => {
             if (field.name) {
-                if (field.filename) {
+                if (field.fileName) {
                     result[field.name] = {
-                        filename: field.filename,
+                        filename: field.fileName,
                         data: field.data,
-                        type: field.type
+                        type: field.fileType
                     };
                 } else {
                     result[field.name] = field.data;
