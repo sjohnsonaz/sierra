@@ -16,6 +16,7 @@ export default class Field {
         this.fileName = hash['filename'];
         this.data = '';
         this.fileStream = new Duplex();
+        this.fileStream._read = function () { };
         this.fileStream.on('data', (data) => {
             this.data = data;
         });
