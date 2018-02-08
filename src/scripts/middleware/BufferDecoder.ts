@@ -31,17 +31,20 @@ export default class BufferDecoder {
         } else {
             let previousBoundary: Boundary = undefined;
             boundaries.forEach((boundary, index) => {
-                if (index === 0) {
-                    // We have the first boundary
+                // We have the first boundary
+                if (!previousBoundary) {
+                    // Push all data into current Field
                     if (this.currentField && boundary.start > 0) {
-                        // Push all data into current Field
                         this.currentField.addData(buffer.slice(0, boundary.start - 1));
                     }
-                } else {
-                    // Create new Field
-                    // Push data between previousBoundary and boundary into Field
-                    this.currentField = new Field();
-                    this.fields.push(this.currentField);
+                }
+
+                // Create new Field
+                this.currentField = new Field();
+                this.fields.push(this.currentField);
+
+                // Push data between previousBoundary and boundary into Field
+                if (previousBoundary) {
                     this.currentField.addData(buffer.slice(previousBoundary.end, boundary.start - 1));
                 }
                 previousBoundary = boundary;
