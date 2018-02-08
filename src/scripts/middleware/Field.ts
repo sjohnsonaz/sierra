@@ -1,19 +1,17 @@
 import stream, { Stream, Duplex } from 'stream';
+import FormDataHeader from './FormDataHeader';
 
 export default class Field {
-    header: string;
+    header: FormDataHeader;
     name: string;
     fileName: string;
     fileType: string;
     fileStream: Duplex;
     data: any;
+    firstLine: boolean = false;
+    stashedBuffer: Buffer;
 
-    constructor(header: string) {
-        this.header = header;
-
-        let hash = Field.headerToHash(header);
-        this.name = hash['name'];
-        this.fileName = hash['filename'];
+    constructor() {
         this.data = '';
         this.fileStream = new Duplex();
         this.fileStream._read = function () { };
@@ -22,41 +20,50 @@ export default class Field {
         });
     }
 
-    addData(data: any) {
-        if (this.fileName) {
-            this.fileStream.push(data)
-        } else {
-            this.data = data;
-        }
-    }
-
-    setContentType(header: string) {
-        let nameParts = header.split(': ');
-        if (nameParts) {
-            this.fileType = nameParts[1];
-        }
-    }
-
-    static headerToHash(header: string) {
-        let hash = {};
-        let parts = header.split('; ');
-
-        // Header Name
-        if (parts && parts[0]) {
-            let nameParts = parts[0].split(': ');
-            if (nameParts && nameParts.length === 2) {
-                hash[nameParts[0]] = nameParts[1];
+    addData(buffer: Buffer) {
+        let headerEnd = 0;
+        if (!this.header) {
+            if (this.stashedBuffer) {
+                buffer = Buffer.concat([this.stashedBuffer, buffer]);
             }
-            parts.shift();
-        }
-
-        // Header Data
-        parts.forEach(part => {
-            let match = part.trim().match(/(.*)=\"(.*)\"/);
-            if (match && match.length === 3) {
-                hash[match[1]] = match[2];
+            headerEnd = buffer.indexOf('\r\n\r\n');
+            if (headerEnd !== -1) {
+                this.createHeader(buffer.slice(0, headerEnd).toString().trim());
+                this.stashedBuffer = undefined;
+            } else {
+                this.stashedBuffer = buffer;
             }
-        });
-        return hash;
+        }
+        console.log('header object:', this.header);
+        if (this.header) {
+            let data = headerEnd > 0 ? buffer.slice(headerEnd + 4) : buffer;
+            if (this.fileName) {
+                this.fileStream.push(data)
+            } else {
+                this.data = data;
+            }
+        }
     }
+
+    private createHeader(row: string) {
+        console.log('header:', row);
+        this.header = FormDataHeader.create(row);
+        let contentDisposition = this.header.contentDisposition;
+        console.log('disposition:', contentDisposition);
+        if (contentDisposition) {
+            this.name = contentDisposition.hash['name'];
+            this.fileName = contentDisposition.hash['filename'];
+        }
+        this.fileType = this.header.contentType;
+    }
+
+    /*
+    private getRowEnd(buffer: Buffer, start?: number) {
+        return buffer.indexOf('\r\n', start);
+    }
+
+    private getRow(buffer: Buffer, start?: number, end?: number) {
+        return buffer.slice(start, end).toString().trim();
+    }
+    */
 }

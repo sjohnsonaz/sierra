@@ -1,22 +1,84 @@
 import Field from './Field';
+import Boundary from './Boundary';
 
-export default class BuferDecoder {
+export default class BufferDecoder {
     boundary: string;
-    boundaryEnd: string;
+    //boundaryEnd: string;
     boundaryLength: number;
     bufferRemainder: Buffer;
+    bufferRemainderLength
     fields: Field[] = [];
     currentField: Field;
     firstChunk: boolean = true;
 
     constructor(httpBoundary: string) {
         this.boundary = '--' + httpBoundary;
-        this.boundaryEnd = httpBoundary + '--';
-        this.boundaryLength = this.boundary.length;
+        //this.boundaryEnd = httpBoundary + '--';
+        // Add two to the end for the '--'
+        this.boundaryLength = this.boundary.length + 2;
+        this.bufferRemainder = Buffer.alloc(this.boundaryLength);
+    }
+
+    addData(buffer: Buffer) {
+        buffer = this.unStash(buffer);
+        let boundaries = Boundary.getBoundaries(buffer, this.boundary);
+        console.log(boundaries);
+        if (!boundaries.length) {
+            // All data goes to the last Field
+            if (this.currentField) {
+                this.currentField.addData(this.stash(buffer));
+            }
+        } else {
+            let previousBoundary: Boundary = undefined;
+            boundaries.forEach((boundary, index) => {
+                if (index === 0) {
+                    // We have the first boundary
+                    if (this.currentField && boundary.start > 0) {
+                        // Push all data into current Field
+                        this.currentField.addData(buffer.slice(0, boundary.start - 1));
+                    }
+                } else {
+                    // Create new Field
+                    // Push data between previousBoundary and boundary into Field
+                    this.currentField = new Field();
+                    this.fields.push(this.currentField);
+                    this.currentField.addData(buffer.slice(previousBoundary.end, boundary.start - 1));
+                }
+                previousBoundary = boundary;
+            });
+            // We have the last boundary
+            if (!previousBoundary.final) {
+                // If we have seen a boundary before, push all data into the current field
+                if (this.currentField) {
+                    this.stash(buffer, previousBoundary.end);
+                    //this.currentField.addData(this.stash(buffer, previousBoundary.end));
+                }
+                // Otherwise we are getting data that cannot be used
+            }
+        }
+    }
+
+    private stash(buffer: Buffer, start: number = 0) {
+        let remainderLength = start + buffer.length - this.boundaryLength;
+        this.bufferRemainder = buffer.slice(start);
+        if (remainderLength > 0) {
+            return buffer.slice(start, remainderLength - 1);
+        } else {
+            return Buffer.alloc(0);
+        }
+    }
+
+    private unStash(buffer: Buffer) {
+        if (this.bufferRemainder.length > 0) {
+            return Buffer.concat([this.bufferRemainder, buffer]);
+        } else {
+            return buffer;
+        }
     }
 
     decode() {
         let result: Object = {};
+        console.log(this.fields);
         this.fields.forEach(field => {
             if (field.name) {
                 if (field.fileName) {
@@ -32,68 +94,5 @@ export default class BuferDecoder {
         });
 
         return result;
-    }
-
-    addData(buffer: Buffer) {
-        let currentBuffer = buffer;
-        if (this.bufferRemainder) {
-            currentBuffer = Buffer.concat([this.bufferRemainder, buffer]);
-        }
-        let nextIndex = this.parseBuffer(currentBuffer);
-        this.bufferRemainder = currentBuffer.slice(nextIndex);
-    }
-
-    private parseBuffer(buffer: Buffer) {
-        let length = buffer.length;
-        let index = 0;
-        if (this.firstChunk) {
-            index = buffer.indexOf(this.boundary, 0, 'ascii') + this.boundaryLength;
-            this.firstChunk = false;
-        }
-        while (index < length) {
-            let firstIndex = index;
-            let nextIndex = buffer.indexOf(this.boundary, firstIndex, 'ascii');
-            if (nextIndex === -1) {
-                break;
-            }
-            let bufferPart = buffer.slice(firstIndex, nextIndex - 1);
-
-            this.currentField = this.createField(bufferPart);
-            this.fields.push(this.currentField);
-
-            index = nextIndex + this.boundaryLength;
-        }
-        return index;
-    }
-
-    private createField(buffer: Buffer) {
-        let field: Field;
-        let data = buffer.toString().trim();
-        let lines = data.split('\r\n');
-
-        let dispositionIndex = buffer.indexOf('Content-Disposition');
-        let dispositionEnd = buffer.indexOf('\r\n', dispositionIndex);
-        let dispositionRow = buffer.slice(dispositionIndex, dispositionEnd).toString().trim();
-
-        //console.log('disposition:', dispositionIndex, dispositionEnd, dispositionRow);
-        field = new Field(dispositionRow);
-
-        let contentStart;
-
-        let typeIndex = buffer.indexOf('Content-Type');
-        if (typeIndex !== -1) {
-            let typeEnd = buffer.indexOf('\r\n', typeIndex);
-            let typeRow = buffer.slice(typeIndex, typeEnd).toString().trim();
-
-            field.setContentType(typeRow);
-            //console.log('type:', typeIndex, typeEnd, typeRow);
-
-            contentStart = typeEnd + 4;
-        } else {
-            contentStart = dispositionEnd + 4;
-        }
-        field.addData(buffer.slice(contentStart));
-
-        return field;
     }
 }
