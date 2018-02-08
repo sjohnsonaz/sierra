@@ -22,7 +22,6 @@ export default class BufferDecoder {
     addData(buffer: Buffer) {
         buffer = this.unStash(buffer);
         let boundaries = Boundary.getBoundaries(buffer, this.boundary);
-        console.log(boundaries);
         if (!boundaries.length) {
             // All data goes to the last Field
             if (this.currentField) {
@@ -81,7 +80,6 @@ export default class BufferDecoder {
 
     decode() {
         let result: Object = {};
-        console.log(this.fields);
         this.fields.forEach(field => {
             if (field.name) {
                 if (field.fileName) {

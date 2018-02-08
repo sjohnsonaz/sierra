@@ -34,7 +34,6 @@ export default class Field {
                 this.stashedBuffer = buffer;
             }
         }
-        console.log('header object:', this.header);
         if (this.header) {
             let data = headerEnd > 0 ? buffer.slice(headerEnd + 4) : buffer;
             if (this.fileName) {
@@ -46,24 +45,12 @@ export default class Field {
     }
 
     private createHeader(row: string) {
-        console.log('header:', row);
         this.header = FormDataHeader.create(row);
         let contentDisposition = this.header.contentDisposition;
-        console.log('disposition:', contentDisposition);
         if (contentDisposition) {
             this.name = contentDisposition.hash['name'];
             this.fileName = contentDisposition.hash['filename'];
         }
         this.fileType = this.header.contentType;
     }
-
-    /*
-    private getRowEnd(buffer: Buffer, start?: number) {
-        return buffer.indexOf('\r\n', start);
-    }
-
-    private getRow(buffer: Buffer, start?: number, end?: number) {
-        return buffer.slice(start, end).toString().trim();
-    }
-    */
 }
