@@ -29,33 +29,35 @@ export default class BufferDecoder {
             }
         } else {
             let previousBoundary: Boundary = undefined;
-            boundaries.forEach((boundary, index) => {
-                // We have the first boundary
+            for (let index = 0, length = boundaries.length - 1; index <= length; index++) {
+                let boundary = boundaries[index];
+
+                // We have the first boundary of this chunk
                 if (!previousBoundary) {
-                    // Push all data into current Field
+                    // Push all data into the old field
                     if (this.currentField && boundary.start > 0) {
                         this.currentField.addData(buffer.slice(0, boundary.start - 1));
                     }
                 }
 
-                // Create new Field
-                this.currentField = new Field();
-                this.fields.push(this.currentField);
+                // Push if not the end boundary
+                if (!boundary.final) {
+                    // Create new Field
+                    this.currentField = new Field();
+                    this.fields.push(this.currentField);
 
-                // Push data between previousBoundary and boundary into Field
-                if (previousBoundary) {
-                    this.currentField.addData(buffer.slice(previousBoundary.end, boundary.start - 1));
+                    let start = previousBoundary ? previousBoundary.end : 0;
+
+                    // We have the last boundary of this chunk
+                    if (index === length) {
+                        this.currentField.addData(this.stash(buffer, start));
+                    } else {
+                        this.currentField.addData(buffer.slice(start, boundary.start - 1));
+                    }
                 }
+
+                // Store boundary
                 previousBoundary = boundary;
-            });
-            // We have the last boundary
-            if (!previousBoundary.final) {
-                // If we have seen a boundary before, push all data into the current field
-                if (this.currentField) {
-                    this.stash(buffer, previousBoundary.end);
-                    //this.currentField.addData(this.stash(buffer, previousBoundary.end));
-                }
-                // Otherwise we are getting data that cannot be used
             }
         }
     }
