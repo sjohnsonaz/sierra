@@ -16,7 +16,7 @@ export { default as RouteBuilder, IRouteNames } from './router/RouteBuilder';
 export { Verb } from './router/Verb';
 
 export { default as RouteMiddleware } from './middleware/RouteMiddleware';
-export { default as BodyMiddleware } from './middleware/BodyMiddleware';
+export { default as BodyMiddleware } from './middleware/body/BodyMiddleware';
 export { default as SessionMiddleware } from './middleware/SessionMiddleware';
 
 export { default as Uuid } from './utils/Uuid';

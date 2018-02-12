@@ -1,7 +1,7 @@
 import { request } from 'https';
 
-import Context from '../server/Context';
-import EncodeUtil from '../utils/EncodeUtil';
+import Context from '../../server/Context';
+import EncodeUtil from '../../utils/EncodeUtil';
 
 import Field from './Field';
 
