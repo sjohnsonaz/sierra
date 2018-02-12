@@ -85,7 +85,8 @@ export default class Session<T> {
         // Do we have a cookie?
         if (regenerate || !id) {
             id = await gateway.getId(context);
-            cookie[cookieIdentifier] = id + '; Path=/';
+            cookie[cookieIdentifier] = id;
+            cookie['Path'] = '/';
             Session.setCookie(context, cookie);
         }
 
