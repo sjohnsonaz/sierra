@@ -1,6 +1,6 @@
 
 import Context from './Context';
-import { ICookie } from './ICookie';
+import Cookie from './Cookie';
 import { ISessionGateway } from './ISessionGateway'
 import { Errors } from './Errors';
 
@@ -42,10 +42,10 @@ export default class Session<T> {
         }
 
         // Try to remove cookie from client
-        let cookie = Session.getCookie(this.context);
+        let cookie = Cookie.getCookie(this.context);
         cookie[this.cookieIdentifier] = 'deleted';
         cookie['expires'] = 'Thu, 01 Jan 1970 00:00:00 GMT';
-        Session.setCookie(this.context, cookie);
+        Cookie.setCookie(this.context, cookie);
 
         return await this.gateway.destroy(this.context, this.id);
     }
@@ -58,7 +58,7 @@ export default class Session<T> {
     }
 
     touch(): string {
-        let cookie = Session.getCookie(this.context);
+        let cookie = Cookie.getCookie(this.context);
         let expires = (new Date(Date.now() + 60 * 1000)).toUTCString();
         cookie['expires'] = expires;
         return expires;
@@ -79,7 +79,7 @@ export default class Session<T> {
             regenerate
         } = options;
 
-        let cookie = Session.getCookie(context);
+        let cookie = Cookie.getCookie(context);
         let id = cookie[cookieIdentifier];
 
         // Do we have a cookie?
@@ -87,7 +87,7 @@ export default class Session<T> {
             id = await gateway.getId(context);
             cookie[cookieIdentifier] = id;
             cookie['Path'] = '/';
-            Session.setCookie(context, cookie);
+            Cookie.setCookie(context, cookie);
         }
 
         // Load data for this id
@@ -98,33 +98,5 @@ export default class Session<T> {
         context.session = session;
 
         return session;
-    }
-
-    static cookieToHash(cookie: string) {
-        let entries = cookie ? cookie.split(';').map(entry => entry.trim()) : [];
-        let hash: ICookie = {};
-        entries.forEach(entry => {
-            let parts = entry.split('=');
-            if (parts.length === 2 && parts[0] && parts[1]) {
-                hash[parts[0]] = parts[1];
-            }
-        });
-        return hash;
-    }
-
-    static hashToCookie(hash: ICookie) {
-        return Object.keys(hash).map(name => name + '=' + hash[name] + ';').join(' ');
-    }
-
-    static hashToCookieArray(hash: ICookie) {
-        return Object.keys(hash).map(name => name + '=' + hash[name]);
-    }
-
-    static getCookie(context: Context) {
-        return Session.cookieToHash(context.request.headers.cookie);
-    }
-
-    static setCookie(context: Context, hash: ICookie) {
-        context.response.setHeader('Set-Cookie', Session.hashToCookie(hash));
     }
 }

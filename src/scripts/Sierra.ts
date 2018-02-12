@@ -1,6 +1,6 @@
 export { default as Context } from './server/Context';
 import { Errors } from './server/Errors';
-export { ICookie } from './server/ICookie';
+export { default as Cookie } from './server/Cookie';
 export { IMethod } from './server/IMethod';
 export { IMiddleware } from './server/IMiddleware';
 export { ISessionGateway } from './server/ISessionGateway';
