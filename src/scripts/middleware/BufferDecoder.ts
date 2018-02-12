@@ -25,9 +25,6 @@ export default class BufferDecoder {
 
         // Get all boundaries from buffer
         let boundaries = Boundary.getBoundaries(buffer, this.boundary);
-        if (boundaries.length) {
-            console.log('boundaries:', boundaries);
-        }
 
         // Do we have any boundaries?
         if (!boundaries.length) {

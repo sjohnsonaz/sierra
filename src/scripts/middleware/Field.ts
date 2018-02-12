@@ -18,15 +18,12 @@ export default class Field {
         this.fileStream.on('data', (data) => {
             this.data = data;
         });
-        console.log('field created...');
     }
 
     addData(buffer: Buffer) {
         let headerEnd = 0;
         // Do we not have a header?
         if (!this.header) {
-            console.log('header text:', buffer.toString().trim());
-
             // We need to find a header
             if (this.stashedBuffer) {
                 // We have stashed buffer content
@@ -54,12 +51,11 @@ export default class Field {
         if (this.header) {
             // We have a header
             let data = buffer;
-            //console.log('data length:', data.length);
-            //if (this.fileName) {
-            //this.fileStream.push(data)
-            // } else {
-            this.data = data;
-            // }
+            if (this.fileName) {
+                this.fileStream.push(data)
+            } else {
+                this.data = data;
+            }
         }
     }
 
