@@ -98,7 +98,7 @@ export default class BufferDecoder {
                 if (field.fileName) {
                     result[field.name] = {
                         filename: field.fileName,
-                        data: field.data,
+                        data: Buffer.concat(field.data as Buffer[]),
                         type: field.fileType
                     };
                 } else {

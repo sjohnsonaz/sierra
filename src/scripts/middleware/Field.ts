@@ -8,18 +8,17 @@ export default class Field {
     fileName: string;
     fileType: string;
     fileStream: Duplex;
-    data: any;
+    data: (string | Buffer)[] = [];
     firstLine: boolean = false;
     stashedBuffer: Buffer;
     fileHandler: IFileHandler;
 
     constructor(fileHandler: IFileHandler) {
-        this.data = '';
         this.fileHandler = fileHandler;
         this.fileStream = new Duplex();
         this.fileStream._read = function () { };
         this.fileStream.on('data', (data) => {
-            this.data = data;
+            this.data.push(data);
         });
     }
 
@@ -57,7 +56,7 @@ export default class Field {
             if (this.fileName) {
                 this.fileStream.push(data)
             } else {
-                this.data = data;
+                this.data.push(data);
             }
         }
     }
