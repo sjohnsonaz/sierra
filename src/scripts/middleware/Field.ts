@@ -18,29 +18,48 @@ export default class Field {
         this.fileStream.on('data', (data) => {
             this.data = data;
         });
+        console.log('field created...');
     }
 
     addData(buffer: Buffer) {
         let headerEnd = 0;
+        // Do we not have a header?
         if (!this.header) {
+            console.log('header text:', buffer.toString().trim());
+
+            // We need to find a header
             if (this.stashedBuffer) {
+                // We have stashed buffer content
+                // Concatenate the stash with buffer
                 buffer = Buffer.concat([this.stashedBuffer, buffer]);
             }
+
+            // Find the end of the header
             headerEnd = buffer.indexOf('\r\n\r\n');
+
             if (headerEnd !== -1) {
+                // We found the end of the header
+                // Create the header with the buffer
                 this.createHeader(buffer.slice(0, headerEnd).toString().trim());
+                // Store the remainder of the buffer into buffer
+                buffer = buffer.slice(headerEnd + 4);
                 this.stashedBuffer = undefined;
             } else {
+                // We haven't found the end of the header
+                // Stash the buffer
                 this.stashedBuffer = buffer;
             }
         }
+        // Do we have a header
         if (this.header) {
-            let data = headerEnd > 0 ? buffer.slice(headerEnd + 4) : buffer;
-            if (this.fileName) {
-                this.fileStream.push(data)
-            } else {
-                this.data = data;
-            }
+            // We have a header
+            let data = buffer;
+            //console.log('data length:', data.length);
+            //if (this.fileName) {
+            //this.fileStream.push(data)
+            // } else {
+            this.data = data;
+            // }
         }
     }
 

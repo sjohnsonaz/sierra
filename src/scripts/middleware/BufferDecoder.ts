@@ -20,39 +20,50 @@ export default class BufferDecoder {
     }
 
     addData(buffer: Buffer) {
+        // Get buffer and stash
         buffer = this.unStash(buffer);
+
+        // Get all boundaries from buffer
         let boundaries = Boundary.getBoundaries(buffer, this.boundary);
+        if (boundaries.length) {
+            console.log('boundaries:', boundaries);
+        }
+
+        // Do we have any boundaries?
         if (!boundaries.length) {
+            // We have no boundaries
             // All data goes to the last Field
             if (this.currentField) {
                 this.currentField.addData(this.stash(buffer));
             }
         } else {
+            // We do have boundaries
             let previousBoundary: Boundary = undefined;
             for (let index = 0, length = boundaries.length - 1; index <= length; index++) {
                 let boundary = boundaries[index];
 
-                // We have the first boundary of this chunk
-                if (!previousBoundary) {
-                    // Push all data into the old field
-                    if (this.currentField && boundary.start > 0) {
-                        this.currentField.addData(buffer.slice(0, boundary.start - 1));
-                    }
+                // Push the data from before the boundary
+
+                // If we have a previous boundary, use it, otherwise start from 0
+                let start = previousBoundary ? previousBoundary.end : 0;
+
+                // Push all data into the old field
+                if (this.currentField && boundary.start > 0) {
+                    this.currentField.addData(buffer.slice(start, boundary.start));
                 }
 
-                // Push if not the end boundary
+                // Do we have the end boundary?
                 if (!boundary.final) {
+                    // We do not have the end boundary
+
                     // Create new Field
                     this.currentField = new Field();
                     this.fields.push(this.currentField);
 
-                    let start = previousBoundary ? previousBoundary.end : 0;
-
-                    // We have the last boundary of this chunk
+                    // Do we have the last boundary of this chunk?
                     if (index === length) {
-                        this.currentField.addData(this.stash(buffer, start));
-                    } else {
-                        this.currentField.addData(buffer.slice(start, boundary.start - 1));
+                        // We have the last boundary of this
+                        this.currentField.addData(this.stash(buffer, boundary.end));
                     }
                 }
 
@@ -64,9 +75,9 @@ export default class BufferDecoder {
 
     private stash(buffer: Buffer, start: number = 0) {
         let remainderLength = start + buffer.length - this.boundaryLength;
-        this.bufferRemainder = buffer.slice(start);
+        this.bufferRemainder = buffer.slice(remainderLength);
         if (remainderLength > 0) {
-            return buffer.slice(start, remainderLength - 1);
+            return buffer.slice(start, remainderLength);
         } else {
             return Buffer.alloc(0);
         }

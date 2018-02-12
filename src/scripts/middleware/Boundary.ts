@@ -30,7 +30,7 @@ export default class Boundary {
     }
 
     private static isFinalBoundary(buffer: Buffer, boundary: Boundary) {
-        let nextChars = buffer.slice(boundary.end, boundary.end + 1).toString('ascii');
+        let nextChars = buffer.slice(boundary.end, boundary.end + 2).toString('ascii');
         return nextChars[0] === '-' && nextChars[1] === '-';
     }
 
