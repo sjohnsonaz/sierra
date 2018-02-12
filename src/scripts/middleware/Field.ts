@@ -1,5 +1,6 @@
 import stream, { Stream, Duplex } from 'stream';
 import FormDataHeader from './FormDataHeader';
+import { IFileHandler } from './IFileHandler';
 
 export default class Field {
     header: FormDataHeader;
@@ -10,9 +11,11 @@ export default class Field {
     data: any;
     firstLine: boolean = false;
     stashedBuffer: Buffer;
+    fileHandler: IFileHandler;
 
-    constructor() {
+    constructor(fileHandler: IFileHandler) {
         this.data = '';
+        this.fileHandler = fileHandler;
         this.fileStream = new Duplex();
         this.fileStream._read = function () { };
         this.fileStream.on('data', (data) => {

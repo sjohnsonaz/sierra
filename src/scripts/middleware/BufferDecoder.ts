@@ -1,5 +1,6 @@
 import Field from './Field';
 import Boundary from './Boundary';
+import { IFileHandler } from './IFileHandler';
 
 export default class BufferDecoder {
     boundary: string;
@@ -10,13 +11,15 @@ export default class BufferDecoder {
     fields: Field[] = [];
     currentField: Field;
     firstChunk: boolean = true;
+    fileHandler: IFileHandler;
 
-    constructor(httpBoundary: string) {
+    constructor(httpBoundary: string, fileHandler: IFileHandler) {
         this.boundary = '--' + httpBoundary;
         //this.boundaryEnd = httpBoundary + '--';
         // Add two to the end for the '--'
         this.boundaryLength = this.boundary.length + 2;
         this.bufferRemainder = Buffer.alloc(this.boundaryLength);
+        this.fileHandler = fileHandler;
     }
 
     addData(buffer: Buffer) {
@@ -54,7 +57,7 @@ export default class BufferDecoder {
                     // We do not have the end boundary
 
                     // Create new Field
-                    this.currentField = new Field();
+                    this.currentField = new Field(this.fileHandler);
                     this.fields.push(this.currentField);
 
                     // Do we have the last boundary of this chunk?

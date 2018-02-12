@@ -7,6 +7,8 @@ import Field from './Field';
 
 import BufferDecoder from './BufferDecoder';
 
+import { IFileHandler } from './IFileHandler';
+
 export default class BodyMiddleware {
     static async handle(context: Context) {
         let verb = context.request.method.toLowerCase();
@@ -113,7 +115,7 @@ export default class BodyMiddleware {
     }
 
     static async handleFormData(context: Context) {
-        let bufferDecoder = new BufferDecoder(context.httpBoundary);
+        let bufferDecoder = new BufferDecoder(context.httpBoundary, () => { });
         return new Promise<any>((resolve, reject) => {
             try {
                 context.request.on('error', (e) => {
