@@ -1,6 +1,6 @@
 const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
 
-export default class RouteUtils {
+export default class RouteUtil {
     static getParameterNames(functionHandle: Function) {
         let definition = functionHandle.toString().replace(STRIP_COMMENTS, '');
         if (definition.startsWith('function')) {
@@ -23,8 +23,8 @@ export default class RouteUtils {
     }
 
     static functionToRegex(prefix: string, enter: Function): RegExp {
-        var params = RouteUtils.getParameterNames(enter);
+        var params = RouteUtil.getParameterNames(enter);
         params.unshift(prefix);
-        return RouteUtils.stringToRegex(params.join('/:'));
+        return RouteUtil.stringToRegex(params.join('/:'));
     }
 }
