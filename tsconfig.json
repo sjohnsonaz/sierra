@@ -18,6 +18,7 @@
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "lib": [
+      "dom",
       "es2017"
     ]
   },

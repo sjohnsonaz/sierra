@@ -77,7 +77,8 @@ export default class Cookie {
     }
 
     static getCookie(context: Context) {
-        return Cookie.stringToHash(context.request.headers.cookie);
+        // TODO: Fix cookie type
+        return Cookie.stringToHash(context.request.headers.cookie as string);
     }
 
     static setCookie(context: Context, hash: ICookieHash) {
