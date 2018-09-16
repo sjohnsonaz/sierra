@@ -43,8 +43,10 @@ export default class Session<T> {
 
         // Try to remove cookie from client
         let cookie = Cookie.getCookie(this.context);
-        cookie[this.cookieIdentifier] = 'deleted';
+        cookie[this.cookieIdentifier] = '';
         cookie['expires'] = 'Thu, 01 Jan 1970 00:00:00 GMT';
+        cookie['path'] = '/';
+        cookie['expires'] = (new Date(Date.now() + 60 * 1000)).toUTCString();
         Cookie.setCookie(this.context, cookie);
 
         return await this.gateway.destroy(this.context, this.id);
@@ -72,7 +74,8 @@ export default class Session<T> {
         regenerate: boolean;
     }>) {
         options = Object.assign({
-            cookieIdentifier: 'sierra_id'
+            cookieIdentifier: 'sierra_id',
+            expires: (new Date(Date.now() + 60 * 1000))
         }, options);
         let {
             cookieIdentifier,
@@ -86,7 +89,8 @@ export default class Session<T> {
         if (regenerate || !id) {
             id = await gateway.getId(context);
             cookie[cookieIdentifier] = id;
-            cookie['Path'] = '/';
+            cookie['path'] = '/';
+            cookie['expires'] = options.expires.toUTCString();
             Cookie.setCookie(context, cookie);
         }
 
