@@ -16,26 +16,26 @@ export default class Application {
     server: http.Server;
     controllers: Controller[] = [];
 
-    init() {
-        this.connectDatabase();
-        this.addMiddleware(this.requestHandler);
-        this.buildControllers();
+    async init() {
+        await this.connectDatabase();
+        await this.addMiddleware(this.requestHandler);
+        await this.buildControllers();
         return this.requestHandler;
     }
 
-    connectDatabase(): Promise<boolean> {
-        return Promise.resolve(true);
+    connectDatabase(): Promise<void> {
+        return Promise.resolve();
     }
 
-    addMiddleware(requestHandler: RequestHandler): void {
-
+    addMiddleware(requestHandler: RequestHandler): Promise<void> {
+        return Promise.resolve();
     }
 
     addController(controller: Controller) {
         this.controllers.push(controller);
     }
 
-    buildControllers() {
+    async    buildControllers() {
         console.log('Building Controllers: ' + this.controllers.length);
 
         this.controllers.forEach(controller => {
