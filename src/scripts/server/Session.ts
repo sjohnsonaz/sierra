@@ -44,9 +44,8 @@ export default class Session<T> {
         // Try to remove cookie from client
         let cookie = Cookie.getCookie(this.context);
         cookie[this.cookieIdentifier] = '';
-        cookie['expires'] = 'Thu, 01 Jan 1970 00:00:00 GMT';
         cookie['path'] = '/';
-        cookie['expires'] = (new Date(Date.now() + 60 * 1000)).toUTCString();
+        cookie['expires'] = (new Date(Date.now() + 60 * 60 * 1000)).toUTCString();
         Cookie.setCookie(this.context, cookie);
 
         return await this.gateway.destroy(this.context, this.id);
@@ -61,7 +60,7 @@ export default class Session<T> {
 
     touch(): string {
         let cookie = Cookie.getCookie(this.context);
-        let expires = (new Date(Date.now() + 60 * 1000)).toUTCString();
+        let expires = (new Date(Date.now() + 60 * 60 * 1000)).toUTCString();
         cookie['expires'] = expires;
         return expires;
     }
@@ -75,7 +74,7 @@ export default class Session<T> {
     }>) {
         options = Object.assign({
             cookieIdentifier: 'sierra_id',
-            expires: (new Date(Date.now() + 60 * 1000))
+            expires: (new Date(Date.now() + 60 * 60 * 1000))
         }, options);
         let {
             cookieIdentifier,
