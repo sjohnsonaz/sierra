@@ -102,7 +102,8 @@ export default class BufferDecoder {
                         type: field.fileType
                     };
                 } else {
-                    result[field.name] = field.data;
+                    let data = Buffer.concat(field.data as Buffer[]).toString();
+                    result[field.name] = data.substr(0, data.length - 2);
                 }
             }
         });
