@@ -21,11 +21,12 @@ export default class RequestHandler {
                 result = await this.middlewares[index](context, result);
                 if (result instanceof OutgoingMessage) {
                     this.send(context, result.data, result.status, result.type, result.template, result.contentType);
-                    break;
+                    return;
                 }
             }
             if (!(result instanceof OutgoingMessage)) {
                 this.send(context, result);
+                return
             }
             if (result === undefined) {
                 throw Errors.notFound;
