@@ -141,7 +141,7 @@ export default class RequestHandler {
         }
     }
 
-    sendError<T>(context: Context, data: Error, status: number = 500) {
+    async sendError<T>(context: Context, data: Error, status: number = 500) {
         console.log(context.request.method, context.request.url, colorStatus(status));
         let accept = context.request.headers.accept;
         if (!(data instanceof Error)) {
@@ -150,10 +150,15 @@ export default class RequestHandler {
         if (Math.floor(status / 100) === 5) {
             console.error(data);
         }
-        if (this.view && accept && accept.indexOf('text/html') > -1) {
-            this.sendView(context, data, status, 'error');
-        } else {
-            this.sendJson(context, data.message || data.name, status);
+        try {
+            if (this.view && accept && accept.indexOf('text/html') > -1) {
+                await this.sendView(context, data, status, 'error');
+            } else {
+                await this.sendJson(context, data.message || data.name, status);
+            }
+        }
+        catch (e) {
+            console.error(e);
         }
     }
 
