@@ -5,7 +5,6 @@ import { getArgumentNames, wrapMethod } from '../utils/FunctionUtil';
 import RouteUtil from '../utils/RouteUtil';
 import Controller from './Controller';
 import Route from './Route';
-import RequestHandler from '../server/RequestHandler';
 
 import RouteDefinition, { RouteMethod } from './RouteDefinition';
 
