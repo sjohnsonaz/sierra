@@ -1,5 +1,5 @@
 import * as http from 'http';
-import * as Url from 'url';
+import { URL } from 'url';
 
 import OutgoingMessage from './OutgoingMessage';
 import Session from './Session';
@@ -32,14 +32,15 @@ export default class Context {
         this.createAccept(request);
 
         this.url = request.url;
-        let url = Url.parse(request.url, true);
-        // Remove ending '/' from pathname
+
+        let url = new URL(request.url, 'http://' + request.headers.host + '/');
+        // Remove ending '/' from pathname, unless only single '/'.
         let pathname = url.pathname;
-        if (pathname.endsWith('/')) {
+        if (pathname !== '/' && pathname.endsWith('/')) {
             pathname = pathname.slice(0, -1);
         }
         this.pathname = pathname;
-        this.query = url.query;
+        this.query = url.searchParams;
     }
 
     private createContentType(request: http.IncomingMessage) {

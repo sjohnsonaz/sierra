@@ -26,6 +26,7 @@
     "@types/chai": "4.1.7",
     "@types/handlebars": "4.1.0",
     "@types/mocha": "5.2.6",
+    "@types/node": "11.10.5",
     "chai": "4.2.0",
     "chai-http": "4.2.1",
     "handlebars": "4.1.0",

@@ -1,7 +1,4 @@
-import { IMiddleware } from '../server/IMiddleware';
-
 import RouteBuilder from './RouteBuilder';
-import RequestHandler from '../server/RequestHandler';
 import Route from './Route';
 
 export default class Controller {
