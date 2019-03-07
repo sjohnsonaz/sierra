@@ -23,17 +23,16 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@types/chai": "4.1.4",
-    "@types/chai-http": "3.0.5",
-    "@types/handlebars": "4.0.39",
-    "@types/mocha": "5.2.5",
-    "chai": "4.1.2",
-    "chai-http": "4.2.0",
-    "handlebars": "^4.1.0",
-    "mocha": "5.2.0",
-    "nodemon": "1.18.4",
-    "rimraf": "2.6.2",
-    "typescript": "3.0.3"
+    "@types/chai": "4.1.7",
+    "@types/handlebars": "4.1.0",
+    "@types/mocha": "5.2.6",
+    "chai": "4.2.0",
+    "chai-http": "4.2.1",
+    "handlebars": "4.1.0",
+    "mocha": "6.0.2",
+    "nodemon": "1.18.10",
+    "rimraf": "2.6.3",
+    "typescript": "3.3.3333"
   },
   "keywords": [
     "service",
