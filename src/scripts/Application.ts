@@ -6,7 +6,7 @@ import { IViewMiddleware } from './server/IViewMiddleware';
 import Controller from './router/Controller';
 import Route from './router/Route';
 
-import RequestHandler from './server/RequestHandler';
+import RequestHandler, { LogLevel } from './server/RequestHandler';
 import RouteMiddleware from './middleware/RouteMiddleware';
 import { error } from 'util';
 
@@ -15,6 +15,14 @@ export default class Application {
     routeMiddleware: RouteMiddleware = new RouteMiddleware();
     server: http.Server;
     controllers: Controller[] = [];
+
+    get logging() {
+        return this.requestHandler.logging;
+    }
+
+    set logging(logging: LogLevel) {
+        this.requestHandler.logging = logging;
+    }
 
     async init() {
         await this.connectDatabase();
@@ -35,9 +43,7 @@ export default class Application {
         this.controllers.push(controller);
     }
 
-    async    buildControllers() {
-        console.log('Building Controllers: ' + this.controllers.length);
-
+    async buildControllers() {
         this.controllers.forEach(controller => {
             controller.build().forEach(route => {
                 this.routeMiddleware.routes.push(route);
@@ -78,8 +84,6 @@ export default class Application {
 
         // Concat all Routes
         this.routeMiddleware.routes = regexRoutes.concat(stringRoutes);
-
-        console.log('Routes: ' + this.routeMiddleware.routes.length);
 
         this.requestHandler.use(this.routeMiddleware.handler);
     }

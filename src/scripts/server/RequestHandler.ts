@@ -8,10 +8,17 @@ import { Errors } from './Errors';
 
 import ConsoleUtil from '../utils/ConsoleUtil';
 
+export enum LogLevel {
+    none = 0,
+    errors = 1,
+    verbose = 2
+}
+
 export default class RequestHandler {
     middlewares: IMiddleware<any, any>[] = [];
     error: IMiddleware<any, any>;
     view: IViewMiddleware<any>;
+    logging: LogLevel = LogLevel.errors;
 
     callback = async (request: http.IncomingMessage, response: http.ServerResponse) => {
         let context = new Context(request, response);
@@ -92,7 +99,9 @@ export default class RequestHandler {
             context.response.end();
         }
         catch (e) {
-            console.error(e);
+            if (this.logging >= LogLevel.errors) {
+                console.error(e);
+            }
             context.response.statusCode = 500;
             context.response.setHeader('Content-Type', 'text/html');
             context.response.write('\
@@ -112,7 +121,9 @@ export default class RequestHandler {
     }
 
     send<T>(context: Context, data: T, status: number = 200, type: OutputType = 'auto', template?: string, contentType?: string) {
-        console.log(context.request.method, context.request.url, colorStatus(status));
+        if (this.logging >= LogLevel.verbose) {
+            console.log(context.request.method, context.request.url, colorStatus(status));
+        }
         let accept = context.accept;
         switch (type) {
             case 'auto':
@@ -143,13 +154,17 @@ export default class RequestHandler {
     }
 
     async sendError<T>(context: Context, data: Error, status: number = 500) {
-        console.log(context.request.method, context.request.url, colorStatus(status));
+        if (this.logging >= LogLevel.verbose) {
+            console.log(context.request.method, context.request.url, colorStatus(status));
+        }
         let accept = context.request.headers.accept;
         if (!(data instanceof Error)) {
             data = new Error(data);
         }
         if (Math.floor(status / 100) === 5) {
-            console.error(data);
+            if (this.logging >= LogLevel.errors) {
+                console.error(data);
+            }
         }
         try {
             if (this.view && accept && accept.indexOf('text/html') > -1) {
@@ -159,7 +174,9 @@ export default class RequestHandler {
             }
         }
         catch (e) {
-            console.error(e);
+            if (this.logging >= LogLevel.errors) {
+                console.error(e);
+            }
         }
     }
 
