@@ -4,6 +4,7 @@ import { URL } from 'url';
 import OutgoingMessage from './OutgoingMessage';
 import Session from './Session';
 import { Verb } from '../router/Verb';
+import { HeaderName } from './HeaderName';
 
 export default class Context {
     request: http.IncomingMessage;
@@ -76,6 +77,14 @@ export default class Context {
         } else {
             this.accept = [];
         }
+    }
+
+    setResponseHeader(header: HeaderName | string, value: number | string | string[]) {
+        this.response.setHeader(header as string, value);
+    }
+
+    getResponseHeader(header: HeaderName | string) {
+        return this.response.getHeader(header);
     }
 
     send<U>(data: U, status: number = 200) {
