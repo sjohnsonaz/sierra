@@ -45,11 +45,11 @@ export default class Context {
     }
 
     private createContentType(request: http.IncomingMessage) {
-        let contentTypeHeader = (this.request.headers['content-type'] || '').toLowerCase();
+        let contentTypeHeader = (this.request.headers['content-type'] || '');
         let contentType = contentTypeHeader;
         if (contentType) {
             let parts = contentTypeHeader.split('; ');
-            contentType = parts[0];
+            contentType = parts[0].toLowerCase();
             if (parts.length > 1) {
                 let hash = {};
                 parts.shift();
