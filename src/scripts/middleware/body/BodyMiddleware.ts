@@ -1,13 +1,7 @@
-import { request } from 'https';
-
 import Context from '../../server/Context';
 import EncodeUtil from '../../utils/EncodeUtil';
 
-import Field from './Field';
-
 import BufferDecoder from './BufferDecoder';
-
-import { IFileHandler } from './IFileHandler';
 
 export default class BodyMiddleware {
     static async handle(context: Context) {

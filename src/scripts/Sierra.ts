@@ -1,5 +1,5 @@
 export { default as Context } from './server/Context';
-import { Errors } from './server/Errors';
+export { Errors } from './server/Errors';
 export { default as Cookie } from './server/Cookie';
 export { IMethod } from './server/IMethod';
 export { IMiddleware } from './server/IMiddleware';
@@ -17,6 +17,7 @@ export { Verb } from './router/Verb';
 
 export { default as RouteMiddleware } from './middleware/RouteMiddleware';
 export { default as BodyMiddleware } from './middleware/body/BodyMiddleware';
+export { IFileField } from './middleware/body/IFileField';
 export { default as SessionMiddleware } from './middleware/SessionMiddleware';
 
 export { default as Uuid } from './utils/Uuid';

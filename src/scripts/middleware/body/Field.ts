@@ -1,6 +1,7 @@
 import stream, { Stream, Duplex } from 'stream';
 import FormDataHeader from './FormDataHeader';
 import { IFileHandler } from './IFileHandler';
+import { IFileField } from './IFileField';
 
 export default class Field {
     header: FormDataHeader;
@@ -58,6 +59,20 @@ export default class Field {
             } else {
                 this.data.push(data);
             }
+        }
+    }
+
+    decode() {
+        if (this.fileName) {
+            let output: IFileField = {
+                filename: this.fileName,
+                data: Buffer.concat(this.data as Buffer[]),
+                type: this.fileType
+            };
+            return output;
+        } else {
+            let data = Buffer.concat(this.data as Buffer[]).toString();
+            return data.substr(0, data.length - 2);
         }
     }
 

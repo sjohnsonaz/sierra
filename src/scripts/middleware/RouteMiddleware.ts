@@ -16,6 +16,7 @@ export default class RouteMiddleware {
             let route = routes[0];
             context.template = route.template;
             context.params = createParams(context.pathname.match(route.regex), route.argumentNames);
+            context.body = context.body || {};
             let result = value;
             for (let index = 0, length = route.middlewares.length; index < length; index++) {
                 result = await route.middlewares[index](context, result);
@@ -32,7 +33,7 @@ export default class RouteMiddleware {
                     $accept: context.accept,
                     $contentType: context.contentType
                 };
-                return await route.method.apply(route, route.argumentNames.map(name => contextParams[name] || context.params[name] || context.query[name]));
+                return await route.method.apply(route, route.argumentNames.map(name => contextParams[name] || context.params[name] || context.query[name] || context.body[name]));
             } else {
                 return await route.method(context, result);
             }

@@ -109,14 +109,11 @@ export default class Application {
             this.server = this.createServer();
         }
         return new Promise<http.Server>((resolve, reject) => {
-            try {
-                this.server.listen(port, () => {
-                    resolve(this.server);
-                });
-            }
-            catch (e) {
+            this.server.listen(port, () => {
+                resolve(this.server);
+            }).on('error', (e) => {
                 reject(e);
-            }
+            });
         });
     }
 

@@ -95,16 +95,7 @@ export default class BufferDecoder {
         let result: Object = {};
         this.fields.forEach(field => {
             if (field.name) {
-                if (field.fileName) {
-                    result[field.name] = {
-                        filename: field.fileName,
-                        data: Buffer.concat(field.data as Buffer[]),
-                        type: field.fileType
-                    };
-                } else {
-                    let data = Buffer.concat(field.data as Buffer[]).toString();
-                    result[field.name] = data.substr(0, data.length - 2);
-                }
+                result[field.name] = field.decode();
             }
         });
 
