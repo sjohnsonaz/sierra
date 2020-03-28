@@ -1,8 +1,10 @@
+import * as path from 'path';
+
 import { IMiddleware } from '../server/IMiddleware';
 import { Verb, VerbLookup } from '../router/Verb';
 
 import { getArgumentNames } from '../utils/FunctionUtil';
-import RouteUtil from '../utils/RouteUtil';
+import { stringToRegex, getControllerName } from '../utils/RouteUtil';
 import Controller from './Controller';
 import Route from './Route';
 
@@ -126,24 +128,20 @@ export default class RouteBuilder {
                             nameParts.push(index);
                         }
                     } else {
-                        // Ensure name does not start with /
-                        if (name[0] === '/') {
-                            name = name.substr(1);
-                        }
-
                         // Use the name we have
                         nameParts.push(name);
                     }
 
                     // Build name
-                    name = nameParts.join('/');
+                    name = path.join(...nameParts);
 
                     // Ensure preceeding '/'
-                    if (typeof name === 'string' && !name.startsWith('/')) {
+                    if (!name.startsWith('/')) {
                         name = '/' + name;
                     }
                 }
-                var regex = RouteUtil.stringToRegex(name);
+                name = path.posix.normalize(name);
+                var regex = stringToRegex(name);
             } else {
                 var regex = name;
             }
@@ -167,28 +165,14 @@ export default class RouteBuilder {
 
     static getBase<T, U extends IMiddleware<any, any>, W extends Controller>(controller: W) {
         if (controller.base) {
-            return controller.base === '/' ? '' : controller.base;
+            return controller.base;
         } else {
-            var name = (controller.constructor as any).name;
-            if (name) {
-                var results = name.match(/(.*)([sS]ervice|[cC]ontroller|[rR]outer)/);
-                if (results && results[1]) {
-                    name = results[1].toLowerCase();
-                }
-            }
-            return name;
+            return getControllerName(controller);
         }
     }
 
     static getTemplate<T, U extends IMiddleware<any, any>, W extends Controller>(controller: W, index: string) {
-        var name = (controller.constructor as any).name;
-        if (name) {
-            var results = name.match(/(.*)([sS]ervice|[cC]ontroller|[rR]outer)/);
-            if (results && results[1]) {
-                name = results[1].toLowerCase();
-            }
-        }
-        return name + '/' + index;
+        return getControllerName(controller) + '/' + index;
     }
 
     static getKeys(...objects: Object[]) {

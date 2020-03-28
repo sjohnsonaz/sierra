@@ -1,30 +1,43 @@
+import { Controller } from "../Sierra";
+
 const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
 
-export default class RouteUtil {
-    static getParameterNames(functionHandle: Function) {
-        let definition = functionHandle.toString().replace(STRIP_COMMENTS, '');
-        if (definition.startsWith('function')) {
-            // We have a standard function
-            return definition.slice(definition.indexOf('(') + 1, definition.indexOf(')')).match(/([^\s,]+)/g) || [];
+export function getParameterNames(functionHandle: Function) {
+    let definition = functionHandle.toString().replace(STRIP_COMMENTS, '');
+    if (definition.startsWith('function')) {
+        // We have a standard function
+        return definition.slice(definition.indexOf('(') + 1, definition.indexOf(')')).match(/([^\s,]+)/g) || [];
+    } else {
+        // We have an arrow function
+        let arrowIndex = definition.indexOf('=>');
+        let parenthesisIndex = definition.indexOf('(');
+        if (parenthesisIndex > -1 && parenthesisIndex < arrowIndex) {
+            return definition.slice(parenthesisIndex + 1, definition.indexOf(')')).match(/([^\s,]+)/g) || [];
         } else {
-            // We have an arrow function
-            let arrowIndex = definition.indexOf('=>');
-            let parenthesisIndex = definition.indexOf('(');
-            if (parenthesisIndex > -1 && parenthesisIndex < arrowIndex) {
-                return definition.slice(parenthesisIndex + 1, definition.indexOf(')')).match(/([^\s,]+)/g) || [];
-            } else {
-                return definition.slice(0, arrowIndex).match(/([^\s,]+)/g) || [];
-            }
+            return definition.slice(0, arrowIndex).match(/([^\s,]+)/g) || [];
         }
     }
+}
 
-    static stringToRegex(definition: string): RegExp {
-        return new RegExp('^' + definition.replace(/\//g, '\\/').replace(/:(\w*)/g, '([\^\/]*)') + '$', 'i');
-    }
+export function stringToRegex(definition: string): RegExp {
+    return new RegExp('^' + definition.replace(/\//g, '\\/').replace(/:(\w*)/g, '([\^\/]*)') + '$', 'i');
+}
 
-    static functionToRegex(prefix: string, enter: Function): RegExp {
-        var params = RouteUtil.getParameterNames(enter);
-        params.unshift(prefix);
-        return RouteUtil.stringToRegex(params.join('/:'));
+export function functionToRegex(prefix: string, enter: Function): RegExp {
+    var params = getParameterNames(enter);
+    params.unshift(prefix);
+    return stringToRegex(params.join('/:'));
+}
+
+export function getControllerName(controller: Controller) {
+    let name = controller.constructor.name;
+    if (name) {
+        var results = name.match(/(.*)([sS]ervice|[cC]ontroller|[rR]outer)/);
+        if (results && results[1]) {
+            name = results[1].toLowerCase();
+        }
+    } else {
+        name = '';
     }
+    return name;
 }
