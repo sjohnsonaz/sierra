@@ -1,1 +1,1 @@
-import '../tests/test';
+import '../tests/Default_Route_test';
