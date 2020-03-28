@@ -1,5 +1,3 @@
-import * as Url from 'url';
-
 import { IMiddleware } from '../server/IMiddleware';
 import Context from '../server/Context';
 import { Errors } from '../server/Errors';

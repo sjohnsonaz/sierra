@@ -3,8 +3,6 @@ import Context from '../server/Context';
 import Session from '../server/Session';
 import { ISessionGateway } from '../server/ISessionGateway';
 
-import Uuid from '../utils/Uuid';
-
 export default class SessionMiddleware<T> {
     gateway: ISessionGateway<any>;
 

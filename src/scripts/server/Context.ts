@@ -6,18 +6,18 @@ import Session from './Session';
 import { Verb } from '../router/Verb';
 import { HeaderName } from './HeaderName';
 
-export default class Context {
+export default class Context<T = any, U = any, V = any, X = any> {
     request: http.IncomingMessage;
     response: http.ServerResponse;
-    session: Session<any>
-    body: any;
+    session: Session<X>
+    body: V;
     method: Verb;
     contentType: string;
     accept: string[];
     url: string;
     pathname: string;
-    query: any;
-    params: any;
+    query: T;
+    params: U;
     template: string;
     httpBoundary: string;
 
@@ -41,7 +41,7 @@ export default class Context {
             pathname = pathname.slice(0, -1);
         }
         this.pathname = pathname;
-        this.query = url.searchParams;
+        this.query = url.searchParams as any;
     }
 
     private createContentType(request: http.IncomingMessage) {

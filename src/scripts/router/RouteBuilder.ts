@@ -1,7 +1,7 @@
 import { IMiddleware } from '../server/IMiddleware';
 import { Verb, VerbLookup } from '../router/Verb';
 
-import { getArgumentNames, wrapMethod } from '../utils/FunctionUtil';
+import { getArgumentNames } from '../utils/FunctionUtil';
 import RouteUtil from '../utils/RouteUtil';
 import Controller from './Controller';
 import Route from './Route';

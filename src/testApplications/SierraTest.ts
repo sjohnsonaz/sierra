@@ -1,6 +1,5 @@
-import Sierra, { Controller, middleware, route, Context, method, view, json, BodyMiddleware, SessionMiddleware, ISessionGateway, Uuid } from '../scripts/Sierra';
+import Sierra, { Controller, middleware, route, Context, method, json, BodyMiddleware, SessionMiddleware, ISessionGateway, Uuid } from '../scripts/Sierra';
 
-import { request } from 'http';
 import HandlebarsView from './HandlebarsView';
 
 async function SimpleMiddleware() {

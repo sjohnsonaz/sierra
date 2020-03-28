@@ -26,6 +26,7 @@ export function injectVariables(method: Function, context: Object) {
     return F(context);
 }
 
+// TODO: Determine if this is still needed
 export function wrapMethod(method: Function, thisArg: any) {
     var argumentNames = getArgumentNames(method);
     var wrappedMethod = function (req, res, next) {

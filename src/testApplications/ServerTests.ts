@@ -1,5 +1,3 @@
-import { expect } from 'chai';
-
 import * as http from 'http';
 import * as fs from 'fs';
 

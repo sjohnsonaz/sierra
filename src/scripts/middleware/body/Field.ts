@@ -1,4 +1,4 @@
-import stream, { Stream, Duplex } from 'stream';
+import { Duplex } from 'stream';
 import FormDataHeader from './FormDataHeader';
 import { IFileHandler } from './IFileHandler';
 import { IFileField } from './IFileField';

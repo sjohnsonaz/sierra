@@ -8,7 +8,6 @@ import Route from './router/Route';
 
 import RequestHandler, { LogLevel } from './server/RequestHandler';
 import RouteMiddleware from './middleware/RouteMiddleware';
-import { error } from 'util';
 
 export default class Application {
     requestHandler: RequestHandler = new RequestHandler();

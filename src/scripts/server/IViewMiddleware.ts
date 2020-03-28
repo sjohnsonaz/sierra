@@ -1,4 +1,3 @@
-import { IMiddleware } from './IMiddleware';
 import Context from './Context';
 
 export interface IViewMiddleware<T> {
