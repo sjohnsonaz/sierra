@@ -63,23 +63,7 @@ export default class Application {
         });
 
         // Sort string Routes
-        stringRoutes.sort((routeA, routeB) => {
-            let a = routeA.name as string;
-            let b = routeB.name as string;
-            let aParts = a.substr(1).split('/');
-            let bParts = b.substr(1).split('/');
-            let length = Math.max(aParts.length, bParts.length);
-            let result = 0;
-            for (let index = 0; index < length; index++) {
-                let aPart = aParts[index] || '';
-                let bPart = bParts[index] || '';
-                result = ((aPart[0] === ':') as any) - ((bPart[0] === ':') as any);
-                if (result) {
-                    break;
-                }
-            }
-            return result;
-        });
+        stringRoutes.sort(sortRoutes);
 
         // Concat all Routes
         this.routeMiddleware.routes = regexRoutes.concat(stringRoutes);
@@ -131,4 +115,22 @@ export default class Application {
             }
         });
     }
+}
+
+export function sortRoutes(routeA: Route<any, any>, routeB: Route<any, any>) {
+    let a = routeA.name as string;
+    let b = routeB.name as string;
+    let aParts = a.substr(1).split('/');
+    let bParts = b.substr(1).split('/');
+    let length = Math.max(aParts.length, bParts.length);
+    let result = 0;
+    for (let index = 0; index < length; index++) {
+        let aPart = aParts[index] || '';
+        let bPart = bParts[index] || '';
+        result = ((aPart[0] === ':') as any) - ((bPart[0] === ':') as any);
+        if (result) {
+            break;
+        }
+    }
+    return result;
 }

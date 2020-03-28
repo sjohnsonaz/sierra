@@ -3,6 +3,9 @@ import chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 let expect = chai.expect;
 
+import { Route, Verb } from '../scripts/Sierra';
+import { sortRoutes } from '../scripts/Application';
+
 describe('Route.sort', () => {
     it('routes are sorted by RegExp, then location or first \':\', then alphabetical', () => {
 
@@ -19,21 +22,10 @@ describe('Route.sort', () => {
             '/getsomething/:id/fixed'
         ];
 
-        routes.sort((a, b) => {
-            let aParts = a.substr(1).split('/');
-            let bParts = b.substr(1).split('/');
-            let length = Math.max(aParts.length, bParts.length);
-            let result = 0;
-            for (let index = 0; index < length; index++) {
-                let aPart = aParts[index] || '';
-                let bPart = bParts[index] || '';
-                result = ((aPart[0] === ':') as any) - ((bPart[0] === ':') as any);
-                if (result) {
-                    break;
-                }
-            }
-            return result;
-        });
+        routes.map(route => {
+            return new Route(Verb.Get, route, undefined, undefined, undefined, undefined, undefined, undefined);
+        }).sort(sortRoutes);
+
         expect(true).to.equal(true);
     });
 });
