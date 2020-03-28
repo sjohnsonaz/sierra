@@ -22,6 +22,6 @@ export { default as SessionMiddleware } from './middleware/SessionMiddleware';
 
 export { default as Uuid } from './utils/Uuid';
 
-export { route, method, middleware } from './modules/Decorators';
+export { route, method, middleware } from './utils/Decorators';
 
 export { default as default } from './Application';
