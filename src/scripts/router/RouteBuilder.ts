@@ -27,6 +27,13 @@ export default class RouteBuilder {
         this.routeNames[methodName].middleware.push(middleware);
     }
 
+    unshiftMiddleware(methodName: string, middleware: IMiddleware<any, any>) {
+        if (!this.routeNames[methodName]) {
+            this.routeNames[methodName] = new RouteDefinition();
+        }
+        this.routeNames[methodName].middleware.unshift(middleware);
+    }
+
     addDefinition(methodName: string, verb: Verb, name: string | RegExp, pipeArgs?: boolean, override?: boolean) {
         if (!this.routeNames[methodName]) {
             this.routeNames[methodName] = new RouteDefinition();

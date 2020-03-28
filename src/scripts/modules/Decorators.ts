@@ -34,6 +34,6 @@ export function method<U extends IMethod<any>>(verb?: VerbType | VerbType[], nam
 export function middleware<T extends IMiddleware<any, any>, U extends IMiddleware<any, any> | IMethod<any>>(middleware: T) {
     return function (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<U>) {
         var routeBuilder = RouteBuilder.getRouteBuilder(target);
-        routeBuilder.addMiddleware(propertyKey, middleware);
+        routeBuilder.unshiftMiddleware(propertyKey, middleware);
     }
 }
