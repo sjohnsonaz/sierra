@@ -1,7 +1,7 @@
-import Context from './Context';
+import Context from '../../server/Context';
 
-import { ISessionGateway } from './ISessionGateway';
-import Uuid from '../utils/Uuid';
+import { ISessionGateway } from '../../server/ISessionGateway';
+import Uuid from '../../utils/Uuid';
 export default class MemorySessionGateway<T> implements ISessionGateway<T> {
     data: {
         [index: string]: T;

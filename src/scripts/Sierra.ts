@@ -18,7 +18,7 @@ export { Verb } from './middleware/route/Verb';
 export { default as RouteMiddleware } from './middleware/route/RouteMiddleware';
 export { default as BodyMiddleware } from './middleware/body/BodyMiddleware';
 export { IFileField } from './middleware/body/IFileField';
-export { default as SessionMiddleware } from './middleware/SessionMiddleware';
+export { default as SessionMiddleware } from './middleware/session/SessionMiddleware';
 
 export { default as Uuid } from './utils/Uuid';
 
