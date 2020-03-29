@@ -1,5 +1,3 @@
-import { Controller } from "../Sierra";
-
 const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg;
 
 export function getParameterNames(functionHandle: Function) {
@@ -27,17 +25,4 @@ export function functionToRegex(prefix: string, enter: Function): RegExp {
     var params = getParameterNames(enter);
     params.unshift(prefix);
     return stringToRegex(params.join('/:'));
-}
-
-export function getControllerName(controller: Controller) {
-    let name = controller.constructor.name;
-    if (name) {
-        var results = name.match(/(.*)([sS]ervice|[cC]ontroller|[rR]outer)/);
-        if (results && results[1]) {
-            name = results[1].toLowerCase();
-        }
-    } else {
-        name = '';
-    }
-    return name;
 }

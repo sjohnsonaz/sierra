@@ -44,7 +44,7 @@ export default class Application {
 
     async buildControllers() {
         this.controllers.forEach(controller => {
-            controller.build().forEach(route => {
+            Controller.build(controller).forEach(route => {
                 this.routeMiddleware.routes.push(route);
             });
         });

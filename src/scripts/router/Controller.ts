@@ -1,17 +1,43 @@
+import * as path from 'path';
+
 import RouteBuilder from './RouteBuilder';
 import Route from './Route';
 
 export default class Controller {
-    base: string;
-    service: boolean = false;
+    _base: string;
     _routeBuilder: RouteBuilder;
 
     constructor(base?: string) {
-        this.base = base;
+        this._base = base;
     }
 
-    build(): Route<any, any>[] {
-        let routeHash = this._routeBuilder.build(this);
+    static build(controller: Controller): Route<any, any>[] {
+        let routeHash = controller._routeBuilder.build(controller);
         return Object.values(routeHash);
+    }
+
+    static getName(controller: Controller) {
+        let name = controller.constructor.name.toLowerCase();
+        if (name) {
+            var results = name.match(/(.*)(service|controller|router)/);
+            if (results && results[1]) {
+                name = results[1].toLowerCase();
+            }
+        } else {
+            name = '';
+        }
+        return name;
+    }
+
+    static getBase(controller: Controller) {
+        if (controller._base) {
+            return controller._base;
+        } else {
+            return Controller.getName(controller);
+        }
+    }
+
+    static getTemplate(controller: Controller, index: string) {
+        return path.join(Controller.getName(controller), index);
     }
 }

@@ -4,18 +4,18 @@ import { IMiddleware } from '../server/IMiddleware';
 import { Verb, VerbLookup } from '../router/Verb';
 
 import { getArgumentNames } from '../utils/FunctionUtil';
-import { stringToRegex, getControllerName } from '../utils/RouteUtil';
+import { stringToRegex } from '../utils/RouteUtil';
 import Controller from './Controller';
 import Route from './Route';
 
 import RouteDefinition, { RouteMethod } from './RouteDefinition';
 
-export interface IRouteNames<U extends IMiddleware<any, any>> {
+export interface IRouteDefinitionHash<U extends IMiddleware<any, any>> {
     [index: string]: RouteDefinition<U>;
 }
 
 export default class RouteBuilder {
-    routeNames: IRouteNames<IMiddleware<any, any>> = {};
+    routeDefinitions: IRouteDefinitionHash<IMiddleware<any, any>> = {};
     parent: RouteBuilder;
 
     constructor(parent?: RouteBuilder) {
@@ -23,75 +23,75 @@ export default class RouteBuilder {
     }
 
     addMiddleware(methodName: string, middleware: IMiddleware<any, any>) {
-        if (!this.routeNames[methodName]) {
-            this.routeNames[methodName] = new RouteDefinition();
+        if (!this.routeDefinitions[methodName]) {
+            this.routeDefinitions[methodName] = new RouteDefinition();
         }
-        this.routeNames[methodName].middleware.push(middleware);
+        this.routeDefinitions[methodName].middleware.push(middleware);
     }
 
     unshiftMiddleware(methodName: string, middleware: IMiddleware<any, any>) {
-        if (!this.routeNames[methodName]) {
-            this.routeNames[methodName] = new RouteDefinition();
+        if (!this.routeDefinitions[methodName]) {
+            this.routeDefinitions[methodName] = new RouteDefinition();
         }
-        this.routeNames[methodName].middleware.unshift(middleware);
+        this.routeDefinitions[methodName].middleware.unshift(middleware);
     }
 
     addDefinition(methodName: string, verb: Verb, name: string | RegExp, pipeArgs?: boolean, override?: boolean) {
-        if (!this.routeNames[methodName]) {
-            this.routeNames[methodName] = new RouteDefinition();
+        if (!this.routeDefinitions[methodName]) {
+            this.routeDefinitions[methodName] = new RouteDefinition();
         }
-        this.routeNames[methodName].method = new RouteMethod(verb, name, pipeArgs, override);;
+        this.routeDefinitions[methodName].method = new RouteMethod(verb, name, pipeArgs, override);;
     }
 
-    getRouteNames() {
+    getRouteDefinitions() {
         if (this.parent) {
-            // Merge with existing routes
-            let routeNames = this.routeNames;
-            let parentRouteNames: IRouteNames<IMiddleware<any, any>> = this.parent.getRouteNames();
+            // Merge with existing RouteDefinitions
+            let routeDefinitions = this.routeDefinitions;
+            let parentRouteDefinitions: IRouteDefinitionHash<IMiddleware<any, any>> = this.parent.getRouteDefinitions();
 
             // Create merged object with values from this RouteBuilder
-            let mergedRouteNames: IRouteNames<IMiddleware<any, any>> = {};
-            let keys: string[] = RouteBuilder.getKeys(parentRouteNames, routeNames);
+            let mergedRouteDefinitions: IRouteDefinitionHash<IMiddleware<any, any>> = {};
+            let keys: string[] = RouteBuilder.getKeys(parentRouteDefinitions, routeDefinitions);
             keys.forEach(index => {
-                let routeName = routeNames[index];
-                let parentRouteName = parentRouteNames[index];
+                let routeDefinition = routeDefinitions[index];
+                let parentRouteDefinition = parentRouteDefinitions[index];
 
                 // If a conflict exists, merge RouteDefinitions
-                if (parentRouteName && routeName) {
+                if (parentRouteDefinition && routeDefinition) {
                     let routeDefinition = new RouteDefinition();
-                    if (routeName.method) {
-                        routeDefinition.method = routeName.method;
-                        routeDefinition.middleware = routeDefinition.middleware.concat(routeName.middleware);
+                    if (routeDefinition.method) {
+                        routeDefinition.method = routeDefinition.method;
+                        routeDefinition.middleware = routeDefinition.middleware.concat(routeDefinition.middleware);
                     } else {
-                        routeDefinition.method = parentRouteName.method;
-                        routeDefinition.middleware = routeDefinition.middleware.concat(routeName.middleware, parentRouteName.middleware);
+                        routeDefinition.method = parentRouteDefinition.method;
+                        routeDefinition.middleware = routeDefinition.middleware.concat(routeDefinition.middleware, parentRouteDefinition.middleware);
                     }
-                    mergedRouteNames[index] = routeDefinition;
+                    mergedRouteDefinitions[index] = routeDefinition;
                 } else {
-                    mergedRouteNames[index] = routeName || parentRouteName;
+                    mergedRouteDefinitions[index] = routeDefinition || parentRouteDefinition;
                 }
             });
-            return mergedRouteNames;
+            return mergedRouteDefinitions;
         } else {
-            return this.routeNames;
+            return this.routeDefinitions;
         }
     }
 
     build(controller: Controller) {
-        let routeNames = this.getRouteNames();
-        return Object.keys(routeNames).map(index => {
-            let routeName = routeNames[index];
-            var middleware = routeName.middleware;
-            var routeMethod = routeName.method;
+        let routeDefinitions = this.getRouteDefinitions();
+        return Object.keys(routeDefinitions).map(methodName => {
+            let routeDefinition = routeDefinitions[methodName];
+            var middleware = routeDefinition.middleware;
+            var routeMethod = routeDefinition.method;
             if (!routeMethod) {
-                throw 'No method defined for this route: ' + index;
+                throw 'No method defined for this route: ' + methodName;
             }
             var name = routeMethod.name || '';
             var verb = routeMethod.verb;
             var pipeArgs = routeMethod.pipeArgs;
 
             // Get argument names, and bind method
-            var method = controller[index];
+            var method = controller[methodName];
             if (method) {
                 if (pipeArgs) {
                     var argumentNames = getArgumentNames(method);
@@ -100,12 +100,12 @@ export default class RouteBuilder {
             }
 
             // Ensure index is lower case
-            index = index.toLowerCase();
+            methodName = methodName.toLowerCase();
 
             // Do we have a verb already
             if (!verb) {
-                if (VerbLookup.indexOf(index as any) >= 0) {
-                    verb = index as any;
+                if (VerbLookup.indexOf(methodName as any) >= 0) {
+                    verb = methodName as any;
                 }
             }
 
@@ -118,14 +118,14 @@ export default class RouteBuilder {
                     // Else, assemble string
                     let nameParts = [];
 
-                    // Use controller name
-                    nameParts.push(RouteBuilder.getBase(controller));
+                    // Use controller base
+                    nameParts.push(Controller.getBase(controller));
 
                     // If we have no name, attempt to create one
                     if (!name) {
                         // If the method isn't equal to the verb or 'index', use method in route
-                        if (verb !== index && index !== 'index') {
-                            nameParts.push(index);
+                        if (verb !== methodName && methodName !== 'index') {
+                            nameParts.push(methodName);
                         }
                     } else {
                         // Use the name we have
@@ -146,13 +146,13 @@ export default class RouteBuilder {
                 var regex = name;
             }
 
-            let template = RouteBuilder.getTemplate(controller, index);
+            let template = Controller.getTemplate(controller, methodName);
 
             return new Route(verb, name, regex, middleware, method, pipeArgs, argumentNames, template);
         });
     }
 
-    static getRouteBuilder<T, U extends IMiddleware<any, any>>(target: Controller) {
+    static getRouteBuilder(target: { _routeBuilder: RouteBuilder }) {
         if (target._routeBuilder) {
             if (!target.hasOwnProperty('_routeBuilder')) {
                 target._routeBuilder = new RouteBuilder(target._routeBuilder);
@@ -161,18 +161,6 @@ export default class RouteBuilder {
             target._routeBuilder = new RouteBuilder();
         }
         return target._routeBuilder;
-    }
-
-    static getBase<T, U extends IMiddleware<any, any>, W extends Controller>(controller: W) {
-        if (controller.base) {
-            return controller.base;
-        } else {
-            return getControllerName(controller);
-        }
-    }
-
-    static getTemplate<T, U extends IMiddleware<any, any>, W extends Controller>(controller: W, index: string) {
-        return getControllerName(controller) + '/' + index;
     }
 
     static getKeys(...objects: Object[]) {
