@@ -1,10 +1,10 @@
 import * as path from 'path';
 
-import { IMiddleware } from '../server/IMiddleware';
-import { Verb, VerbLookup } from '../router/Verb';
+import { IMiddleware } from '../../server/IMiddleware';
+import { Verb, VerbLookup } from './Verb';
 
-import { getArgumentNames } from '../utils/FunctionUtil';
-import { stringToRegex } from '../utils/RouteUtil';
+import { getArgumentNames } from '../../utils/FunctionUtil';
+import { stringToRegex } from '../../utils/RouteUtil';
 import Controller from './Controller';
 import Route from './Route';
 

@@ -1,4 +1,4 @@
-import { IMiddleware } from '../server/IMiddleware';
+import { IMiddleware } from '../../server/IMiddleware';
 import { Verb } from './Verb';
 
 export default class Route<T, U> {

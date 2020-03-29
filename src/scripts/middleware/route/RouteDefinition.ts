@@ -1,5 +1,5 @@
-import { IMiddleware } from '../server/IMiddleware';
-import { Verb } from '../router/Verb';
+import { IMiddleware } from '../../server/IMiddleware';
+import { Verb } from './Verb';
 
 export class RouteMethod {
     verb: Verb;

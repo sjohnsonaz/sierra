@@ -3,7 +3,7 @@ import { URL } from 'url';
 
 import OutgoingMessage from './OutgoingMessage';
 import Session from './Session';
-import { Verb } from '../router/Verb';
+import { Verb } from '../middleware/route/Verb';
 import { HeaderName } from './HeaderName';
 
 export default class Context<T = any, U = any, V = any, X = any> {

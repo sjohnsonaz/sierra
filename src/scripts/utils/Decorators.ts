@@ -1,9 +1,9 @@
-import { VerbType } from '../router/Verb';
+import { VerbType } from '../middleware/route/Verb';
 import { IMiddleware } from '../server/IMiddleware';
 import { IMethod } from '../server/IMethod';
 
-import RouteBuilder from '../router/RouteBuilder';
-import Controller from '../router/Controller';
+import RouteBuilder from '../middleware/route/RouteBuilder';
+import Controller from '../middleware/route/Controller';
 
 /**
  * Adds a method as a route.  By default arguments are not piped from the request.

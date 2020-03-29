@@ -1,8 +1,8 @@
-import { IMiddleware } from '../server/IMiddleware';
-import Context from '../server/Context';
-import { Errors } from '../server/Errors';
+import { IMiddleware } from '../../server/IMiddleware';
+import Context from '../../server/Context';
+import { Errors } from '../../server/Errors';
 
-import Route from '../router/Route';
+import Route from './Route';
 
 export default class RouteMiddleware {
     routes: Route<any, any>[] = [];

@@ -3,11 +3,11 @@ import * as http from 'http';
 import { IMiddleware } from './server/IMiddleware';
 import { IViewMiddleware } from './server/IViewMiddleware';
 
-import Controller from './router/Controller';
-import Route from './router/Route';
+import Controller from './middleware/route/Controller';
+import Route from './middleware/route/Route';
 
 import RequestHandler, { LogLevel } from './server/RequestHandler';
-import RouteMiddleware from './middleware/RouteMiddleware';
+import RouteMiddleware from './middleware/route/RouteMiddleware';
 
 export default class Application {
     requestHandler: RequestHandler = new RequestHandler();
