@@ -35,6 +35,7 @@ export default class RequestHandler {
                 this.send(context, result);
                 return
             }
+            // TODO: Can we reach this point?
             if (result === undefined) {
                 throw Errors.notFound;
             }
