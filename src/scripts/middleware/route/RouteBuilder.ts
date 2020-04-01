@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import { IMiddleware } from '../../server/IMiddleware';
+import { IServerMiddleware } from '../../server/IServerMiddleware';
 import { Verb, VerbLookup } from './Verb';
 
 import { getArgumentNames } from '../../utils/FunctionUtil';
@@ -10,26 +10,26 @@ import Route from './Route';
 
 import RouteDefinition, { RouteMethod } from './RouteDefinition';
 
-export interface IRouteDefinitionHash<U extends IMiddleware<any, any>> {
+export interface IRouteDefinitionHash<U extends IServerMiddleware<any, any>> {
     [index: string]: RouteDefinition<U>;
 }
 
 export default class RouteBuilder {
-    routeDefinitions: IRouteDefinitionHash<IMiddleware<any, any>> = {};
+    routeDefinitions: IRouteDefinitionHash<IServerMiddleware<any, any>> = {};
     parent: RouteBuilder;
 
     constructor(parent?: RouteBuilder) {
         this.parent = parent;
     }
 
-    addMiddleware(methodName: string, middleware: IMiddleware<any, any>) {
+    addMiddleware(methodName: string, middleware: IServerMiddleware<any, any>) {
         if (!this.routeDefinitions[methodName]) {
             this.routeDefinitions[methodName] = new RouteDefinition();
         }
         this.routeDefinitions[methodName].middleware.push(middleware);
     }
 
-    unshiftMiddleware(methodName: string, middleware: IMiddleware<any, any>) {
+    unshiftMiddleware(methodName: string, middleware: IServerMiddleware<any, any>) {
         if (!this.routeDefinitions[methodName]) {
             this.routeDefinitions[methodName] = new RouteDefinition();
         }
@@ -47,10 +47,10 @@ export default class RouteBuilder {
         if (this.parent) {
             // Merge with existing RouteDefinitions
             let routeDefinitions = this.routeDefinitions;
-            let parentRouteDefinitions: IRouteDefinitionHash<IMiddleware<any, any>> = this.parent.getRouteDefinitions();
+            let parentRouteDefinitions: IRouteDefinitionHash<IServerMiddleware<any, any>> = this.parent.getRouteDefinitions();
 
             // Create merged object with values from this RouteBuilder
-            let mergedRouteDefinitions: IRouteDefinitionHash<IMiddleware<any, any>> = {};
+            let mergedRouteDefinitions: IRouteDefinitionHash<IServerMiddleware<any, any>> = {};
             let keys: string[] = RouteBuilder.getKeys(parentRouteDefinitions, routeDefinitions);
             keys.forEach(index => {
                 let routeDefinition = routeDefinitions[index];

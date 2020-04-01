@@ -1,6 +1,6 @@
 import * as http from 'http';
 
-import { IMiddleware } from './server/IMiddleware';
+import { IServerMiddleware } from './server/IServerMiddleware';
 import { IViewMiddleware } from './server/IViewMiddleware';
 
 import Controller from './middleware/route/Controller';
@@ -71,7 +71,7 @@ export default class Application {
         this.requestHandler.use(this.routeMiddleware.handler);
     }
 
-    use(middleware: IMiddleware<any, any>) {
+    use(middleware: IServerMiddleware<any, any>) {
         this.requestHandler.use(middleware);
     }
 
@@ -79,7 +79,7 @@ export default class Application {
         this.requestHandler.view = viewMiddlware;
     }
 
-    error(errorMiddleware: IMiddleware<any, any>) {
+    error(errorMiddleware: IServerMiddleware<any, any>) {
         this.requestHandler.error = errorMiddleware;
     }
 

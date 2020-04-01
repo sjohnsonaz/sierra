@@ -1,6 +1,8 @@
+import { PipelineExit } from "../pipeline/Pipeline";
+
 export type OutputType = 'auto' | 'json' | 'view' | 'text' | 'raw';
 
-export default class OutgoingMessage<T>{
+export default class OutgoingMessage<T> extends PipelineExit {
     data: T;
     status: number;
     type: OutputType;
@@ -8,6 +10,7 @@ export default class OutgoingMessage<T>{
     contentType: string;
 
     constructor(data: any, status: number = 200, type: OutputType = 'auto', template?: string, contentType?: string) {
+        super();
         this.data = data;
         this.status = status;
         this.type = type;

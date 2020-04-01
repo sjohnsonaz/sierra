@@ -1,4 +1,3 @@
-import { IMiddleware } from '../../server/IMiddleware';
 import Context from '../../server/Context';
 import { Errors } from '../../server/Errors';
 
@@ -6,7 +5,7 @@ import Route from './Route';
 
 export default class RouteMiddleware {
     routes: Route<any, any>[] = [];
-    handler: IMiddleware<any, void> = async (context: Context, value: any) => {
+    handler = async (context: Context, value: any) => {
         let routes = this.routes.filter(route => {
             return (context.method === route.verb || route.verb === 'all') && !!context.pathname.match(route.regex);
         });

@@ -1,12 +1,13 @@
 import * as http from 'http';
 
-import { IMiddleware } from './IMiddleware';
+import { IServerMiddleware } from './IServerMiddleware';
 import { IViewMiddleware } from './IViewMiddleware';
 import Context from './Context';
 import OutgoingMessage, { OutputType } from './OutgoingMessage';
 import { Errors } from './Errors';
 
 import ConsoleUtil from '../utils/ConsoleUtil';
+import Pipeline from '../pipeline/Pipeline';
 
 export enum LogLevel {
     none = 0,
@@ -15,29 +16,19 @@ export enum LogLevel {
 }
 
 export default class RequestHandler {
-    middlewares: IMiddleware<any, any>[] = [];
-    error: IMiddleware<any, any>;
+    pipeline: Pipeline<Context, any, any> = new Pipeline();
+    error: IServerMiddleware<any, any>;
     view: IViewMiddleware<any>;
     logging: LogLevel = LogLevel.errors;
 
     callback = async (request: http.IncomingMessage, response: http.ServerResponse) => {
         let context = new Context(request, response);
         try {
-            let result = undefined;
-            for (let index = 0, length = this.middlewares.length; index < length; index++) {
-                result = await this.middlewares[index](context, result);
-                if (result instanceof OutgoingMessage) {
-                    this.send(context, result.data, result.status, result.type, result.template, result.contentType);
-                    return;
-                }
-            }
-            if (!(result instanceof OutgoingMessage)) {
+            let result = await this.pipeline.run(context, undefined);
+            if (result instanceof OutgoingMessage) {
+                this.send(context, result.data, result.status, result.type, result.template, result.contentType);
+            } else {
                 this.send(context, result);
-                return
-            }
-            // TODO: Can we reach this point?
-            if (result === undefined) {
-                throw Errors.notFound;
             }
         }
         catch (e) {
@@ -181,8 +172,8 @@ export default class RequestHandler {
         }
     }
 
-    use<T, U>(middlware: IMiddleware<T, U>) {
-        this.middlewares.push(middlware);
+    use<T, U>(middlware: IServerMiddleware<T, U>) {
+        this.pipeline.use(middlware);
     }
 }
 

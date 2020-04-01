@@ -1,4 +1,4 @@
-import { IMiddleware } from '../../server/IMiddleware';
+import { IServerMiddleware } from '../../server/IServerMiddleware';
 import { Verb } from './Verb';
 
 export class RouteMethod {
@@ -15,7 +15,7 @@ export class RouteMethod {
     }
 }
 
-export default class RouteDefinition<U extends IMiddleware<any, any>> {
+export default class RouteDefinition<U extends IServerMiddleware<any, any>> {
     method: RouteMethod;
     middleware: U[] = [];
 }

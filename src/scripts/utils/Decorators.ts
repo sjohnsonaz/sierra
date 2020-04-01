@@ -1,5 +1,5 @@
 import { VerbType } from '../middleware/route/Verb';
-import { IMiddleware } from '../server/IMiddleware';
+import { IServerMiddleware } from '../server/IServerMiddleware';
 import { IMethod } from '../server/IMethod';
 
 import RouteBuilder from '../middleware/route/RouteBuilder';
@@ -10,7 +10,7 @@ import Controller from '../middleware/route/Controller';
  * @param verb 
  * @param name 
  */
-export function route<U extends IMiddleware<any, any>>(verb?: VerbType | VerbType[], name?: string | RegExp, pipeArgs: boolean = false) {
+export function route<U extends IServerMiddleware<any, any>>(verb?: VerbType | VerbType[], name?: string | RegExp, pipeArgs: boolean = false) {
     return function (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<U>) {
         var routeBuilder = RouteBuilder.getRouteBuilder(target);
         if (verb instanceof Array) {
@@ -46,7 +46,7 @@ export function method<U extends IMethod<any>>(verb?: VerbType | VerbType[], nam
  * @param verb 
  * @param name 
  */
-export function middleware<T extends IMiddleware<any, any>, U extends IMiddleware<any, any> | IMethod<any>>(middleware: T) {
+export function middleware<T extends IServerMiddleware<any, any>, U extends IServerMiddleware<any, any> | IMethod<any>>(middleware: T) {
     return function (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<U>) {
         var routeBuilder = RouteBuilder.getRouteBuilder(target);
         // Decorators are applied in reverse order, so we must add to the beginning of the Array.

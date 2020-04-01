@@ -1,12 +1,12 @@
-import { IMiddleware } from '../../server/IMiddleware';
 import { Verb } from './Verb';
+import { IServerMiddleware } from '../../server/IServerMiddleware';
 
 export default class Route<T, U> {
     verb: Verb;
     name: string | RegExp;
     regex: RegExp;
-    middlewares: IMiddleware<any, any>[];
-    method: IMiddleware<T, U>;
+    middlewares: IServerMiddleware<any, any>[];
+    method: IServerMiddleware<T, U>;
     pipeArgs: boolean;
     argumentNames: string[];
     template: string;
@@ -15,8 +15,8 @@ export default class Route<T, U> {
         verb: Verb,
         name: string | RegExp,
         regex: RegExp,
-        middlewares: IMiddleware<any, any>[],
-        method: IMiddleware<T, U>,
+        middlewares: IServerMiddleware<any, any>[],
+        method: IServerMiddleware<T, U>,
         pipeArgs: boolean = false,
         argumentNames: string[] = [],
         template: string

@@ -7,7 +7,7 @@ import { Context } from '../scripts/Sierra';
 
 export default class HandlebarsView {
     static viewRoot: string = ''
-    static async handle(context: Context, data, template: string) {
+    static async handle<T>(context: Context, data: T, template?: string): Promise<string> {
         let templateFile = path.join(HandlebarsView.viewRoot, template) + '.handlebars';
         var templateText = await new Promise((resolve, reject) => {
             fs.readFile(templateFile, {
