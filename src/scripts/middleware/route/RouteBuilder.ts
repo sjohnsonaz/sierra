@@ -133,7 +133,7 @@ export default class RouteBuilder {
                     }
 
                     // Build name
-                    name = path.join(...nameParts);
+                    name = path.posix.join(...nameParts);
 
                     // Ensure preceeding '/'
                     if (!name.startsWith('/')) {
