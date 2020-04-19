@@ -8,6 +8,7 @@ import Route from './middleware/route/Route';
 
 import RequestHandler, { LogLevel } from './server/RequestHandler';
 import RouteMiddleware from './middleware/route/RouteMiddleware';
+import { Errors } from './server/Errors';
 
 export default class Application {
     requestHandler: RequestHandler = new RequestHandler();
@@ -104,7 +105,7 @@ export default class Application {
         return new Promise<boolean>((resolve, reject) => {
             try {
                 if (!this.server) {
-                    throw 'Server has never been started';
+                    throw Errors.neverStarted;
                 }
                 this.server.close(() => {
                     resolve(true);

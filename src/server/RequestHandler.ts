@@ -77,7 +77,7 @@ export default class RequestHandler {
     async sendView<T>(context: Context, data: T, status: number = 200, template: string) {
         try {
             if (!this.view) {
-                throw 'No view middleware';
+                throw Errors.noViewMiddleware;
             }
             let output = await this.view(context, data, template || context.template);
             context.response.statusCode = status;

@@ -9,6 +9,7 @@ import Controller from './Controller';
 import Route from './Route';
 
 import RouteDefinition, { RouteMethod } from './RouteDefinition';
+import { Errors } from '../../server/Errors';
 
 export interface IRouteDefinitionHash<U extends IServerMiddleware<any, any>> {
     [index: string]: RouteDefinition<U>;
@@ -84,7 +85,7 @@ export default class RouteBuilder {
             var middleware = routeDefinition.middleware;
             var routeMethod = routeDefinition.method;
             if (!routeMethod) {
-                throw 'No method defined for this route: ' + methodName;
+                throw Errors.noMethod + methodName;
             }
             var name = routeMethod.name || '';
             var verb = routeMethod.verb;
