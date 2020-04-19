@@ -3,7 +3,7 @@ import chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 let expect = chai.expect;
 
-import Sierra, { Controller, route, Context, middleware } from '../scripts/Sierra';
+import Sierra, { Controller, route, Context, middleware } from '../../Sierra';
 
 describe('middleware decorator', () => {
     let port = 3001;

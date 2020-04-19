@@ -25,4 +25,13 @@ export default class Pipeline<T extends IPipelineContext, U, V> {
     use(middlware: IMiddleware<T, any, any>) {
         this.middlewares.push(middlware);
     }
+
+    remove(middleware: IMiddleware<T, any, any>) {
+        let index = this.middlewares.indexOf(middleware);
+        if (index >= 0) {
+            return this.middlewares.splice(index, 1);
+        } else {
+            return [];
+        }
+    }
 }

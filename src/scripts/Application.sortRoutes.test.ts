@@ -3,8 +3,8 @@ import chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 let expect = chai.expect;
 
-import { Route, Verb } from '../scripts/Sierra';
-import { sortRoutes } from '../scripts/Application';
+import { Route, Verb } from './Sierra';
+import { sortRoutes } from './Application';
 
 describe('Route.sort', () => {
     it('routes are sorted by RegExp, then location or first \':\', then alphabetical', () => {

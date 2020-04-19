@@ -3,7 +3,7 @@ import chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 let expect = chai.expect;
 
-import { Controller } from '../scripts/Sierra';
+import { Controller } from '../../Sierra';
 
 describe('RouteUtil.getControllerName()', () => {
     it('should return name for Controllers ending in Controller', () => {
