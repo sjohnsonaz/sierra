@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import Handlebars from 'handlebars';
 
-import { Context } from '../Sierra';
+import { Context } from '../src/Sierra';
 
 export default class HandlebarsView {
     static viewRoot: string = ''

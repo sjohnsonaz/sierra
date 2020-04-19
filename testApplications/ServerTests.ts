@@ -3,7 +3,7 @@ import * as fs from 'fs';
 
 import Handlebars from 'handlebars';
 
-import RequestHandler from '../server/RequestHandler';
+import RequestHandler from '../src/server/RequestHandler';
 
 let handler = new RequestHandler();
 
