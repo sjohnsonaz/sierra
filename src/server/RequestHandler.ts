@@ -1,19 +1,14 @@
 import * as http from 'http';
 
+import ConsoleUtil from '../utils/ConsoleUtil';
+import Pipeline from '../pipeline/Pipeline';
+
 import { IServerMiddleware } from './IServerMiddleware';
 import { IViewMiddleware } from './IViewMiddleware';
 import Context from './Context';
 import OutgoingMessage, { OutputType } from './OutgoingMessage';
 import { Errors } from './Errors';
-
-import ConsoleUtil from '../utils/ConsoleUtil';
-import Pipeline from '../pipeline/Pipeline';
-
-export enum LogLevel {
-    none = 0,
-    errors = 1,
-    verbose = 2
-}
+import { LogLevel } from './LogLevel';
 
 export default class RequestHandler {
     pipeline: Pipeline<Context, any, any> = new Pipeline();
