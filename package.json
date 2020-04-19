@@ -5,10 +5,10 @@
   "repository": "https://www.github.com/sjohnsonaz/sierra.git",
   "license": "MIT",
   "author": "Sean Johnson <sjohnson@sjohnsonaz.com>",
-  "main": "dist/scripts/Sierra.js",
-  "typings": "dist/scripts/Sierra.d.ts",
+  "main": "dist/Sierra.js",
+  "typings": "dist/Sierra.d.ts",
   "scripts": {
-    "start": "node ./dist/scripts/Sierra.js",
+    "start": "node ./dist/testApplications/SierraTest.js",
     "build": "tsc",
     "clean": "rimraf ./dist",
     "prepublishOnly": "rimraf ./dist && tsc --declaration",

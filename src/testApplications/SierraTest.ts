@@ -1,4 +1,4 @@
-import Sierra, { Controller, middleware, route, Context, method, json, BodyMiddleware, SessionMiddleware, ISessionGateway, Uuid } from '../scripts/Sierra';
+import Sierra, { Controller, middleware, route, Context, method, json, BodyMiddleware, SessionMiddleware, ISessionGateway, Uuid } from '../Sierra';
 
 import HandlebarsView from './HandlebarsView';
 
