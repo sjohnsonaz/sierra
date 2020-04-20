@@ -16,11 +16,13 @@ export default class EncodeUtil {
         return values.join('&');
     }
 
-    static urlStringToObject(url: string) {
+    static urlStringToObject(url: string): {
+        [index: string]: string | string[];
+    } {
         if (url.startsWith('?')) {
             url = url.substring(1);
         }
-        let obj: Object = {};
+        let obj = {};
         url.split('&').forEach(part => {
             let pieces = part.split('=');
             if (pieces.length !== 2) {
@@ -28,7 +30,21 @@ export default class EncodeUtil {
             }
             let name = pieces[0];
             let value = pieces[1];
-            obj[name] = decodeURIComponent(value);
+            // If name ends with [], we have an array.
+            // If name already exists, we have an array.
+            if (name) {
+                if (name.endsWith('[]')) {
+                    name = name.substr(0, name.length - 2);
+                    if (name) {
+                        if (!obj[name]) {
+                            obj[name] = [];
+                        }
+                        obj[name].push(decodeURIComponent(value));
+                    }
+                } else {
+                    obj[name] = decodeURIComponent(value);
+                }
+            }
         });
         return obj;
     }

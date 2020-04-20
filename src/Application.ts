@@ -6,9 +6,10 @@ import { IViewMiddleware } from './server/IViewMiddleware';
 import Controller from './middleware/route/Controller';
 import Route from './middleware/route/Route';
 
-import RequestHandler, { LogLevel } from './server/RequestHandler';
+import RequestHandler from './server/RequestHandler';
 import RouteMiddleware from './middleware/route/RouteMiddleware';
 import { Errors } from './server/Errors';
+import { LogLevel } from './server/LogLevel';
 
 export default class Application {
     requestHandler: RequestHandler = new RequestHandler();
