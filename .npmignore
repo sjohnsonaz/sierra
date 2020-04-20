@@ -23,8 +23,6 @@ dist/mocha/
 
 # Build configuration files
 tsconfig.json
-webpack.config.js
-webpack.dev.config.js
 .travis.yml
 nodemon.json
 
