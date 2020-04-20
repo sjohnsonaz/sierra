@@ -43,11 +43,38 @@ describe('EncodeUtil', function () {
         });
 
         it('should handle array parameters', function () {
+            let input = 'a=first&a=last';
+            let output = EncodeUtil.urlStringToObject(input);
+            expect(output.a).instanceOf(Array);
+            expect(output.a[0]).to.equal('first');
+            expect(output.a[1]).to.equal('last');
+        });
+
+        it('should handle array bracket parameters', function () {
             let input = 'a[]=first&a[]=last';
             let output = EncodeUtil.urlStringToObject(input);
             expect(output.a).instanceOf(Array);
             expect(output.a[0]).to.equal('first');
             expect(output.a[1]).to.equal('last');
+        });
+
+        it('should handle array list parameters', function () {
+            let input = 'a=first,last';
+            let output = EncodeUtil.urlStringToObject(input);
+            expect(output.a).instanceOf(Array);
+            expect(output.a[0]).to.equal('first');
+            expect(output.a[1]).to.equal('last');
+        });
+
+        it('should handle array mixed parameters', function () {
+            let input = 'a=first&a[]=second&a=third,fourth';
+            let output = EncodeUtil.urlStringToObject(input);
+            expect(output.a).instanceOf(Array);
+            expect(output.a.length).to.equal(4);
+            expect(output.a[0]).to.equal('first');
+            expect(output.a[1]).to.equal('second');
+            expect(output.a[2]).to.equal('third');
+            expect(output.a[3]).to.equal('fourth');
         });
     });
 });

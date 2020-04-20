@@ -30,19 +30,43 @@ export default class EncodeUtil {
             }
             let name = pieces[0];
             let value = pieces[1];
-            // If name ends with [], we have an array.
-            // If name already exists, we have an array.
             if (name) {
+                // If name ends with [], we have an array.
                 if (name.endsWith('[]')) {
                     name = name.substr(0, name.length - 2);
                     if (name) {
                         if (!obj[name]) {
                             obj[name] = [];
                         }
-                        obj[name].push(decodeURIComponent(value));
+                    } else {
+                        return;
+                    }
+                }
+                value = decodeURIComponent(value);
+                let valueArray = value.split(',');
+                if (valueArray.length > 1) {
+                    // If name already exists, we have an array.
+                    if (obj[name]) {
+                        if (!(obj[name] instanceof Array)) {
+                            obj[name] = [obj[name]];
+                        }
+                        valueArray.forEach(value => {
+                            obj[name].push(value);
+                        });
+                    } else {
+                        obj[name] = valueArray;
                     }
                 } else {
-                    obj[name] = decodeURIComponent(value);
+                    // If name already exists, we have an array.
+                    if (obj[name]) {
+                        if (!(obj[name] instanceof Array)) {
+                            obj[name] = [obj[name], value];
+                        } else {
+                            obj[name].push(value);
+                        }
+                    } else {
+                        obj[name] = value;
+                    }
                 }
             }
         });
