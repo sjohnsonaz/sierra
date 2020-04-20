@@ -1,4 +1,5 @@
 import * as path from 'path';
+import 'reflect-metadata';
 
 import { IServerMiddleware } from '../../server/IServerMiddleware';
 import { Verb, VerbLookup } from './Verb';
@@ -91,6 +92,11 @@ export default class RouteBuilder {
             var verb = routeMethod.verb;
             var pipeArgs = routeMethod.pipeArgs;
 
+            let argumentTypes;
+            if (Reflect.getMetadata) {
+                argumentTypes = Reflect.getMetadata("design:paramtypes", controller, methodName);
+            }
+
             // Get argument names, and bind method
             var method = controller[methodName];
             if (method) {
@@ -149,7 +155,7 @@ export default class RouteBuilder {
 
             let template = Controller.getTemplate(controller, methodName);
 
-            return new Route(verb, name, regex, middleware, method, pipeArgs, argumentNames, template);
+            return new Route(verb, name, regex, middleware, method, pipeArgs, argumentNames, template, argumentTypes);
         });
     }
 

@@ -28,9 +28,35 @@ export default class RouteMiddleware {
                     $query: context.query,
                     $params: context.params,
                     $accept: context.accept,
-                    $contentType: context.contentType
+                    $contentType: context.contentType,
+                    $result: result
                 };
-                return await route.method.apply(route, route.argumentNames.map(name => contextParams[name] || context.params[name] || context.query[name] || context.body[name]));
+                return await route.method.apply(route, route.argumentNames.map((name, index) => {
+                    let value = contextParams[name] || context.params[name] || context.query[name] || context.body[name];
+                    let argumentType = route.argumentTypes[index];
+                    if (argumentType) {
+                        let output;
+                        switch (argumentType) {
+                            case String:
+                                output = value;
+                                break;
+                            case Number:
+                                output = Number(value);
+                                break;
+                            case Boolean:
+                                output = Boolean(value);
+                                break;
+                            default:
+                                //return new argumentType(value);
+                                output = value;
+                                break;
+                        }
+                        console.log(name, argumentType, output);
+                        return output;
+                    } else {
+                        return value;
+                    }
+                }));
             } else {
                 return await route.method(context, result);
             }

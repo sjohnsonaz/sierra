@@ -10,6 +10,7 @@ export default class Route<T, U> {
     pipeArgs: boolean;
     argumentNames: string[];
     template: string;
+    argumentTypes: any[];
 
     constructor(
         verb: Verb,
@@ -19,7 +20,8 @@ export default class Route<T, U> {
         method: IServerMiddleware<T, U>,
         pipeArgs: boolean = false,
         argumentNames: string[] = [],
-        template: string
+        template: string,
+        argumentTypes: any[] = []
     ) {
         this.verb = verb;
         this.name = name;
@@ -29,5 +31,6 @@ export default class Route<T, U> {
         this.pipeArgs = pipeArgs;
         this.argumentNames = argumentNames;
         this.template = template;
+        this.argumentTypes = argumentTypes;
     }
 }

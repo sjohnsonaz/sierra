@@ -8,7 +8,7 @@
   "main": "dist/Sierra.js",
   "typings": "dist/Sierra.d.ts",
   "scripts": {
-    "start": "node ./dist/testApplications/SierraTest.js",
+    "start": "tsc-watch --onSuccess \"node --inspect ./dist/testApplications/SierraTest.js",
     "build": "tsc",
     "clean": "rimraf ./dist",
     "prepublishOnly": "rimraf ./dist && tsc --declaration",
@@ -32,7 +32,9 @@
     "handlebars": "4.7.6",
     "mocha": "7.1.1",
     "nodemon": "2.0.2",
+    "reflect-metadata": "0.1.13",
     "rimraf": "3.0.2",
+    "tsc-watch": "4.2.3",
     "typescript": "3.8.3"
   },
   "keywords": [
