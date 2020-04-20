@@ -9,7 +9,7 @@ describe('Default route', () => {
     let port = 3001;
     let application: Sierra;
 
-    before(async () => {
+    before(async function () {
         class TestController extends Controller {
             constructor() {
                 super('/');
@@ -27,13 +27,13 @@ describe('Default route', () => {
         await application.listen(port);
     });
 
-    it('should use default route', async () => {
+    after(async function () {
+        await application.close();
+    });
+
+    it('should use default route', async function () {
         let res = await chai.request('localhost:' + port)
             .get('/');
         expect(res).to.have.status(200);
-    });
-
-    after(async () => {
-        await application.close();
     });
 });

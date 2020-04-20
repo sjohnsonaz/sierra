@@ -23,13 +23,13 @@ describe('route decorator', () => {
         await application.listen(port);
     });
 
+    after(async () => {
+        await application.close();
+    });
+
     it('should generate get routes', async () => {
         let res = await chai.request('localhost:' + port)
             .get('/test');
         expect(res).to.have.status(200);
-    });
-
-    after(async () => {
-        await application.close();
     });
 });

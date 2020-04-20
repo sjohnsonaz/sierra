@@ -41,6 +41,10 @@ describe('middleware decorator', () => {
         await application.listen(port);
     });
 
+    after(async () => {
+        await application.close();
+    });
+
     it('should run in order', async () => {
         let res = await chai.request('localhost:' + port)
             .get('/test');
@@ -58,9 +62,5 @@ describe('middleware decorator', () => {
         expect(result).to.be.instanceOf(Object);
         expect(result.a).to.equal(1);
         expect(result.b).to.equal(2);
-    });
-
-    after(async () => {
-        await application.close();
     });
 });

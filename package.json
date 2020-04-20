@@ -8,15 +8,15 @@
   "main": "dist/Sierra.js",
   "typings": "dist/Sierra.d.ts",
   "scripts": {
-    "start": "tsc-watch --onSuccess \"node --inspect ./dist/testApplications/SierraTest.js",
+    "start": "tsc-watch --onSuccess \"node --inspect ./dist/examples/SierraTest.js",
     "build": "tsc",
     "clean": "rimraf ./dist",
     "prepublishOnly": "rimraf ./dist && tsc --declaration",
     "test": "tsc && mocha './dist/**/*.test.js'",
     "watch": "tsc --watch",
     "watch-link": "tsc --declaration --watch",
-    "node": "node --inspect ./dist/testApplications/SierraTest.js",
-    "nodemon": "nodemon ./dist/testApplications/SierraTest.js",
+    "node": "node --inspect ./dist/examples/SierraTest.js",
+    "nodemon": "nodemon ./dist/examples/SierraTest.js",
     "mkdocs": "mkdocs build",
     "mkdocs-serve": "mkdocs serve",
     "mkdocs-deploy": "mkdocs gh-deploy"
