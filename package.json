@@ -29,7 +29,7 @@
     "@types/node": "13.9.5",
     "chai": "4.2.0",
     "chai-http": "4.3.0",
-    "handlebars": "4.7.3",
+    "handlebars": "4.7.6",
     "mocha": "7.1.1",
     "nodemon": "2.0.2",
     "rimraf": "3.0.2",
