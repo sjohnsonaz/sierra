@@ -13,6 +13,7 @@
                 "run-script",
                 "start"
             ],
+            "restart": true,
             "port": 9229,
             "skipFiles": [
                 "<node_internals>/**"
