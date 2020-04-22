@@ -13,12 +13,8 @@
     "clean": "rimraf ./dist",
     "prepublishOnly": "rimraf ./dist && tsc --declaration",
     "test": "tsc && mocha './dist/**/*.test.js'",
-    "watch": "tsc --watch",
-    "watch-link": "tsc --declaration --watch",
-    "mkdocs": "mkdocs build",
-    "mkdocs-serve": "mkdocs serve",
-    "mkdocs-deploy": "mkdocs gh-deploy",
-    "docsify-serve":"docsify serve docs"
+    "watch": "tsc --watch --declaration",
+    "docs": "docsify serve docs"
   },
   "dependencies": {
     "reflect-metadata": "0.1.13"
