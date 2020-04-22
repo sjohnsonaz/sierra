@@ -48,10 +48,10 @@ export default class RouteMiddleware {
                                 break;
                             default:
                                 //return new argumentType(value);
+                                //console.log(name, argumentType, output);
                                 output = value;
                                 break;
                         }
-                        console.log(name, argumentType, output);
                         return output;
                     } else {
                         return value;
