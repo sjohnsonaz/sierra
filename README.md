@@ -1,6 +1,6 @@
 # Sierra
 
-[![Build Status](https://travis-ci.org/sjohnsonaz/sierra.svg?branch=master)](https://travis-ci.org/sjohnsonaz/sierra) [![npm version](https://badge.fury.io/js/sierra.svg)](https://badge.fury.io/js/sierra)
+![Node.js CI](https://github.com/sjohnsonaz/sierra/workflows/Node.js%20CI/badge.svg) [![npm version](https://badge.fury.io/js/sierra.svg)](https://badge.fury.io/js/sierra)
 
 **Modern MVC support for your Node.js application.**
 
