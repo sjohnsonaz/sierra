@@ -20,7 +20,9 @@
     "mkdocs-serve": "mkdocs serve",
     "mkdocs-deploy": "mkdocs gh-deploy"
   },
-  "dependencies": {},
+  "dependencies": {
+    "reflect-metadata": "0.1.13"
+  },
   "devDependencies": {
     "@types/chai": "4.2.11",
     "@types/handlebars": "4.1.0",
@@ -30,7 +32,6 @@
     "chai-http": "4.3.0",
     "handlebars": "4.7.6",
     "mocha": "7.1.1",
-    "reflect-metadata": "0.1.13",
     "rimraf": "3.0.2",
     "tsc-watch": "4.2.3",
     "typescript": "3.8.3"
