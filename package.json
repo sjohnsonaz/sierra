@@ -15,10 +15,10 @@
     "test": "tsc && mocha './dist/**/*.test.js'",
     "watch": "tsc --watch",
     "watch-link": "tsc --declaration --watch",
-    "node": "node --inspect ./dist/examples/SierraTest.js",
     "mkdocs": "mkdocs build",
     "mkdocs-serve": "mkdocs serve",
-    "mkdocs-deploy": "mkdocs gh-deploy"
+    "mkdocs-deploy": "mkdocs gh-deploy",
+    "docsify-serve":"docsify serve docs"
   },
   "dependencies": {
     "reflect-metadata": "0.1.13"
@@ -30,6 +30,7 @@
     "@types/node": "13.9.5",
     "chai": "4.2.0",
     "chai-http": "4.3.0",
+    "docsify-cli": "^4.4.0",
     "handlebars": "4.7.6",
     "mocha": "7.1.1",
     "rimraf": "3.0.2",
