@@ -7,7 +7,7 @@ import SessionGateway from './SessionGateway';
 let testApplication = new Sierra();
 
 // View
-HandlebarsView.viewRoot = './testApplications/views/';
+HandlebarsView.viewRoot = './examples/views/';
 testApplication.view(HandlebarsView.handle);
 
 // Body
