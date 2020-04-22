@@ -9,7 +9,7 @@ export default class OutgoingMessage<T> extends PipelineExit {
     template: string;
     contentType: string;
 
-    constructor(data: any, status: number = 200, type: OutputType = 'auto', template?: string, contentType?: string) {
+    constructor(data: T, status: number = 200, type: OutputType = 'auto', template?: string, contentType?: string) {
         super();
         this.data = data;
         this.status = status;
