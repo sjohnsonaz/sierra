@@ -23,9 +23,6 @@ export default class Controller {
             if (results && results[1]) {
                 name = results[1].toLowerCase();
             }
-            if (name === 'index' || name === 'home') {
-                name = '';
-            }
         } else {
             name = '';
         }
@@ -36,7 +33,11 @@ export default class Controller {
         if (controller._base) {
             return controller._base;
         } else {
-            return Controller.getName(controller);
+            let name = Controller.getName(controller);
+            if (name === 'index' || name === 'home') {
+                name = '';
+            }
+            return name;
         }
     }
 

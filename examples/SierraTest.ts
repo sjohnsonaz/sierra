@@ -1,7 +1,7 @@
 import Sierra, { BodyMiddleware, SessionMiddleware } from '../src/Sierra';
 
 import HandlebarsView from './HandlebarsView';
-import TestController from './TestController';
+import HomeController from './HomeController';
 import SessionGateway from './SessionGateway';
 
 let testApplication = new Sierra();
@@ -18,7 +18,7 @@ let sessionMiddleware = new SessionMiddleware(new SessionGateway());
 testApplication.use(sessionMiddleware.handle.bind(sessionMiddleware));
 
 // Controllers
-testApplication.addController(new TestController());
+testApplication.addController(new HomeController());
 
 // Init
 testApplication.init();

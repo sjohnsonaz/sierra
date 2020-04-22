@@ -4,7 +4,7 @@ async function SimpleMiddleware() {
     return true;
 }
 
-export default class TestController extends Controller {
+export default class HomeController extends Controller {
     constructor() {
         super('/');
     }
