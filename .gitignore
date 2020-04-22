@@ -35,7 +35,7 @@ dist/
 *.tgz
 
 # Editor configuration files
-.vscode/
+# .vscode/
 
 # MkDocs files
 site

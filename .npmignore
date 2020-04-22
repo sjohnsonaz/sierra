@@ -6,11 +6,10 @@ docs/
 
 # Source directory
 src/
+examples/
 
 # Build directory
-dist/bundle/
-dist/tests/
-dist/mocha/
+dist/examples/
 
 # Sourcemap, log, packed files
 *.map
@@ -22,6 +21,7 @@ dist/mocha/
 .npmignore
 
 # Build configuration files
+.github/
 tsconfig.json
 .travis.yml
 nodemon.json

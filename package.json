@@ -5,8 +5,8 @@
   "repository": "https://www.github.com/sjohnsonaz/sierra.git",
   "license": "MIT",
   "author": "Sean Johnson <sjohnson@sjohnsonaz.com>",
-  "main": "dist/Sierra.js",
-  "typings": "dist/Sierra.d.ts",
+  "main": "dist/src/Sierra.js",
+  "typings": "dist/src/Sierra.d.ts",
   "scripts": {
     "start": "tsc-watch --onSuccess \"node --inspect ./dist/examples/SierraTest.js\"",
     "build": "tsc",
@@ -16,7 +16,6 @@
     "watch": "tsc --watch",
     "watch-link": "tsc --declaration --watch",
     "node": "node --inspect ./dist/examples/SierraTest.js",
-    "nodemon": "nodemon ./dist/examples/SierraTest.js",
     "mkdocs": "mkdocs build",
     "mkdocs-serve": "mkdocs serve",
     "mkdocs-deploy": "mkdocs gh-deploy"
@@ -31,7 +30,6 @@
     "chai-http": "4.3.0",
     "handlebars": "4.7.6",
     "mocha": "7.1.1",
-    "nodemon": "2.0.2",
     "reflect-metadata": "0.1.13",
     "rimraf": "3.0.2",
     "tsc-watch": "4.2.3",
