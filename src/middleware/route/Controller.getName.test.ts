@@ -26,4 +26,38 @@ describe('RouteUtil.getControllerName()', () => {
         let base = Controller.getName(new TestRouter());
         expect(base).to.equal('test');
     });
+
+    it('should return "" for Controllers starting with Home', () => {
+        class HomeService extends Controller {
+        }
+        let base = Controller.getName(new HomeService());
+        expect(base).to.equal('');
+
+        class HomeController extends Controller {
+        }
+        base = Controller.getName(new HomeController());
+        expect(base).to.equal('');
+
+        class HomeRouter extends Controller {
+        }
+        base = Controller.getName(new HomeRouter());
+        expect(base).to.equal('');
+    });
+
+    it('should return "" for Controllers starting with Index', () => {
+        class IndexService extends Controller {
+        }
+        let base = Controller.getName(new IndexService());
+        expect(base).to.equal('');
+
+        class IndexController extends Controller {
+        }
+        base = Controller.getName(new IndexController());
+        expect(base).to.equal('');
+
+        class IndexRouter extends Controller {
+        }
+        base = Controller.getName(new IndexRouter());
+        expect(base).to.equal('');
+    });
 });

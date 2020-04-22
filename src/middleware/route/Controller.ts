@@ -23,6 +23,9 @@ export default class Controller {
             if (results && results[1]) {
                 name = results[1].toLowerCase();
             }
+            if (name === 'index' || name === 'home') {
+                name = '';
+            }
         } else {
             name = '';
         }
