@@ -5,16 +5,20 @@ node_modules/
 docs/
 
 # Source directory
-src/
+# src/
 examples/
 
 # Build directory
 dist/examples/
 
 # Sourcemap, log, packed files
-*.map
+# *.map
 *.log
 *.tgz
+*.test.ts
+*.test.d.ts
+*.test.js
+*.test.js.map
 
 # Ignore files
 .gitignore
@@ -23,12 +27,6 @@ dist/examples/
 # Build configuration files
 .github/
 tsconfig.json
-.travis.yml
-nodemon.json
 
 # Editor configuration files
 .vscode/
-
-# MkDocs files
-mkdocs.yml
-site
