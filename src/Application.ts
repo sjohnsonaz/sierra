@@ -93,27 +93,40 @@ export default class Application {
         if (!this.server) {
             this.server = this.createServer();
         }
-        return new Promise<http.Server>((resolve, reject) => {
-            this.server.listen(port, () => {
+        return new Promise((resolve, reject) => {
+            const startup = () => {
+                this.server.on('error', onError);
+                this.server.on('listening', onListening)
+            };
+            const cleanup = () => {
+                this.server.off('error', onError);
+                this.server.off('listening', onListening);
+            };
+            const onError = (err: Error) => {
+                reject(err);
+                cleanup();
+            };
+            const onListening = () => {
                 resolve(this.server);
-            }).on('error', (e) => {
-                reject(e);
-            });
+                cleanup()
+            };
+            startup();
+            this.listen(port);
         });
     }
 
-    close(): Promise<boolean> {
-        return new Promise<boolean>((resolve, reject) => {
-            try {
-                if (!this.server) {
-                    throw Errors.neverStarted;
-                }
-                this.server.close(() => {
-                    resolve(true);
+    close(): Promise<void> {
+        return new Promise((resolve, reject) => {
+            if (!this.server) {
+                reject(Errors.neverStarted);
+            } else {
+                this.server.close(error => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve();
+                    }
                 });
-            }
-            catch (e) {
-                reject(e);
             }
         });
     }
