@@ -1,5 +1,5 @@
 import Context from '../../server/Context';
-import EncodeUtil from '../../utils/EncodeUtil';
+import { urlStringToObject } from '../../utils/EncodeUtil';
 
 import BufferDecoder from './BufferDecoder';
 
@@ -65,7 +65,12 @@ export default class BodyMiddleware {
                 }).on('end', () => {
                     try {
                         let bufferedData = Buffer.concat(body).toString().trim();
-                        context.body = bufferedData ? EncodeUtil.urlStringToObject(bufferedData) : null;
+                        if (bufferedData) {
+                            const data = urlStringToObject(bufferedData);
+                            context.body = data;
+                        } else {
+                            context.body = null;
+                        }
                         resolve(context.body);
                     }
                     catch (e) {
