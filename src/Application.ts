@@ -111,7 +111,7 @@ export default class Application {
                 cleanup()
             };
             startup();
-            this.listen(port);
+            this.server.listen(port);
         });
     }
 
