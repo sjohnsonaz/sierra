@@ -31,6 +31,9 @@ export { IFileField } from './middleware/body/IFileField';
 // Session Middleware
 export { default as SessionMiddleware } from './middleware/session/SessionMiddleware';
 
+// Connect Middleware
+export { ConnectMiddleware } from './middleware/connect';
+
 // Util
 export { default as Uuid } from './utils/Uuid';
 export { route, method, middleware } from './utils/Decorators';

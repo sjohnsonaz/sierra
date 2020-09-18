@@ -20,10 +20,13 @@ export default class RequestHandler {
         let context = new Context(request, response);
         try {
             let result = await this.pipeline.run(context, undefined);
-            if (result instanceof OutgoingMessage) {
-                this.send(context, result.data, result.status, result.type, result.template, result.contentType);
-            } else {
-                this.send(context, result);
+            // If Headers have already sent, we cannot send.
+            if (!context.response.headersSent && !context.response.writableEnded) {
+                if (result instanceof OutgoingMessage) {
+                    this.send(context, result.data, result.status, result.type, result.template, result.contentType);
+                } else {
+                    this.send(context, result);
+                }
             }
         }
         catch (e) {

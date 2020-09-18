@@ -70,7 +70,10 @@ export default class Application {
         // Concat all Routes
         this.routeMiddleware.routes = regexRoutes.concat(stringRoutes);
 
-        this.requestHandler.use(this.routeMiddleware.handler);
+        // Add RouteMiddleware if we have Routes.
+        if (this.routeMiddleware.routes.length) {
+            this.requestHandler.use(this.routeMiddleware.handler);
+        }
     }
 
     use(middleware: IServerMiddleware<any, any>) {
