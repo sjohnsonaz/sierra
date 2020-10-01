@@ -58,21 +58,21 @@ export default class RequestHandler {
     sendJson<T>(context: Context, data: T, status: number = 200) {
         context.response.statusCode = status;
         context.response.setHeader('Content-Type', 'application/json');
-        context.response.write(JSON.stringify(data || null));
+        context.response.write(JSON.stringify(data ?? null));
         context.response.end();
     }
 
     sendRaw<T>(context: Context, data: T, status: number = 200, contentType: string) {
         context.response.statusCode = status;
         if (typeof data === 'string') {
-            context.response.setHeader('Content-Type', contentType || 'text/plain');
+            context.response.setHeader('Content-Type', contentType ?? 'text/plain');
             context.response.write(data);
         } else if (Buffer.isBuffer(data)) {
-            context.response.setHeader('Content-Type', contentType || 'octet-stream');
+            context.response.setHeader('Content-Type', contentType ?? 'octet-stream');
             context.response.write(data);
         } else {
-            context.response.setHeader('Content-Type', contentType || 'application/json');
-            context.response.write(JSON.stringify(data || null));
+            context.response.setHeader('Content-Type', contentType ?? 'application/json');
+            context.response.write(JSON.stringify(data ?? null));
         }
         context.response.end();
     }
@@ -82,7 +82,7 @@ export default class RequestHandler {
             if (!this.view) {
                 throw Errors.noViewMiddleware;
             }
-            let output = await this.view(context, data, template || context.template);
+            let output = await this.view(context, data, template ?? context.template);
             context.response.statusCode = status;
             context.response.setHeader('Content-Type', 'text/html');
             context.response.write(output);
@@ -160,7 +160,7 @@ export default class RequestHandler {
             if (this.view && accept && accept.indexOf('text/html') > -1) {
                 await this.sendView(context, data, status, 'error');
             } else {
-                await this.sendJson(context, data.message || data.name, status);
+                await this.sendJson(context, data.message ?? data.name, status);
             }
         }
         catch (e) {
