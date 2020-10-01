@@ -24,11 +24,17 @@ testApplication.addController(new HomeController());
 testApplication.init();
 
 // Listen
-let port = 3001;
+const port = 3001;
 (async () => {
     try {
         await testApplication.listen(port);
         console.log('Listening to port: ' + port);
+
+        await testApplication.wait();
+        console.log('Stopping...');
+
+        await testApplication.close();
+        console.log('Stopped');
     }
     catch (e) {
         console.error(e);

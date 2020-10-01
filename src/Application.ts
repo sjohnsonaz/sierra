@@ -133,6 +133,17 @@ export default class Application {
             }
         });
     }
+
+    async wait() {
+        return new Promise<void>(resolve => {
+            process.on('SIGINT', () => {
+                resolve();
+            });
+            process.on('SIGTERM', () => {
+                resolve();
+            });
+        });
+    }
 }
 
 export function sortRoutes(routeA: Route<any, any>, routeB: Route<any, any>) {

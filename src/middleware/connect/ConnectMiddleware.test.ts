@@ -7,7 +7,7 @@ import Sierra from '../../Sierra';
 import { ConnectMiddleware } from './ConnectMiddleware';
 
 describe('ConnectMiddleware', () => {
-    let port = 3001;
+    const port = 3001;
     let application: Sierra;
 
     beforeEach(async () => {
