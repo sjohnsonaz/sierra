@@ -1,15 +1,13 @@
-import chai = require('chai');
-import chaiHttp = require('chai-http');
-chai.use(chaiHttp);
-let expect = chai.expect;
+import fetch from 'node-fetch';
 
 import Sierra, { Controller, route, Context, middleware } from '../../Sierra';
 
 describe('middleware decorator', () => {
-    let port = 3001;
-    let application: Sierra;
+    const port = 3001;
+    const url = `http://localhost:${port}`;
+    let application: Sierra = undefined;
 
-    before(async () => {
+    beforeEach(async () => {
         class TestController extends Controller {
             @middleware(async (_context) => {
                 return false;
@@ -41,26 +39,22 @@ describe('middleware decorator', () => {
         await application.listen(port);
     });
 
-    after(async () => {
+    afterEach(async () => {
         await application.close();
     });
 
     it('should run in order', async () => {
-        let res = await chai.request('localhost:' + port)
-            .get('/test');
-        expect(res).to.be.json;
-        let result = JSON.parse(res.text);
-        expect(result).to.be.instanceOf(Object);
-        expect(result.value).to.equal(true);
+        const response = await fetch(`${url}/test`);
+        const result = await response.json();
+        expect(result).toBeInstanceOf(Object);
+        expect(result.value).toBe(true);
     });
 
     it('should run all middlewares', async () => {
-        let res = await chai.request('localhost:' + port)
-            .post('/test');
-        expect(res).to.be.json;
-        let result = JSON.parse(res.text);
-        expect(result).to.be.instanceOf(Object);
-        expect(result.a).to.equal(1);
-        expect(result.b).to.equal(2);
+        const response = await fetch(`${url}/test`, { method: 'post' });
+        const result = await response.json();
+        expect(result).toBeInstanceOf(Object);
+        expect(result.a).toBe(1);
+        expect(result.b).toBe(2);
     });
 });

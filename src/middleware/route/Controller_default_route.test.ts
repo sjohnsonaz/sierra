@@ -1,15 +1,13 @@
-import chai = require('chai');
-import chaiHttp = require('chai-http');
-chai.use(chaiHttp);
-let expect = chai.expect;
+import fetch from 'node-fetch';
 
 import Sierra, { Controller, route, Context } from '../../Sierra';
 
 describe('Default route', () => {
-    let port = 3001;
+    const port = 3001;
+    const url = `http://localhost:${port}`;
     let application: Sierra;
 
-    before(async function () {
+    beforeEach(async function () {
         class TestController extends Controller {
             constructor() {
                 super('/');
@@ -27,13 +25,12 @@ describe('Default route', () => {
         await application.listen(port);
     });
 
-    after(async function () {
+    afterEach(async function () {
         await application.close();
     });
 
     it('should use default route', async function () {
-        let res = await chai.request('localhost:' + port)
-            .get('/');
-        expect(res).to.have.status(200);
+        const response = await fetch(`${url}/`);
+        expect(response.status).toBe(200);
     });
 });

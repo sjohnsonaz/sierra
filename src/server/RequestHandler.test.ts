@@ -1,17 +1,14 @@
-import chai = require('chai');
-import chaiHttp = require('chai-http');
-chai.use(chaiHttp);
-let expect = chai.expect;
-
 import * as http from 'http';
 import * as fs from 'fs';
 
+import fetch from 'node-fetch';
 import Handlebars from 'handlebars';
 
 import RequestHandler from './RequestHandler';
 
 describe('RequestHandler', function () {
     const port = 3001;
+    const url = `http://localhost:${port}`;
     let server: http.Server;
     let handler: RequestHandler;
 
@@ -63,55 +60,45 @@ describe('RequestHandler', function () {
         handler.use(async function (context) {
             return context.send(true);
         });
-        let res = await chai.request('localhost:' + port)
-            .get('/');
-        expect(res).to.be.json;
-        let result = JSON.parse(res.text);
-        expect(result).to.equal(true);
+        const response = await fetch(`${url}/`);
+        const result = await response.json();
+        expect(result).toBe(true);
     });
 
     it('should send false responses', async function () {
         handler.use(async function (context) {
             return context.send(false);
         });
-        let res = await chai.request('localhost:' + port)
-            .get('/');
-        expect(res).to.be.json;
-        let result = JSON.parse(res.text);
-        expect(result).to.equal(false);
+        const response = await fetch(`${url}/`);
+        const result = await response.json();
+        expect(result).toBe(false);
     });
 
     it('should send null responses', async function () {
         handler.use(async function (context) {
             return context.send(null);
         });
-        let res = await chai.request('localhost:' + port)
-            .get('/');
-        expect(res).to.be.json;
-        let result = JSON.parse(res.text);
-        expect(result).to.equal(null);
+        const response = await fetch(`${url}/`);
+        const result = await response.json();
+        expect(result).toBe(null);
     });
 
     it('should cast undefined responses to null', async function () {
         handler.use(async function (context) {
             return context.send(undefined);
         });
-        let res = await chai.request('localhost:' + port)
-            .get('/');
-        expect(res).to.be.json;
-        let result = JSON.parse(res.text);
-        expect(result).to.equal(null);
+        const response = await fetch(`${url}/`);
+        const result = await response.json();
+        expect(result).toBe(null);
     });
 
     it('should send object responses', async function () {
         handler.use(async function (context) {
             return context.send({ value: 'test' });
         });
-        let res = await chai.request('localhost:' + port)
-            .get('/');
-        expect(res).to.be.json;
-        let result = JSON.parse(res.text);
-        expect(result).to.be.instanceOf(Object);
-        expect(result.value).to.equal('test');
+        const response = await fetch(`${url}/`);
+        const result = await response.json();
+        expect(result).toBeInstanceOf
+        expect(result.value).toBe('test');
     });
 });

@@ -1,6 +1,3 @@
-import chai = require('chai');
-let expect = chai.expect;
-
 import { Pipeline } from '../Sierra';
 
 describe('Pipeline', function () {
@@ -10,7 +7,7 @@ describe('Pipeline', function () {
             return true;
         });
         let result = await pipeline.run({});
-        expect(result).to.equal(true);
+        expect(result).toBe(true);
     });
 
     it('should run middleware in order', async function () {
@@ -22,7 +19,7 @@ describe('Pipeline', function () {
             return value + 'c';
         });
         let result = await pipeline.run({}, 'a');
-        expect(result).to.equal('abc');
+        expect(result).toBe('abc');
     });
 
     it('should throw exceptions', async function () {
@@ -40,6 +37,6 @@ describe('Pipeline', function () {
         catch (e) {
             result = e;
         }
-        expect(result).to.equal('exception');
+        expect(result).toBe('exception');
     })
 });

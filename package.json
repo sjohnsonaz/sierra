@@ -12,7 +12,7 @@
     "build": "tsc",
     "clean": "rimraf ./dist",
     "prepublishOnly": "rimraf ./dist && tsc --declaration",
-    "test": "tsc && mocha './dist/**/*.test.js'",
+    "test": "jest",
     "watch": "tsc --watch --declaration",
     "docs": "docsify serve docs"
   },
@@ -20,18 +20,18 @@
     "reflect-metadata": "0.1.13"
   },
   "devDependencies": {
-    "@types/chai": "4.2.11",
     "@types/handlebars": "4.1.0",
-    "@types/mocha": "7.0.2",
-    "@types/node": "13.9.5",
-    "chai": "4.2.0",
-    "chai-http": "4.3.0",
-    "docsify-cli": "^4.4.0",
+    "@types/jest": "26.0.14",
+    "@types/node": "14.11.2",
+    "@types/node-fetch": "^2.5.7",
+    "docsify-cli": "4.4.1",
     "handlebars": "4.7.6",
-    "mocha": "7.1.1",
+    "jest": "26.4.2",
+    "node-fetch": "^2.6.1",
     "rimraf": "3.0.2",
-    "tsc-watch": "4.2.3",
-    "typescript": "3.8.3"
+    "ts-jest": "26.4.1",
+    "tsc-watch": "4.2.9",
+    "typescript": "4.0.3"
   },
   "keywords": [
     "service",
@@ -40,5 +40,12 @@
     "middleware",
     "routing",
     "router"
-  ]
+  ],
+  "jest": {
+    "preset": "ts-jest",
+    "testPathIgnorePatterns": [
+      "<rootDir>/dist/"
+    ],
+    "maxWorkers": 1
+  }
 }

@@ -1,8 +1,3 @@
-import chai = require('chai');
-import chaiHttp = require('chai-http');
-chai.use(chaiHttp);
-let expect = chai.expect;
-
 import { Route, Verb } from './Sierra';
 import { sortRoutes } from './Application';
 
@@ -26,6 +21,6 @@ describe('Route.sort', () => {
             return new Route(Verb.Get, route, undefined, undefined, undefined, undefined, undefined, undefined);
         }).sort(sortRoutes);
 
-        expect(true).to.equal(true);
+        expect(true).toBe(true);
     });
 });

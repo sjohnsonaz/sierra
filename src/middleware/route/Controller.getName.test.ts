@@ -1,8 +1,3 @@
-import chai = require('chai');
-import chaiHttp = require('chai-http');
-chai.use(chaiHttp);
-let expect = chai.expect;
-
 import { Controller } from '../../Sierra';
 
 describe('Controller', function () {
@@ -11,21 +6,21 @@ describe('Controller', function () {
             class HomeService extends Controller {
             }
             let base = Controller.getName(new HomeService());
-            expect(base).to.equal('home');
+            expect(base).toBe('home');
         });
 
         it('should return name for Controllers ending in Controller', function () {
             class HomeController extends Controller {
             }
             let base = Controller.getName(new HomeController());
-            expect(base).to.equal('home');
+            expect(base).toBe('home');
         });
 
         it('should return name for Controllers ending in Router', function () {
             class HomeRouter extends Controller {
             }
             let base = Controller.getName(new HomeRouter());
-            expect(base).to.equal('home');
+            expect(base).toBe('home');
         });
     });
 
@@ -34,34 +29,34 @@ describe('Controller', function () {
             class HomeService extends Controller {
             }
             let base = Controller.getBase(new HomeService());
-            expect(base).to.equal('');
+            expect(base).toBe('');
 
             class HomeController extends Controller {
             }
             base = Controller.getBase(new HomeController());
-            expect(base).to.equal('');
+            expect(base).toBe('');
 
             class HomeRouter extends Controller {
             }
             base = Controller.getBase(new HomeRouter());
-            expect(base).to.equal('');
+            expect(base).toBe('');
         });
 
         it('should return "" for Controllers starting with Index', function () {
             class IndexService extends Controller {
             }
             let base = Controller.getBase(new IndexService());
-            expect(base).to.equal('');
+            expect(base).toBe('');
 
             class IndexController extends Controller {
             }
             base = Controller.getBase(new IndexController());
-            expect(base).to.equal('');
+            expect(base).toBe('');
 
             class IndexRouter extends Controller {
             }
             base = Controller.getBase(new IndexRouter());
-            expect(base).to.equal('');
+            expect(base).toBe('');
         });
     });
 });
