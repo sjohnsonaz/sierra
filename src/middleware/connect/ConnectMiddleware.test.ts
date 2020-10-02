@@ -1,11 +1,9 @@
-import fetch from 'node-fetch';
+import * as request from 'supertest';
 
 import Sierra from '../../Sierra';
 import { ConnectMiddleware } from './ConnectMiddleware';
 
 describe('ConnectMiddleware', () => {
-    const port = 3001;
-    const url = `http://localhost:${port}`;
     let application: Sierra;
 
     beforeEach(async () => {
@@ -17,11 +15,6 @@ describe('ConnectMiddleware', () => {
             return 'errored';
         });
         application.init();
-        await application.listen(port);
-    });
-
-    afterEach(async () => {
-        await application.close();
     });
 
     it('should continue on next()', async () => {
@@ -29,9 +22,9 @@ describe('ConnectMiddleware', () => {
             next();
         }));
 
-        const response = await fetch(`${url}`);
-        const result = await response.json();
-        expect(result).toBe('returned');
+        await request(application.createServer())
+            .get('')
+            .expect(200, JSON.stringify('returned'));
     });
 
     it('should throw on next(err)', async () => {
@@ -39,9 +32,9 @@ describe('ConnectMiddleware', () => {
             next('throw error');
         }));
 
-        const response = await fetch(`${url}`);
-        const result = await response.json();
-        expect(result).toBe('errored');
+        await request(application.createServer())
+            .get('')
+            .expect(500, JSON.stringify('errored'));
     });
 
     it('should continue on send()', async () => {
@@ -50,8 +43,8 @@ describe('ConnectMiddleware', () => {
             res.end();
         }));
 
-        const response = await fetch(`${url}`);
-        const result = await response.json();
-        expect(result).toBe('returned');
+        await request(application.createServer())
+            .get('')
+            .expect(200, JSON.stringify('returned'));
     });
 });

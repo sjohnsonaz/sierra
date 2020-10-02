@@ -1,13 +1,11 @@
-import fetch from 'node-fetch';
+import * as request from 'supertest';
 
 import Sierra, { Controller, route, Context } from '../../Sierra';
 
 describe('Default route', () => {
-    const port = 3001;
-    const url = `http://localhost:${port}`;
     let application: Sierra;
 
-    beforeEach(async function () {
+    beforeAll(async function () {
         class TestController extends Controller {
             constructor() {
                 super('/');
@@ -22,15 +20,11 @@ describe('Default route', () => {
         application = new Sierra();
         application.addController(new TestController());
         application.init();
-        await application.listen(port);
-    });
-
-    afterEach(async function () {
-        await application.close();
     });
 
     it('should use default route', async function () {
-        const response = await fetch(`${url}/`);
-        expect(response.status).toBe(200);
+        await request(application.createServer())
+            .get('/')
+            .expect(200);
     });
 });

@@ -1,13 +1,11 @@
-import fetch from 'node-fetch';
+import * as request from 'supertest';
 
 import Sierra, { Controller, route, Context, middleware } from '../../Sierra';
 
 describe('middleware decorator', () => {
-    const port = 3001;
-    const url = `http://localhost:${port}`;
     let application: Sierra = undefined;
 
-    beforeEach(async () => {
+    beforeAll(async () => {
         class TestController extends Controller {
             @middleware(async (_context) => {
                 return false;
@@ -36,25 +34,20 @@ describe('middleware decorator', () => {
         application = new Sierra();
         application.addController(new TestController());
         application.init();
-        await application.listen(port);
-    });
-
-    afterEach(async () => {
-        await application.close();
     });
 
     it('should run in order', async () => {
-        const response = await fetch(`${url}/test`);
-        const result = await response.json();
-        expect(result).toBeInstanceOf(Object);
-        expect(result.value).toBe(true);
+        await request(application.createServer())
+            .get('/test')
+            .expect(200, { value: true });
     });
 
     it('should run all middlewares', async () => {
-        const response = await fetch(`${url}/test`, { method: 'post' });
-        const result = await response.json();
-        expect(result).toBeInstanceOf(Object);
-        expect(result.a).toBe(1);
-        expect(result.b).toBe(2);
+        await request(application.createServer())
+            .post('/test')
+            .expect(200, {
+                a: 1,
+                b: 2
+            });
     });
 });
