@@ -243,22 +243,24 @@ describe('RouteMiddleware', () => {
                 number: number;
                 string: string;
 
-                constructor(
-                    {
-                        boolean,
-                        number,
-                        string
-                    }: {
-                        boolean: boolean;
-                        number: number;
-                        string: string;
-                    }
-                ) {
+                constructor(boolean: boolean, number: number, string: string) {
                     this.boolean = boolean;
                     this.number = number;
                     this.string = string;
                 }
             }
+
+            application.routeMiddleware.addFactory(BodyObject, ({
+                boolean,
+                number,
+                string
+            }: {
+                boolean: boolean;
+                number: number;
+                string: string;
+            }) => {
+                return new BodyObject(boolean, number, string);
+            });
 
             class IndexController extends Controller {
                 @method('post')

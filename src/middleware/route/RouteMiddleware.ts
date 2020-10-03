@@ -5,6 +5,8 @@ import Route from './Route';
 
 export default class RouteMiddleware {
     routes: Route<any, any>[] = [];
+    factories: Record<string, { (...args: any): any }> = {};
+
     handler = async (context: Context, value: any) => {
         let routes = this.routes.filter(route => {
             return (context.method === route.verb || route.verb === 'all') && !!context.pathname.match(route.regex);
@@ -49,9 +51,12 @@ export default class RouteMiddleware {
                             case Object:
                                 output = value;
                             default:
-                                return new argumentType(value);
-                                //console.log(name, argumentType, output);
-                                //output = value;
+                                const factory = this.getFactory(argumentType);
+                                if (factory) {
+                                    return factory(value);
+                                } else {
+                                    output = value;
+                                }
                                 break;
                         }
                         return output;
@@ -65,6 +70,21 @@ export default class RouteMiddleware {
         } else {
             throw new NoRouteFoundError();
         }
+    }
+
+    addFactory<T>(constructor: { new(...args: any): T }, factory: (args: Record<string, any>) => T) {
+        const name = constructor.name;
+        this.factories[name] = factory;
+    }
+
+    removeFactory(constructor: { new(...args: any): any }) {
+        const name = constructor.name;
+        delete this.factories[name];
+    }
+
+    getFactory<T>(constructor: { new(...args: any): T }): (args: Record<string, any>) => T {
+        const name = constructor.name;
+        return this.factories[name];
     }
 }
 
