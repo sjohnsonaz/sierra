@@ -1,5 +1,5 @@
 import Context from '../../server/Context';
-import { Errors } from '../../server/Errors';
+import { NoRouteFoundError } from '../../server/Errors';
 
 import Route from './Route';
 
@@ -32,7 +32,7 @@ export default class RouteMiddleware {
                     $result: result
                 };
                 return await route.method.apply(route, route.argumentNames.map((name, index) => {
-                    let value = contextParams[name] || context.params[name] || context.query[name] || context.body[name];
+                    let value = contextParams[name as keyof typeof contextParams] || context.params[name] || context.query[name] || context.body[name];
                     let argumentType = route.argumentTypes[index];
                     if (argumentType) {
                         let output;
@@ -61,13 +61,13 @@ export default class RouteMiddleware {
                 return await route.method(context, result);
             }
         } else {
-            throw Errors.noRouteFound;
+            throw new NoRouteFoundError();
         }
     }
 }
 
 function createParams(matches: string[], argumentNames: string[]) {
-    let params = {};
+    let params: Record<string, string> = {};
     if (matches) {
         argumentNames.forEach((name, index) => {
             params[name] = matches[index + 1];

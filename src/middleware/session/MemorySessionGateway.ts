@@ -2,10 +2,8 @@ import Context from '../../server/Context';
 
 import { ISessionGateway } from '../../server/ISessionGateway';
 import Uuid from '../../utils/Uuid';
-export default class MemorySessionGateway<T> implements ISessionGateway<T> {
-    data: {
-        [index: string]: T;
-    } = {};
+export default class MemorySessionGateway<T extends { _id: string }> implements ISessionGateway<T> {
+    data: Record<string, T> = {};
 
     async getId(context: Context): Promise<string> {
         return Uuid.create();

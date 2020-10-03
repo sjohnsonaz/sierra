@@ -7,10 +7,10 @@ import { IServerMiddleware } from './IServerMiddleware';
 import { IViewMiddleware } from './IViewMiddleware';
 import Context from './Context';
 import OutgoingMessage, { OutputType } from './OutgoingMessage';
-import { Errors } from './Errors';
 import { LogLevel } from './LogLevel';
+import { ErrorMessage, NoViewMiddlwareError, NoViewTemplateError, SierraError } from './Errors';
 
-export default class RequestHandler {
+export class RequestHandler {
     pipeline: Pipeline<Context, any, any> = new Pipeline();
     error: IServerMiddleware<any, any>;
     view: IViewMiddleware<any>;
@@ -31,11 +31,13 @@ export default class RequestHandler {
         }
         catch (e) {
             let errorStatus = 500;
-            switch (e) {
-                case Errors.noRouteFound:
-                case Errors.notFound:
-                    errorStatus = 404;
-                    break;
+            if (e instanceof SierraError) {
+                switch (e.message) {
+                    case ErrorMessage.noRouteFound:
+                    case ErrorMessage.notFound:
+                        errorStatus = 404;
+                        break;
+                }
             }
             if (this.error) {
                 try {
@@ -56,6 +58,7 @@ export default class RequestHandler {
     };
 
     sendJson<T>(context: Context, data: T, status: number = 200) {
+        this.log(context, data, status);
         context.response.statusCode = status;
         context.response.setHeader('Content-Type', 'application/json');
         context.response.write(JSON.stringify(data ?? null));
@@ -63,6 +66,7 @@ export default class RequestHandler {
     }
 
     sendRaw<T>(context: Context, data: T, status: number = 200, contentType: string) {
+        this.log(context, data, status);
         context.response.statusCode = status;
         if (typeof data === 'string') {
             context.response.setHeader('Content-Type', contentType ?? 'text/plain');
@@ -80,40 +84,32 @@ export default class RequestHandler {
     async sendView<T>(context: Context, data: T, status: number = 200, template: string) {
         try {
             if (!this.view) {
-                throw Errors.noViewMiddleware;
+                throw new NoViewMiddlwareError();
             }
             let output = await this.view(context, data, template ?? context.template);
+            this.log(context, data, status);
             context.response.statusCode = status;
             context.response.setHeader('Content-Type', 'text/html');
             context.response.write(output);
             context.response.end();
         }
         catch (e) {
+            if (e instanceof NoViewTemplateError) {
+                this.sendJson(context, data, status);
+            } else {
+                this.log(context, data, 500);
+                context.response.statusCode = 500;
+                context.response.setHeader('Content-Type', 'text/html');
+                context.response.write(errorTemplate(e));
+                context.response.end();
+            }
             if (this.logging >= LogLevel.errors) {
                 console.error(e);
             }
-            context.response.statusCode = 500;
-            context.response.setHeader('Content-Type', 'text/html');
-            context.response.write('\
-                <!DOCTYPE html>\
-                <html>\
-                <head>\
-                <title>Sierra Error</title>\
-                </head>\
-                <body>\
-                <h1>Sierra Error</h1>\
-                <pre><code>' + e + '</code></pre>\
-                </body>\
-                </html>\
-            ');
-            context.response.end();
         }
     }
 
     send<T>(context: Context, data: T, status: number = 200, type: OutputType = 'auto', template?: string, contentType?: string) {
-        if (this.logging >= LogLevel.verbose) {
-            console.log(context.request.method, context.request.url, colorStatus(status));
-        }
         let accept = context.accept;
         switch (type) {
             case 'auto':
@@ -144,9 +140,6 @@ export default class RequestHandler {
     }
 
     async sendError<T>(context: Context, data: Error, status: number = 500) {
-        if (this.logging >= LogLevel.verbose) {
-            console.log(context.request.method, context.request.url, colorStatus(status));
-        }
         let accept = context.request.headers.accept;
         if (!(data instanceof Error)) {
             data = new Error(data);
@@ -170,9 +163,31 @@ export default class RequestHandler {
         }
     }
 
+    // TODO: Remove data parameter
+    log<T>(context: Context, _data: T, status: number = 500) {
+        if (this.logging >= LogLevel.verbose) {
+            console.log(context.request.method, context.request.url, colorStatus(status));
+        }
+    }
+
     use<T, U>(middlware: IServerMiddleware<T, U>) {
         this.pipeline.use(middlware);
     }
+}
+
+function errorTemplate(error: any) {
+    return (
+        `<!DOCTYPE html>
+<html>
+    <head>
+        <title>Sierra Error</title>
+    </head>
+    <body>
+        <h1>Sierra Error</h1>
+        <pre><code>${error}</code></pre>
+    </body>
+</html>`
+    );
 }
 
 function colorStatus(status: number) {

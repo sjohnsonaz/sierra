@@ -51,7 +51,7 @@ export default class Context<T = any, U = any, V = any, X = any> {
             let parts = contentTypeHeader.split('; ');
             contentType = parts[0].toLowerCase();
             if (parts.length > 1) {
-                let hash = {};
+                let hash: Record<string, any> = {};
                 parts.shift();
                 parts.forEach(part => {
                     let hashParts = part.split('=');

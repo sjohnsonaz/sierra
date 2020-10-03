@@ -5,7 +5,7 @@ export { IMiddleware } from './pipeline/IMiddleware';
 
 // Server
 export { default as Context } from './server/Context';
-export { Errors } from './server/Errors';
+export * from './server/Errors';
 export { LogLevel } from './server/LogLevel';
 export { default as Cookie } from './server/Cookie';
 export { IMethod } from './server/IMethod';
@@ -13,7 +13,7 @@ export { ISessionGateway } from './server/ISessionGateway';
 export { IServerMiddleware } from './server/IServerMiddleware';
 export { IViewMiddleware } from './server/IViewMiddleware';
 export { default as OutgoingMessage, send, view, json, raw, OutputType } from './server/OutgoingMessage';
-export { default as RequestHandler } from './server/RequestHandler';
+export { RequestHandler } from './server/RequestHandler';
 export { default as Session } from './server/Session';
 
 // Route Middleware
@@ -38,4 +38,4 @@ export { ConnectMiddleware } from './middleware/connect';
 export { default as Uuid } from './utils/Uuid';
 export { route, method, middleware } from './utils/Decorators';
 
-export { default as default } from './Application';
+export { Application as default } from './Application';

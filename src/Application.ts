@@ -6,12 +6,12 @@ import { IViewMiddleware } from './server/IViewMiddleware';
 import Controller from './middleware/route/Controller';
 import Route from './middleware/route/Route';
 
-import RequestHandler from './server/RequestHandler';
+import { RequestHandler } from './server/RequestHandler';
 import RouteMiddleware from './middleware/route/RouteMiddleware';
-import { Errors } from './server/Errors';
 import { LogLevel } from './server/LogLevel';
+import { NeverStartedError } from './server/Errors';
 
-export default class Application {
+export class Application {
     requestHandler: RequestHandler = new RequestHandler();
     routeMiddleware: RouteMiddleware = new RouteMiddleware();
     server: http.Server;
@@ -26,14 +26,9 @@ export default class Application {
     }
 
     async init() {
-        await this.connectDatabase();
         await this.addMiddleware(this.requestHandler);
         await this.buildControllers();
         return this.requestHandler;
-    }
-
-    connectDatabase(): Promise<void> {
-        return Promise.resolve();
     }
 
     addMiddleware(requestHandler: RequestHandler): Promise<void> {
@@ -121,7 +116,7 @@ export default class Application {
     close(): Promise<void> {
         return new Promise((resolve, reject) => {
             if (!this.server) {
-                reject(Errors.neverStarted);
+                reject(new NeverStartedError());
             } else {
                 this.server.close(error => {
                     if (error) {

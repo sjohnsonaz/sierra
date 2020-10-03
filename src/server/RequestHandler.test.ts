@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as request from 'supertest';
 import Handlebars from 'handlebars';
 
-import RequestHandler from './RequestHandler';
+import { RequestHandler } from './RequestHandler';
 
 describe('RequestHandler', function () {
     let server: http.Server;

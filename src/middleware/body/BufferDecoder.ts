@@ -92,7 +92,7 @@ export default class BufferDecoder {
     }
 
     decode() {
-        let result: Object = {};
+        let result: Record<string, any> = {};
         this.fields.forEach(field => {
             if (field.name) {
                 result[field.name] = field.decode();

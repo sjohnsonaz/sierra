@@ -1,4 +1,4 @@
-export function objectToUrlString(obj: Object) {
+export function objectToUrlString(obj: Record<string, any>) {
     var values = [];
     for (var name in obj) {
         if (obj.hasOwnProperty(name)) {

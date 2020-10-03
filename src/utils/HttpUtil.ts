@@ -9,7 +9,7 @@ export interface IHttpResult<T> {
 export default class HttpUtil {
     static request<T>(url: string, options: http.RequestOptions = {}) {
         console.log('calling: ', url);
-        let body = [];
+        let body: any[] = [];
         return new Promise<IHttpResult<T>>((resolve, reject) => {
             console.log('promise');
             let request = http.request(Object.assign({ path: url }, options), (response) => {

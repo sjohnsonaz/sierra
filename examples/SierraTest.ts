@@ -1,4 +1,4 @@
-import Sierra, { BodyMiddleware, SessionMiddleware } from '../src/Sierra';
+import Sierra, { BodyMiddleware, LogLevel, SessionMiddleware } from '../src/Sierra';
 
 import HandlebarsView from './HandlebarsView';
 import HomeController from './HomeController';
@@ -22,6 +22,7 @@ testApplication.addController(new HomeController());
 
 // Init
 testApplication.init();
+testApplication.logging = LogLevel.verbose;
 
 // Listen
 const port = 3001;

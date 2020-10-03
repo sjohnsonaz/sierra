@@ -1,8 +1,8 @@
 
 import Context from './Context';
 import Cookie from './Cookie';
-import { ISessionGateway } from './ISessionGateway'
-import { Errors } from './Errors';
+import { NoSessionGatewayError } from './Errors';
+import { ISessionGateway } from './ISessionGateway';
 
 export default class Session<T> {
     context: Context;
@@ -23,14 +23,14 @@ export default class Session<T> {
 
     async save(): Promise<boolean> {
         if (!this.gateway) {
-            throw Errors.noSessionGateway;
+            throw new NoSessionGatewayError();
         }
         return await this.gateway.save(this.context, this.id, this.data);
     }
 
     async reload(): Promise<T> {
         if (!this.gateway) {
-            throw Errors.noSessionGateway;
+            throw new NoSessionGatewayError();
         }
         this.data = await this.gateway.load(this.context, this.id);
         return this.data;
@@ -38,7 +38,7 @@ export default class Session<T> {
 
     async destroy(): Promise<boolean> {
         if (!this.gateway) {
-            throw Errors.noSessionGateway;
+            throw new NoSessionGatewayError();
         }
 
         // Try to remove cookie from client
@@ -53,7 +53,7 @@ export default class Session<T> {
 
     async regenerate(): Promise<Session<T>> {
         if (!this.gateway) {
-            throw Errors.noSessionGateway;
+            throw new NoSessionGatewayError();
         }
         return Session.load(this.context, this.gateway, { regenerate: true });
     }

@@ -10,7 +10,7 @@ import Controller from './Controller';
 import Route from './Route';
 
 import RouteDefinition, { RouteMethod } from './RouteDefinition';
-import { Errors } from '../../server/Errors';
+import { NoMethodError } from '../../server/Errors';
 
 export interface IRouteDefinitionHash<U extends IServerMiddleware<any, any>> {
     [index: string]: RouteDefinition<U>;
@@ -86,7 +86,7 @@ export default class RouteBuilder {
             var middleware = routeDefinition.middleware;
             var routeMethod = routeDefinition.method;
             if (!routeMethod) {
-                throw Errors.noMethod + methodName;
+                throw new NoMethodError(methodName);
             }
             var name = routeMethod.name || '';
             var verb = routeMethod.verb;
@@ -98,7 +98,7 @@ export default class RouteBuilder {
             }
 
             // Get argument names, and bind method
-            var method = controller[methodName];
+            var method: IServerMiddleware<unknown, unknown> = controller[methodName as keyof typeof controller] as any;
             if (method) {
                 if (pipeArgs) {
                     var argumentNames = getArgumentNames(method);

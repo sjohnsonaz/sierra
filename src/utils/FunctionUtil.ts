@@ -1,3 +1,11 @@
+import * as http from 'http';
+
+interface IRequest extends http.IncomingMessage {
+    query?: Record<string, any>;
+    params?: Record<string, any>;
+    body?: Record<string, any>;
+}
+
 export function getArgumentNames(func: Function) {
     // First match everything inside the function argument parens.
     var matches = func.toString().match(/function\s.*?\(([^)]*)\)\s*{|\(([^)]*)\)\s*=>\s*{|[_$a-zA-Z][_$\w\d]*\(([^)]*)\)\s*{/);
@@ -29,7 +37,7 @@ export function injectVariables(method: Function, context: Object) {
 // TODO: Determine if this is still needed
 export function wrapMethod(method: Function, thisArg: any) {
     var argumentNames = getArgumentNames(method);
-    var wrappedMethod = function (req, res, next) {
+    var wrappedMethod = function (req: IRequest, res: http.ServerResponse, next?: (err?: any) => any) {
         var args = [];
         for (var index = 0, length = argumentNames.length; index < length; index++) {
             var argumentName = argumentNames[index];

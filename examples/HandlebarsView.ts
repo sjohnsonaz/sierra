@@ -4,6 +4,7 @@ import * as path from 'path';
 import Handlebars from 'handlebars';
 
 import { Context } from '../src/Sierra';
+import { NoViewTemplateError } from '../src/server/Errors';
 
 export default class HandlebarsView {
     static viewRoot: string = ''
@@ -23,7 +24,7 @@ export default class HandlebarsView {
             });
         }
         catch {
-            throw 'Cannot find template: ' + template + '.handlebars';
+            throw new NoViewTemplateError(`${template}.handlebars`);
         }
         var compiledTemplate = Handlebars.compile(templateText);
         return compiledTemplate(data);

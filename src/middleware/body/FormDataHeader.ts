@@ -12,7 +12,7 @@ export default class FormDataHeader {
         if (row) {
             let parts = row.split('; ');
             let name = parts[0];
-            let hash = {};
+            let hash: Record<string, any> = {};
             if (parts.length > 1) {
                 parts.shift();
 
