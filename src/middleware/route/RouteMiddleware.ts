@@ -38,13 +38,13 @@ export default class RouteMiddleware {
                         let output;
                         switch (argumentType) {
                             case String:
-                                output = value;
+                                output = value ?? '';
                                 break;
                             case Number:
-                                output = Number(value);
+                                output = parseFloat(value);
                                 break;
                             case Boolean:
-                                output = Boolean(value);
+                                output = ((value ?? '').toString() as string).toLowerCase() === 'true'
                                 break;
                             default:
                                 //return new argumentType(value);
