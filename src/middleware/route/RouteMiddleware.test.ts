@@ -69,9 +69,12 @@ describe('RouteMiddleware', () => {
                 @method('get')
                 async testQuery(boolean: boolean, number: number, string: string) {
                     return {
-                        boolean: typeof boolean,
-                        number: typeof number,
-                        string: typeof string,
+                        boolean,
+                        number,
+                        string,
+                        booleanType: typeof boolean,
+                        numberType: typeof number,
+                        stringType: typeof string,
                         numberIsNan: isNaN(number),
                         stringIsUndefined: string === undefined
                     };
@@ -80,9 +83,12 @@ describe('RouteMiddleware', () => {
                 @method('get', '/testParams/:boolean/:number/:string')
                 async testParams(boolean: boolean, number: number, string: string) {
                     return {
-                        boolean: typeof boolean,
-                        number: typeof number,
-                        string: typeof string,
+                        boolean,
+                        number,
+                        string,
+                        booleanType: typeof boolean,
+                        numberType: typeof number,
+                        stringType: typeof string,
                         numberIsNan: isNaN(number),
                         stringIsUndefined: string === undefined
                     };
@@ -102,29 +108,65 @@ describe('RouteMiddleware', () => {
         });
 
         it('should cast query params', async () => {
-            await request(application.createServer())
+            const { body } = await request(application.createServer())
+                .get('/testQuery')
+                .query({
+                    boolean: true,
+                    number: 1,
+                    string: 'test'
+                })
+                .expect(200);
+            expect(body.boolean).toBe(true);
+            expect(body.number).toBe(1);
+            expect(body.string).toBe('test');
+            expect(body.booleanType).toBe('boolean');
+            expect(body.numberType).toBe('number');
+            expect(body.stringType).toBe('string');
+            expect(body.numberIsNan).toBe(false);
+            expect(body.stringIsUndefined).toBe(false);
+        });
+
+        it('should cast empty query params', async () => {
+            const { body } = await request(application.createServer())
                 .get('/testQuery')
                 .query({})
-                .expect(200, {
-                    boolean: 'boolean',
-                    number: 'number',
-                    string: 'undefined',
-                    numberIsNan: true,
-                    stringIsUndefined: true
-                });
+                .expect(200);
+            expect(body.boolean).toBe(false);
+            expect(body.number).toBe(null);
+            expect(body.string).toBe(undefined);
+            expect(body.booleanType).toBe('boolean');
+            expect(body.numberType).toBe('number');
+            expect(body.stringType).toBe('undefined');
+            expect(body.numberIsNan).toBe(true);
+            expect(body.stringIsUndefined).toBe(true);
         });
 
         it('should cast route params', async () => {
-            await request(application.createServer())
+            const { body } = await request(application.createServer())
+                .get(`/testParams/true/1/test/`)
+                .expect(200);
+            expect(body.boolean).toBe(true);
+            expect(body.number).toBe(1);
+            expect(body.string).toBe('test');
+            expect(body.booleanType).toBe('boolean');
+            expect(body.numberType).toBe('number');
+            expect(body.stringType).toBe('string');
+            expect(body.numberIsNan).toBe(false);
+            expect(body.stringIsUndefined).toBe(false);
+        });
+
+        it('should cast empty route params', async () => {
+            const { body } = await request(application.createServer())
                 .get(`/testParams////`)
-                .query({})
-                .expect(200, {
-                    boolean: 'boolean',
-                    number: 'number',
-                    string: 'undefined',
-                    numberIsNan: true,
-                    stringIsUndefined: true
-                });
+                .expect(200);
+            expect(body.boolean).toBe(false);
+            expect(body.number).toBe(null);
+            expect(body.string).toBe(undefined);
+            expect(body.booleanType).toBe('boolean');
+            expect(body.numberType).toBe('number');
+            expect(body.stringType).toBe('undefined');
+            expect(body.numberIsNan).toBe(true);
+            expect(body.stringIsUndefined).toBe(true);
         });
     });
 });
