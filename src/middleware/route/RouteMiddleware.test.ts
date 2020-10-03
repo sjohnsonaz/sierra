@@ -1,6 +1,6 @@
 import * as request from 'supertest';
 
-import Sierra, { Controller } from "../../Sierra";
+import Sierra, { BodyMiddleware, Controller } from "../../Sierra";
 import { method } from "../../utils/Decorators";
 
 describe('RouteMiddleware', () => {
@@ -23,22 +23,37 @@ describe('RouteMiddleware', () => {
                     id
                 };
             }
-        }
 
+            @method('post')
+            async testBody($body: { id: number }) {
+                const { id } = $body;
+                return {
+                    id
+                };
+            }
+        }
+        application.use(BodyMiddleware.handle);
         application.addController(new IndexController());
         await application.init();
     });
 
-    it('should route params', async () => {
+    it('should use query params', async () => {
         await request(application.createServer())
             .get('/testQuery')
             .query({ id: 1 })
             .expect(200, { id: 1 });
     });
 
-    it('should route params', async () => {
+    it('should use route params', async () => {
         await request(application.createServer())
             .get(`/testParams/${2}`)
             .expect(200, { id: 2 });
+    });
+
+    it('should use body params', async () => {
+        await request(application.createServer())
+            .post('/testBody')
+            .send({ id: 3 })
+            .expect(200, { id: 3 });
     });
 });
