@@ -26,8 +26,7 @@ describe('RouteMiddleware', () => {
                 }
 
                 @method('post')
-                async testBody($body: { id: number }) {
-                    const { id } = $body;
+                async testBody(id: number) {
                     return {
                         id
                     };
@@ -59,7 +58,7 @@ describe('RouteMiddleware', () => {
         });
     });
 
-    describe('argument casting', () => {
+    describe('query param casting', () => {
         let application: Sierra;
 
         beforeAll(async () => {
@@ -79,30 +78,7 @@ describe('RouteMiddleware', () => {
                         stringIsUndefined: string === undefined
                     };
                 }
-
-                @method('get', '/testParams/:boolean/:number/:string')
-                async testParams(boolean: boolean, number: number, string: string) {
-                    return {
-                        boolean,
-                        number,
-                        string,
-                        booleanType: typeof boolean,
-                        numberType: typeof number,
-                        stringType: typeof string,
-                        numberIsNan: isNaN(number),
-                        stringIsUndefined: string === undefined
-                    };
-                }
-
-                // @method('post')
-                // async testBody($body: { id: number }) {
-                //     const { id } = $body;
-                //     return {
-                //         id
-                //     };
-                // }
             }
-            application.use(BodyMiddleware.handle);
             application.addController(new IndexController());
             await application.init();
         });
@@ -140,6 +116,33 @@ describe('RouteMiddleware', () => {
             expect(body.numberIsNan).toBe(true);
             expect(body.stringIsUndefined).toBe(true);
         });
+    });
+
+    describe('route param casting', () => {
+        let application: Sierra;
+
+        beforeAll(async () => {
+            application = new Sierra();
+
+            class IndexController extends Controller {
+                @method('get', '/testParams/:boolean/:number/:string')
+                async testParams(boolean: boolean, number: number, string: string) {
+                    return {
+                        boolean,
+                        number,
+                        string,
+                        booleanType: typeof boolean,
+                        numberType: typeof number,
+                        stringType: typeof string,
+                        numberIsNan: isNaN(number),
+                        stringIsUndefined: string === undefined
+                    };
+                }
+            }
+            application.use(BodyMiddleware.handle);
+            application.addController(new IndexController());
+            await application.init();
+        });
 
         it('should cast route params', async () => {
             const { body } = await request(application.createServer())
@@ -164,6 +167,148 @@ describe('RouteMiddleware', () => {
             expect(body.string).toBe(undefined);
             expect(body.booleanType).toBe('boolean');
             expect(body.numberType).toBe('number');
+            expect(body.stringType).toBe('undefined');
+            expect(body.numberIsNan).toBe(true);
+            expect(body.stringIsUndefined).toBe(true);
+        });
+    });
+
+    describe('body param casting', () => {
+        let application: Sierra;
+
+        beforeAll(async () => {
+            application = new Sierra();
+            class IndexController extends Controller {
+                @method('post')
+                async testBody(boolean: boolean, number: number, string: string) {
+                    return {
+                        boolean,
+                        number,
+                        string,
+                        booleanType: typeof boolean,
+                        numberType: typeof number,
+                        stringType: typeof string,
+                        numberIsNan: isNaN(number),
+                        stringIsUndefined: string === undefined
+                    };
+                }
+            }
+            application.use(BodyMiddleware.handle);
+            application.addController(new IndexController());
+            await application.init();
+        });
+
+        it('should cast body params', async () => {
+            const { body } = await request(application.createServer())
+                .post(`/testBody`)
+                .send({
+                    boolean: true,
+                    number: 1,
+                    string: 'test'
+                })
+                .expect(200);
+            expect(body.boolean).toBe(true);
+            expect(body.number).toBe(1);
+            expect(body.string).toBe('test');
+            expect(body.booleanType).toBe('boolean');
+            expect(body.numberType).toBe('number');
+            expect(body.stringType).toBe('string');
+            expect(body.numberIsNan).toBe(false);
+            expect(body.stringIsUndefined).toBe(false);
+        });
+
+        it('should cast empty body params', async () => {
+            const { body } = await request(application.createServer())
+                .post(`/testBody`)
+                .expect(200);
+            expect(body.boolean).toBe(false);
+            expect(body.number).toBe(null);
+            expect(body.string).toBe(undefined);
+            expect(body.booleanType).toBe('boolean');
+            expect(body.numberType).toBe('number');
+            expect(body.stringType).toBe('undefined');
+            expect(body.numberIsNan).toBe(true);
+            expect(body.stringIsUndefined).toBe(true);
+        });
+    });
+
+    describe('body object param casting', () => {
+        let application: Sierra;
+
+        beforeAll(async () => {
+            application = new Sierra();
+
+            class BodyObject {
+                boolean: boolean;
+                number: number;
+                string: string;
+
+                constructor(
+                    {
+                        boolean,
+                        number,
+                        string
+                    }: {
+                        boolean: boolean;
+                        number: number;
+                        string: string;
+                    }
+                ) {
+                    this.boolean = boolean;
+                    this.number = number;
+                    this.string = string;
+                }
+            }
+
+            class IndexController extends Controller {
+                @method('post')
+                async testBodyObject($body: BodyObject) {
+                    const { boolean, number, string } = $body;
+                    return {
+                        boolean,
+                        number,
+                        string,
+                        booleanType: typeof boolean,
+                        numberType: typeof number,
+                        stringType: typeof string,
+                        numberIsNan: isNaN(number),
+                        stringIsUndefined: string === undefined
+                    };
+                }
+            }
+            application.use(BodyMiddleware.handle);
+            application.addController(new IndexController());
+            await application.init();
+        });
+
+        it('should cast body Object params', async () => {
+            const { body } = await request(application.createServer())
+                .post(`/testBodyObject`)
+                .send({
+                    boolean: true,
+                    number: 1,
+                    string: 'test'
+                })
+                .expect(200);
+            expect(body.boolean).toBe(true);
+            expect(body.number).toBe(1);
+            expect(body.string).toBe('test');
+            expect(body.booleanType).toBe('boolean');
+            expect(body.numberType).toBe('number');
+            expect(body.stringType).toBe('string');
+            expect(body.numberIsNan).toBe(false);
+            expect(body.stringIsUndefined).toBe(false);
+        });
+
+        it('should cast empty body Object params', async () => {
+            const { body } = await request(application.createServer())
+                .post(`/testBodyObject`)
+                .expect(200);
+            expect(body.boolean).toBe(undefined);
+            expect(body.number).toBe(undefined);
+            expect(body.string).toBe(undefined);
+            expect(body.booleanType).toBe('undefined');
+            expect(body.numberType).toBe('undefined');
             expect(body.stringType).toBe('undefined');
             expect(body.numberIsNan).toBe(true);
             expect(body.stringIsUndefined).toBe(true);

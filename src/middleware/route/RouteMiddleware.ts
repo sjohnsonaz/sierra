@@ -46,10 +46,12 @@ export default class RouteMiddleware {
                             case Boolean:
                                 output = ((value ?? '').toString() as string).toLowerCase() === 'true'
                                 break;
-                            default:
-                                //return new argumentType(value);
-                                //console.log(name, argumentType, output);
+                            case Object:
                                 output = value;
+                            default:
+                                return new argumentType(value);
+                                //console.log(name, argumentType, output);
+                                //output = value;
                                 break;
                         }
                         return output;
