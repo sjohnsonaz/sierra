@@ -6,7 +6,7 @@ import Session from './Session';
 import { Verb } from '../middleware/route/Verb';
 import { HeaderName } from './HeaderName';
 
-export default class Context<T = any, U = any, V = any, X = any> {
+export default class Context<T extends URLSearchParams = URLSearchParams, U = any, V = any, X = any> {
     request: http.IncomingMessage;
     response: http.ServerResponse;
     session: Session<X>
