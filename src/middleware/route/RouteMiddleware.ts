@@ -38,7 +38,7 @@ export default class RouteMiddleware {
                         let output;
                         switch (argumentType) {
                             case String:
-                                output = value ?? '';
+                                output = value ?? undefined;
                                 break;
                             case Number:
                                 output = parseFloat(value);

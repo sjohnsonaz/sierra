@@ -73,7 +73,7 @@ describe('RouteMiddleware', () => {
                         number: typeof number,
                         string: typeof string,
                         numberIsNan: isNaN(number),
-                        stringIsEmpty: string === ''
+                        stringIsUndefined: string === undefined
                     };
                 }
 
@@ -84,7 +84,7 @@ describe('RouteMiddleware', () => {
                         number: typeof number,
                         string: typeof string,
                         numberIsNan: isNaN(number),
-                        stringIsEmpty: string === ''
+                        stringIsUndefined: string === undefined
                     };
                 }
 
@@ -108,22 +108,22 @@ describe('RouteMiddleware', () => {
                 .expect(200, {
                     boolean: 'boolean',
                     number: 'number',
-                    string: 'string',
+                    string: 'undefined',
                     numberIsNan: true,
-                    stringIsEmpty: true
+                    stringIsUndefined: true
                 });
         });
 
         it('should cast route params', async () => {
             await request(application.createServer())
                 .get(`/testParams////`)
-                .query({ id: '1' })
+                .query({})
                 .expect(200, {
                     boolean: 'boolean',
                     number: 'number',
-                    string: 'string',
+                    string: 'undefined',
                     numberIsNan: true,
-                    stringIsEmpty: true
+                    stringIsUndefined: true
                 });
         });
     });
