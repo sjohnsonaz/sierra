@@ -72,13 +72,8 @@ export default class Cookie {
         return Object.keys(hash).map(name => name + '=' + hash[name] + ';').join(' ');
     }
 
-    static hashToCookieArray(hash: ICookieHash) {
-        return Object.keys(hash).map(name => name + '=' + hash[name]);
-    }
-
     static getCookie(context: Context) {
-        // TODO: Fix cookie type
-        return Cookie.stringToHash(context.request.headers.cookie as string);
+        return Cookie.stringToHash(context.request.headers.cookie);
     }
 
     static setCookie(context: Context, hash: ICookieHash) {
