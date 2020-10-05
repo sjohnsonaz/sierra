@@ -1,82 +1,170 @@
-export default class ConsoleUtil {
-    // Colors
-    static black(text: any) {
-        return '\x1b[30m' + text + '\x1b[39m';
-    }
-    static red(text: any) {
-        return '\x1b[31m' + text + '\x1b[39m';
-    }
-    static green(text: any) {
-        return '\x1b[32m' + text + '\x1b[39m';
-    }
-    static yellow(text: any) {
-        return '\x1b[33m' + text + '\x1b[39m';
-    }
-    static blue(text: any) {
-        return '\x1b[34m' + text + '\x1b[39m';
-    }
-    static magenta(text: any) {
-        return '\x1b[35m' + text + '\x1b[39m';
-    }
-    static cyan(text: any) {
-        return '\x1b[36m' + text + '\x1b[39m';
-    }
-    static white(text: any) {
-        return '\x1b[37m' + text + '\x1b[39m';
-    }
-    static gray(text: any) {
-        return '\x1b[90m' + text + '\x1b[39m';
+const ESCAPE = 'x1b';
+const RESET = 0;
+
+enum ConsoleColor {
+    Black = 30,
+    Red = 31,
+    Green = 32,
+    Yellow = 33,
+    Blue = 34,
+    Magenta = 35,
+    Cyan = 36,
+    White = 37,
+    Gray = 90
+}
+
+enum ConsoleBackground {
+    Black = 40,
+    Red = 41,
+    Green = 42,
+    Yellow = 43,
+    Blue = 44,
+    Magenta = 45,
+    Cyan = 46,
+    White = 47
+}
+
+enum ConsoleStyle {
+    Bold = 1,
+    Dim = 2,
+    Italic = 3,
+    Underline = 4,
+    Inverse = 7,
+    Hidden = 8,
+    Strikethrough = 9
+}
+
+enum ConsoleEnd {
+    Bold = 22,
+    Italic = 23,
+    Underline = 24,
+    Blink = 25,
+    Inverse = 27,
+    Hidden = 28,
+    Strikethrough = 29,
+    Color = 39,
+    Background = 49
+}
+
+function character(value: number) {
+    return `\\${ESCAPE}[${value}m`;
+}
+
+function text(start: ConsoleColor | ConsoleBackground | ConsoleStyle, end: ConsoleEnd, text: any) {
+    return `${character(start)}${text}${character(end)}`;
+}
+
+export namespace Color {
+    function color(color: ConsoleColor, value: any) {
+        return text(color, ConsoleEnd.Color, value);
     }
 
-    // Backgrounds
-    static bgBlack(text: any) {
-        return '\x1b[40m' + text + '\x1b[49m';
-    }
-    static bgRed(text: any) {
-        return '\x1b[41m' + text + '\x1b[49m';
-    }
-    static bgGreen(text: any) {
-        return '\x1b[42m' + text + '\x1b[49m';
-    }
-    static bgYellow(text: any) {
-        return '\x1b[43m' + text + '\x1b[49m';
-    }
-    static bgBlue(text: any) {
-        return '\x1b[44m' + text + '\x1b[49m';
-    }
-    static bgMagenta(text: any) {
-        return '\x1b[45m' + text + '\x1b[49m';
-    }
-    static bgCyan(text: any) {
-        return '\x1b[46m' + text + '\x1b[49m';
-    }
-    static bgWhite(text: any) {
-        return '\x1b[47m' + text + '\x1b[49m';
+    export function black(value: any) {
+        return color(ConsoleColor.Black, value);
     }
 
-    // Styles
-    static reset(text: any) {
-        return '\x1b[0m' + text + '\x1b[0m';
+    export function red(value: any) {
+        return color(ConsoleColor.Red, value);
     }
-    static bold(text: any) {
-        return '\x1b[1m' + text + '\x1b[22m';
+
+    export function green(value: any) {
+        return color(ConsoleColor.Green, value);
     }
-    static dim(text: any) {
-        return '\x1b[2m' + text + '\x1b[22m';
+
+    export function yellow(value: any) {
+        return color(ConsoleColor.Yellow, value);
     }
-    static italic(text: any) {
-        return '\x1b[3m' + text + '\x1b[23m';
+
+    export function blue(value: any) {
+        return color(ConsoleColor.Blue, value);
     }
-    static underline(text: any) {
-        return '\x1b[4m' + text + '\x1b[24m';
+
+    export function magenta(value: any) {
+        return color(ConsoleColor.Magenta, value);
     }
-    static inverse(text: any) {
-        return '\x1b[7m' + text + '\x1b[27m';
+
+    export function cyan(value: any) {
+        return color(ConsoleColor.Cyan, value);
     }
-    static hidden(text: any) {
-        return '\x1b[8m' + text + '\x1b[28m';
+
+    export function white(value: any) {
+        return color(ConsoleColor.White, value);
     }
-    static strikethrough(text: any) {
-        return '\x1b[9m' + text + '\x1b[29m';
+
+    export function gray(value: any) {
+        return color(ConsoleColor.Gray, value);
+    }
+}
+
+export namespace Background {
+    function background(color: ConsoleBackground, value: any) {
+        return text(color, ConsoleEnd.Background, value);
+    }
+
+    export function black(value: any) {
+        return background(ConsoleBackground.Black, value);
+    }
+
+    export function red(value: any) {
+        return background(ConsoleBackground.Red, value);
+    }
+
+    export function green(value: any) {
+        return background(ConsoleBackground.Green, value);
+    }
+
+    export function yellow(value: any) {
+        return background(ConsoleBackground.Yellow, value);
+    }
+
+    export function blue(value: any) {
+        return background(ConsoleBackground.Blue, value);
+    }
+
+    export function magenta(value: any) {
+        return background(ConsoleBackground.Magenta, value);
+    }
+
+    export function cyan(value: any) {
+        return background(ConsoleBackground.Cyan, value);
+    }
+
+    export function white(value: any) {
+        return background(ConsoleBackground.White, value);
+    }
+}
+
+export namespace style {
+    export function reset(value: any) {
+        return text(RESET, RESET, value);
+    }
+
+    export function bold(value: any) {
+        return text(ConsoleStyle.Bold, ConsoleEnd.Bold, value);
+    }
+
+    // TODO: Test this
+    export function dim(value: any) {
+        return text(ConsoleStyle.Dim, ConsoleEnd.Bold, value);
+    }
+
+    export function italic(value: any) {
+        return text(ConsoleStyle.Italic, ConsoleEnd.Italic, value);
+    }
+
+    export function underline(value: any) {
+        return text(ConsoleStyle.Underline, ConsoleEnd.Underline, value);
+    }
+
+    export function inverse(value: any) {
+        return text(ConsoleStyle.Inverse, ConsoleEnd.Inverse, value);
+    }
+
+    export function hidden(value: any) {
+        return text(ConsoleStyle.Hidden, ConsoleEnd.Hidden, value);
+    }
+
+    export function strikethrough(value: any) {
+        return text(ConsoleStyle.Strikethrough, ConsoleEnd.Strikethrough, value);
     }
 }

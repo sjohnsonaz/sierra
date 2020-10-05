@@ -1,6 +1,6 @@
 import * as http from 'http';
 
-import ConsoleUtil from '../utils/ConsoleUtil';
+import { Color } from '../utils/ConsoleUtil';
 import Pipeline from '../pipeline/Pipeline';
 
 import { IServerMiddleware } from './IServerMiddleware';
@@ -193,16 +193,16 @@ function errorTemplate(error: any) {
 function colorStatus(status: number) {
     switch (Math.floor(status / 100)) {
         case 1:
-            return ConsoleUtil.white(status);
+            return Color.white(status);
         case 2:
-            return ConsoleUtil.green(status);
+            return Color.green(status);
         case 3:
-            return ConsoleUtil.blue(status);
+            return Color.blue(status);
         case 4:
-            return ConsoleUtil.yellow(status);
+            return Color.yellow(status);
         case 5:
-            return ConsoleUtil.red(status);
+            return Color.red(status);
         default:
-            return ConsoleUtil.gray(status);
+            return Color.gray(status);
     }
 }
