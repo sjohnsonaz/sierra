@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import { Controller } from '../../Sierra';
 import { method } from '../../utils/Decorators';
 
@@ -83,7 +85,7 @@ describe('Controller', function () {
                 }
             }
             const template = Controller.getTemplate(new HomeController(), 'getData');
-            expect(template).toBe('home\\getData');
+            expect(template).toBe(path.join('home', 'getData'));
         });
 
         it('should return theIndex Controller name with a method name', function () {
@@ -94,7 +96,7 @@ describe('Controller', function () {
                 }
             }
             const template = Controller.getTemplate(new IndexController(), 'getData');
-            expect(template).toBe('index\\getData');
+            expect(template).toBe(path.join('index', 'getData'));
         });
     });
 });
