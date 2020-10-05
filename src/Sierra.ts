@@ -20,7 +20,7 @@ export { default as Session } from './server/Session';
 export { default as Controller } from './middleware/route/Controller';
 export { default as Route } from './middleware/route/Route';
 export { default as RouteDefinition, RouteMethod } from './middleware/route/RouteDefinition';
-export { default as RouteBuilder, IRouteDefinitionHash } from './middleware/route/RouteBuilder';
+export { default as RouteBuilder } from './middleware/route/RouteBuilder';
 export { Verb } from './middleware/route/Verb';
 export { default as RouteMiddleware } from './middleware/route/RouteMiddleware';
 

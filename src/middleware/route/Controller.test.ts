@@ -1,4 +1,5 @@
 import { Controller } from '../../Sierra';
+import { method } from '../../utils/Decorators';
 
 describe('Controller', function () {
     describe('getName', function () {
@@ -21,6 +22,19 @@ describe('Controller', function () {
             }
             let base = Controller.getName(new HomeRouter());
             expect(base).toBe('home');
+        });
+
+
+        it('should return full name for Controllers not matching pattern', function () {
+            class ExampleHandler extends Controller {
+            }
+            let base = Controller.getName(new ExampleHandler());
+            expect(base).toBe('examplehandler');
+        });
+
+        it('should return empty string for Controllers with no name', function () {
+            let base = Controller.getName(new (class extends Controller { }));
+            expect(base).toBe('');
         });
     });
 
@@ -57,6 +71,30 @@ describe('Controller', function () {
             }
             base = Controller.getBase(new IndexRouter());
             expect(base).toBe('');
+        });
+    });
+
+    describe('getTemplate', function () {
+        it('should return the Controller name with a method name', function () {
+            class HomeController extends Controller {
+                @method('get')
+                async getData() {
+
+                }
+            }
+            const template = Controller.getTemplate(new HomeController(), 'getData');
+            expect(template).toBe('home\\getData');
+        });
+
+        it('should return theIndex Controller name with a method name', function () {
+            class IndexController extends Controller {
+                @method('get')
+                async getData() {
+
+                }
+            }
+            const template = Controller.getTemplate(new IndexController(), 'getData');
+            expect(template).toBe('index\\getData');
         });
     });
 });

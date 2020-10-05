@@ -17,14 +17,17 @@ export default class Controller {
     }
 
     static getName(controller: Controller) {
-        let name = controller.constructor.name.toLowerCase();
+        let { name } = controller.constructor;
         if (name) {
+            name = name.toLowerCase();
             var results = name.match(/(.*)(service|controller|router)/);
             if (results && results[1]) {
                 name = results[1].toLowerCase();
             }
         } else {
             name = '';
+            // TODO: Change to exception
+            // throw 'no controller name';
         }
         return name;
     }
@@ -41,7 +44,7 @@ export default class Controller {
         }
     }
 
-    static getTemplate(controller: Controller, index: string) {
-        return path.join(Controller.getName(controller), index);
+    static getTemplate<T extends Controller>(controller: T, index: keyof T) {
+        return path.join(Controller.getName(controller), index.toString());
     }
 }

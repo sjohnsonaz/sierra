@@ -12,12 +12,8 @@ import Route from './Route';
 import RouteDefinition, { RouteMethod } from './RouteDefinition';
 import { NoMethodError } from '../../server/Errors';
 
-export interface IRouteDefinitionHash<U extends IServerMiddleware<any, any>> {
-    [index: string]: RouteDefinition<U>;
-}
-
 export default class RouteBuilder {
-    routeDefinitions: IRouteDefinitionHash<IServerMiddleware<any, any>> = {};
+    routeDefinitions: Record<string, RouteDefinition<IServerMiddleware<any, any>>> = {};
     parent: RouteBuilder;
 
     constructor(parent?: RouteBuilder) {
@@ -49,10 +45,10 @@ export default class RouteBuilder {
         if (this.parent) {
             // Merge with existing RouteDefinitions
             let routeDefinitions = this.routeDefinitions;
-            let parentRouteDefinitions: IRouteDefinitionHash<IServerMiddleware<any, any>> = this.parent.getRouteDefinitions();
+            let parentRouteDefinitions: Record<string, RouteDefinition<IServerMiddleware<any, any>>> = this.parent.getRouteDefinitions();
 
             // Create merged object with values from this RouteBuilder
-            let mergedRouteDefinitions: IRouteDefinitionHash<IServerMiddleware<any, any>> = {};
+            let mergedRouteDefinitions: Record<string, RouteDefinition<IServerMiddleware<any, any>>> = {};
             let keys: string[] = RouteBuilder.getKeys(parentRouteDefinitions, routeDefinitions);
             keys.forEach(index => {
                 let routeDefinition = routeDefinitions[index];
@@ -79,40 +75,42 @@ export default class RouteBuilder {
         }
     }
 
-    build(controller: Controller) {
-        let routeDefinitions = this.getRouteDefinitions();
-        return Object.keys(routeDefinitions).map(methodName => {
-            let routeDefinition = routeDefinitions[methodName];
-            var middleware = routeDefinition.middleware;
-            var routeMethod = routeDefinition.method;
+    build<T extends Controller>(controller: T) {
+        const routeDefinitions = this.getRouteDefinitions();
+        return Object.keys(routeDefinitions).map(definitionName => {
+            const methodName: keyof T = definitionName as any;
+            const routeDefinition = routeDefinitions[definitionName];
+            const middleware = routeDefinition.middleware;
+            const routeMethod = routeDefinition.method;
             if (!routeMethod) {
-                throw new NoMethodError(methodName);
+                throw new NoMethodError(definitionName);
             }
-            var name = routeMethod.name || '';
-            var verb = routeMethod.verb;
-            var pipeArgs = routeMethod.pipeArgs;
+            let name = routeMethod.name || '';
+            let verb = routeMethod.verb;
+            const pipeArgs = routeMethod.pipeArgs;
 
             let argumentTypes;
             if (Reflect.getMetadata) {
-                argumentTypes = Reflect.getMetadata("design:paramtypes", controller, methodName);
+                argumentTypes = Reflect.getMetadata("design:paramtypes", controller, definitionName);
             }
 
             // Get argument names, and bind method
-            var method: IServerMiddleware<unknown, unknown> = controller[methodName as keyof typeof controller] as any;
+            let method: IServerMiddleware<unknown, unknown> = controller[definitionName as keyof typeof controller] as any;
+            let argumentNames: string[] = undefined;
             if (method) {
                 if (pipeArgs) {
-                    var argumentNames = getArgumentNames(method);
+                    argumentNames = getArgumentNames(method);
                 }
                 method = method.bind(controller);
             }
 
             // Ensure index is lower case
-            methodName = methodName.toLowerCase();
+            const nameLowerCase = definitionName.toLowerCase();
 
             // Do we have a verb already
             if (!verb) {
-                if (VerbLookup.indexOf(methodName as any) >= 0) {
-                    verb = methodName as any;
+                if (VerbLookup.indexOf(nameLowerCase as any) >= 0) {
+                    verb = nameLowerCase as any;
                 }
             }
 
@@ -131,8 +129,8 @@ export default class RouteBuilder {
                     // If we have no name, attempt to create one
                     if (!name) {
                         // If the method isn't equal to the verb or 'index', use method in route
-                        if (verb !== methodName && methodName !== 'index') {
-                            nameParts.push(methodName);
+                        if (verb !== nameLowerCase && nameLowerCase !== 'index') {
+                            nameParts.push(nameLowerCase);
                         }
                     } else {
                         // Use the name we have
