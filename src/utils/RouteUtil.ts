@@ -19,9 +19,9 @@ export function getParameterNames(functionHandle: Function) {
 
 export function getArgumentNames(func: Function) {
     // First match everything inside the function argument parens.
-    var matches = func.toString()
+    const matches = func.toString()
         .match(/function\s.*?\(([^)]*)\)\s*{|\(([^)]*)\)\s*=>\s*{|[_$a-zA-Z][_$\w\d]*\(([^)]*)\)\s*{/);
-    var args = matches[1] || matches[2] || matches[3] || '';
+    const args = matches[1] || matches[2] || matches[3] || '';
 
     // Split the arguments string into an array comma delimited.
     return args.split(',')
@@ -40,7 +40,7 @@ export function stringToRegex(definition: string): RegExp {
 }
 
 export function functionToRegex(prefix: string, enter: Function): RegExp {
-    var params = getParameterNames(enter);
+    const params = getParameterNames(enter);
     params.unshift(prefix);
     return stringToRegex(params.join('/:'));
 }

@@ -23,7 +23,7 @@ function createEnum<T>(value: Record<string, T>) {
     return Object.freeze(value);
 }
 
-export var VerbLookup: Verb[] = [
+export const VerbLookup = Object.freeze([
     VerbType.All,
     VerbType.Get,
     VerbType.Post,
@@ -32,4 +32,4 @@ export var VerbLookup: Verb[] = [
     VerbType.Patch,
     VerbType.Options,
     VerbType.Head
-];
+]);

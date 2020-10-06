@@ -3,7 +3,7 @@ import * as Crypto from 'crypto';
 export default class Uuid {
 
     static create() {
-        var rnds = Crypto.randomBytes(16);
+        const rnds = Crypto.randomBytes(16);
 
         // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
         rnds[6] = (rnds[6] & 0x0f) | 0x40;
@@ -13,14 +13,14 @@ export default class Uuid {
     }
 }
 
-var byteToHex: string[] = [];
-for (var i = 0; i < 256; ++i) {
+const byteToHex: string[] = [];
+for (let i = 0; i < 256; ++i) {
     byteToHex[i] = (i + 0x100).toString(16).substr(1);
 }
 
 function bytesToUuid(buf: Buffer, offset?: number) {
-    var i = offset || 0;
-    var bth = byteToHex;
+    let i = offset || 0;
+    const bth = byteToHex;
     return bth[buf[i++]] + bth[buf[i++]] +
         bth[buf[i++]] + bth[buf[i++]] + '-' +
         bth[buf[i++]] + bth[buf[i++]] + '-' +

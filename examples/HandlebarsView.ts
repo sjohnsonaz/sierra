@@ -10,8 +10,9 @@ export default class HandlebarsView {
     static viewRoot: string = ''
     static async handle<T>(context: Context, data: T, template?: string): Promise<string> {
         let templateFile = path.join(HandlebarsView.viewRoot, template) + '.handlebars';
+        let templateText: string;
         try {
-            var templateText = await new Promise((resolve, reject) => {
+            templateText = await new Promise<string>((resolve, reject) => {
                 fs.readFile(templateFile, {
                     encoding: 'utf8'
                 }, (err, data: string) => {
@@ -26,7 +27,7 @@ export default class HandlebarsView {
         catch {
             throw new NoViewTemplateError(`${template}.handlebars`);
         }
-        var compiledTemplate = Handlebars.compile(templateText);
+        const compiledTemplate = Handlebars.compile(templateText);
         return compiledTemplate(data);
     }
 }

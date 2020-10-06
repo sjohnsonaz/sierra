@@ -1,10 +1,10 @@
 export function objectToUrlString(obj: Record<string, any>) {
-    var values = [];
-    for (var name in obj) {
+    const values = [];
+    for (let name in obj) {
         if (obj.hasOwnProperty(name)) {
-            var value = obj[name];
+            const value = obj[name];
             if (value instanceof Array) {
-                for (var index = 0, length = value.length; index < length; index++) {
+                for (let index = 0, length = value.length; index < length; index++) {
                     values.push(name + '[]=' + encodeURIComponent(value[index]));
                 }
             } else if (value !== undefined) {
