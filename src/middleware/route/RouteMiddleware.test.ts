@@ -59,176 +59,446 @@ describe('RouteMiddleware', () => {
     });
 
     describe('query param casting', () => {
-        let application: Sierra;
+        describe('boolean', function () {
+            let application: Sierra;
 
-        beforeAll(async () => {
-            application = new Sierra();
+            beforeAll(async () => {
+                application = new Sierra();
 
-            class IndexController extends Controller {
-                @method('get')
-                async testQuery(boolean: boolean, number: number, string: string) {
-                    return {
-                        boolean,
-                        number,
-                        string,
-                        booleanType: typeof boolean,
-                        numberType: typeof number,
-                        stringType: typeof string,
-                        numberIsNan: isNaN(number),
-                        stringIsUndefined: string === undefined
-                    };
+                class IndexController extends Controller {
+                    @method('get')
+                    async testBoolean(boolean: boolean) {
+                        return {
+                            boolean,
+                            booleanType: typeof boolean
+                        };
+                    }
                 }
-            }
-            application.addController(new IndexController());
-            await application.init();
+                application.addController(new IndexController());
+                await application.init();
+            });
+
+            it('should cast boolean query params', async () => {
+                const { body } = await request(application.createServer())
+                    .get('/testBoolean')
+                    .query({
+                        boolean: true
+                    })
+                    .expect(200);
+                expect(body.boolean).toBe(true);
+                expect(body.booleanType).toBe('boolean');
+            });
+
+            it('should cast empty boolean query params', async () => {
+                const { body } = await request(application.createServer())
+                    .get('/testBoolean')
+                    .query({})
+                    .expect(200);
+                expect(body.boolean).toBe(false);
+                expect(body.booleanType).toBe('boolean');
+            });
         });
 
-        it('should cast query params', async () => {
-            const { body } = await request(application.createServer())
-                .get('/testQuery')
-                .query({
-                    boolean: true,
-                    number: 1,
-                    string: 'test'
-                })
-                .expect(200);
-            expect(body.boolean).toBe(true);
-            expect(body.number).toBe(1);
-            expect(body.string).toBe('test');
-            expect(body.booleanType).toBe('boolean');
-            expect(body.numberType).toBe('number');
-            expect(body.stringType).toBe('string');
-            expect(body.numberIsNan).toBe(false);
-            expect(body.stringIsUndefined).toBe(false);
+        describe('number', function () {
+            let application: Sierra;
+
+            beforeAll(async () => {
+                application = new Sierra();
+
+                class IndexController extends Controller {
+                    @method('get')
+                    async testNumber(number: number) {
+                        return {
+                            number,
+                            numberType: typeof number,
+                            numberIsNan: isNaN(number)
+                        };
+                    }
+                }
+                application.addController(new IndexController());
+                await application.init();
+            });
+
+            it('should cast number query params', async () => {
+                const { body } = await request(application.createServer())
+                    .get('/testNumber')
+                    .query({
+                        number: 1
+                    })
+                    .expect(200);
+                expect(body.number).toBe(1);
+                expect(body.numberType).toBe('number');
+                expect(body.numberIsNan).toBe(false);
+            });
+
+            it('should cast empty number query params', async () => {
+                const { body } = await request(application.createServer())
+                    .get('/testNumber')
+                    .query({})
+                    .expect(200);
+                expect(body.number).toBe(null);
+                expect(body.numberType).toBe('number');
+                expect(body.numberIsNan).toBe(true);
+            });
         });
 
-        it('should cast empty query params', async () => {
-            const { body } = await request(application.createServer())
-                .get('/testQuery')
-                .query({})
-                .expect(200);
-            expect(body.boolean).toBe(false);
-            expect(body.number).toBe(null);
-            expect(body.string).toBe(undefined);
-            expect(body.booleanType).toBe('boolean');
-            expect(body.numberType).toBe('number');
-            expect(body.stringType).toBe('undefined');
-            expect(body.numberIsNan).toBe(true);
-            expect(body.stringIsUndefined).toBe(true);
+        describe('string', function () {
+            let application: Sierra;
+
+            beforeAll(async () => {
+                application = new Sierra();
+
+                class IndexController extends Controller {
+                    @method('get')
+                    async testString(string: string) {
+                        return {
+                            string,
+                            stringType: typeof string,
+                            stringIsUndefined: string === undefined
+                        };
+                    }
+                }
+                application.addController(new IndexController());
+                await application.init();
+            });
+
+            it('should cast string query params', async () => {
+                const { body } = await request(application.createServer())
+                    .get('/testString')
+                    .query({
+                        string: 'test'
+                    })
+                    .expect(200);
+                expect(body.string).toBe('test');
+                expect(body.stringType).toBe('string');
+                expect(body.stringIsUndefined).toBe(false);
+            });
+
+            it('should cast empty string query params', async () => {
+                const { body } = await request(application.createServer())
+                    .get('/testString')
+                    .query({})
+                    .expect(200);
+                expect(body.string).toBe(undefined);
+                expect(body.stringType).toBe('undefined');
+                expect(body.stringIsUndefined).toBe(true);
+            });
+        });
+
+        describe('array', function () {
+            let application: Sierra;
+
+            beforeAll(async () => {
+                application = new Sierra();
+
+                class IndexController extends Controller {
+                    @method('get')
+                    async testArray(array: number[]) {
+                        return {
+                            array
+                        };
+                    }
+                }
+                application.addController(new IndexController());
+                await application.init();
+            });
+
+            it.skip('should cast query params', async () => {
+                const { body } = await request(application.createServer())
+                    .get('/testArray')
+                    .query({
+                        'array': [1, 2, 3]
+                    })
+                    .expect(200);
+                expect(body['array']).toStrictEqual([1, 2, 3]);
+            });
+
+            it.skip('should cast empty query params', async () => {
+                const { body } = await request(application.createServer())
+                    .get('/testArray')
+                    .query({})
+                    .expect(200);
+                expect(body['array']).toStrictEqual([]);
+            });
         });
     });
 
     describe('route param casting', () => {
-        let application: Sierra;
+        describe('boolean', function () {
+            let application: Sierra;
 
-        beforeAll(async () => {
-            application = new Sierra();
+            beforeAll(async () => {
+                application = new Sierra();
 
-            class IndexController extends Controller {
-                @method('get', '/testParams/:boolean/:number/:string')
-                async testParams(boolean: boolean, number: number, string: string) {
-                    return {
-                        boolean,
-                        number,
-                        string,
-                        booleanType: typeof boolean,
-                        numberType: typeof number,
-                        stringType: typeof string,
-                        numberIsNan: isNaN(number),
-                        stringIsUndefined: string === undefined
-                    };
+                class IndexController extends Controller {
+                    @method('get', '/testBoolean/:boolean')
+                    async testBoolean(boolean: boolean) {
+                        return {
+                            boolean,
+                            booleanType: typeof boolean
+                        };
+                    }
                 }
-            }
-            application.use(BodyMiddleware.handle);
-            application.addController(new IndexController());
-            await application.init();
+                application.use(BodyMiddleware.handle);
+                application.addController(new IndexController());
+                await application.init();
+            });
+
+            it('should cast route params', async () => {
+                const { body } = await request(application.createServer())
+                    .get(`/testBoolean/true`)
+                    .expect(200);
+                expect(body.boolean).toBe(true);
+                expect(body.booleanType).toBe('boolean');
+            });
+
+            it('should cast empty route params', async () => {
+                const { body } = await request(application.createServer())
+                    .get(`/testBoolean//`)
+                    .expect(200);
+                expect(body.boolean).toBe(false);
+                expect(body.booleanType).toBe('boolean');
+            });
         });
 
-        it('should cast route params', async () => {
-            const { body } = await request(application.createServer())
-                .get(`/testParams/true/1/test/`)
-                .expect(200);
-            expect(body.boolean).toBe(true);
-            expect(body.number).toBe(1);
-            expect(body.string).toBe('test');
-            expect(body.booleanType).toBe('boolean');
-            expect(body.numberType).toBe('number');
-            expect(body.stringType).toBe('string');
-            expect(body.numberIsNan).toBe(false);
-            expect(body.stringIsUndefined).toBe(false);
+        describe('number', function () {
+            let application: Sierra;
+
+            beforeAll(async () => {
+                application = new Sierra();
+
+                class IndexController extends Controller {
+                    @method('get', '/testNumber/:number')
+                    async testNumber(number: number) {
+                        return {
+                            number,
+                            numberType: typeof number,
+                            numberIsNan: isNaN(number)
+                        };
+                    }
+                }
+                application.use(BodyMiddleware.handle);
+                application.addController(new IndexController());
+                await application.init();
+            });
+
+            it('should cast route params', async () => {
+                const { body } = await request(application.createServer())
+                    .get(`/testNumber/1`)
+                    .expect(200);
+                expect(body.number).toBe(1);
+                expect(body.numberType).toBe('number');
+                expect(body.numberIsNan).toBe(false);
+            });
+
+            it('should cast empty route params', async () => {
+                const { body } = await request(application.createServer())
+                    .get(`/testNumber//`)
+                    .expect(200);
+                expect(body.number).toBe(null);
+                expect(body.numberType).toBe('number');
+                expect(body.numberIsNan).toBe(true);
+            });
         });
 
-        it('should cast empty route params', async () => {
-            const { body } = await request(application.createServer())
-                .get(`/testParams////`)
-                .expect(200);
-            expect(body.boolean).toBe(false);
-            expect(body.number).toBe(null);
-            expect(body.string).toBe(undefined);
-            expect(body.booleanType).toBe('boolean');
-            expect(body.numberType).toBe('number');
-            expect(body.stringType).toBe('undefined');
-            expect(body.numberIsNan).toBe(true);
-            expect(body.stringIsUndefined).toBe(true);
+        describe('string', function () {
+            let application: Sierra;
+
+            beforeAll(async () => {
+                application = new Sierra();
+
+                class IndexController extends Controller {
+                    @method('get', '/testString/:string')
+                    async testString(string: string) {
+                        return {
+                            string,
+                            stringType: typeof string,
+                            stringIsUndefined: string === undefined
+                        };
+                    }
+                }
+                application.use(BodyMiddleware.handle);
+                application.addController(new IndexController());
+                await application.init();
+            });
+
+            it('should cast route params', async () => {
+                const { body } = await request(application.createServer())
+                    .get(`/testString/test`)
+                    .expect(200);
+                expect(body.string).toBe('test');
+                expect(body.stringType).toBe('string');
+                expect(body.stringIsUndefined).toBe(false);
+            });
+
+            it('should cast empty route params', async () => {
+                const { body } = await request(application.createServer())
+                    .get(`/testString//`)
+                    .expect(200);
+                expect(body.string).toBe(undefined);
+                expect(body.stringType).toBe('undefined');
+                expect(body.stringIsUndefined).toBe(true);
+            });
         });
     });
 
     describe('body param casting', () => {
-        let application: Sierra;
+        describe('boolean', function () {
+            let application: Sierra;
 
-        beforeAll(async () => {
-            application = new Sierra();
-            class IndexController extends Controller {
-                @method('post')
-                async testBody(boolean: boolean, number: number, string: string) {
-                    return {
-                        boolean,
-                        number,
-                        string,
-                        booleanType: typeof boolean,
-                        numberType: typeof number,
-                        stringType: typeof string,
-                        numberIsNan: isNaN(number),
-                        stringIsUndefined: string === undefined
-                    };
+            beforeAll(async () => {
+                application = new Sierra();
+                class IndexController extends Controller {
+                    @method('post')
+                    async testBoolean(boolean: boolean) {
+                        return {
+                            boolean,
+                            booleanType: typeof boolean
+                        };
+                    }
                 }
-            }
-            application.use(BodyMiddleware.handle);
-            application.addController(new IndexController());
-            await application.init();
+                application.use(BodyMiddleware.handle);
+                application.addController(new IndexController());
+                await application.init();
+            });
+
+            it('should cast body params', async () => {
+                const { body } = await request(application.createServer())
+                    .post(`/testBoolean`)
+                    .send({
+                        boolean: true
+                    })
+                    .expect(200);
+                expect(body.boolean).toBe(true);
+                expect(body.booleanType).toBe('boolean');
+            });
+
+            it('should cast empty body params', async () => {
+                const { body } = await request(application.createServer())
+                    .post(`/testBoolean`)
+                    .expect(200);
+                expect(body.boolean).toBe(false);
+                expect(body.booleanType).toBe('boolean');
+            });
         });
 
-        it('should cast body params', async () => {
-            const { body } = await request(application.createServer())
-                .post(`/testBody`)
-                .send({
-                    boolean: true,
-                    number: 1,
-                    string: 'test'
-                })
-                .expect(200);
-            expect(body.boolean).toBe(true);
-            expect(body.number).toBe(1);
-            expect(body.string).toBe('test');
-            expect(body.booleanType).toBe('boolean');
-            expect(body.numberType).toBe('number');
-            expect(body.stringType).toBe('string');
-            expect(body.numberIsNan).toBe(false);
-            expect(body.stringIsUndefined).toBe(false);
+        describe('number', function () {
+            let application: Sierra;
+
+            beforeAll(async () => {
+                application = new Sierra();
+                class IndexController extends Controller {
+                    @method('post')
+                    async testNumber(number: number) {
+                        return {
+                            number,
+                            numberType: typeof number,
+                            numberIsNan: isNaN(number)
+                        };
+                    }
+                }
+                application.use(BodyMiddleware.handle);
+                application.addController(new IndexController());
+                await application.init();
+            });
+
+            it('should cast body params', async () => {
+                const { body } = await request(application.createServer())
+                    .post(`/testNumber`)
+                    .send({
+                        number: 1
+                    })
+                    .expect(200);
+                expect(body.number).toBe(1);
+                expect(body.numberType).toBe('number');
+                expect(body.numberIsNan).toBe(false);
+            });
+
+            it('should cast empty body params', async () => {
+                const { body } = await request(application.createServer())
+                    .post(`/testNumber`)
+                    .expect(200);
+                expect(body.number).toBe(null);
+                expect(body.numberType).toBe('number');
+                expect(body.numberIsNan).toBe(true);
+            });
         });
 
-        it('should cast empty body params', async () => {
-            const { body } = await request(application.createServer())
-                .post(`/testBody`)
-                .expect(200);
-            expect(body.boolean).toBe(false);
-            expect(body.number).toBe(null);
-            expect(body.string).toBe(undefined);
-            expect(body.booleanType).toBe('boolean');
-            expect(body.numberType).toBe('number');
-            expect(body.stringType).toBe('undefined');
-            expect(body.numberIsNan).toBe(true);
-            expect(body.stringIsUndefined).toBe(true);
+        describe('string', function () {
+            let application: Sierra;
+
+            beforeAll(async () => {
+                application = new Sierra();
+                class IndexController extends Controller {
+                    @method('post')
+                    async testString(string: string) {
+                        return {
+                            string,
+                            stringType: typeof string,
+                            stringIsUndefined: string === undefined
+                        };
+                    }
+                }
+                application.use(BodyMiddleware.handle);
+                application.addController(new IndexController());
+                await application.init();
+            });
+
+            it('should cast body params', async () => {
+                const { body } = await request(application.createServer())
+                    .post(`/testString`)
+                    .send({
+                        string: 'test'
+                    })
+                    .expect(200);
+                expect(body.string).toBe('test');
+                expect(body.stringType).toBe('string');
+                expect(body.stringIsUndefined).toBe(false);
+            });
+
+            it('should cast empty body params', async () => {
+                const { body } = await request(application.createServer())
+                    .post(`/testString`)
+                    .expect(200);
+                expect(body.string).toBe(undefined);
+                expect(body.stringType).toBe('undefined');
+                expect(body.stringIsUndefined).toBe(true);
+            });
+        });
+        describe('array', function () {
+            let application: Sierra;
+
+            beforeAll(async () => {
+                application = new Sierra();
+                class IndexController extends Controller {
+                    @method('post')
+                    async testArray(array: number[]) {
+                        return {
+                            array
+                        };
+                    }
+                }
+                application.use(BodyMiddleware.handle);
+                application.addController(new IndexController());
+                await application.init();
+            });
+
+            it('should cast body params', async () => {
+                const { body } = await request(application.createServer())
+                    .post(`/testArray`)
+                    .send({
+                        array: [1, 2, 3]
+                    })
+                    .expect(200);
+                expect(body.array).toStrictEqual([1, 2, 3]);
+            });
+
+            it('should cast empty body params', async () => {
+                const { body } = await request(application.createServer())
+                    .post(`/testArray`)
+                    .expect(200);
+                expect(body.array).toBeUndefined();
+            });
         });
     });
 

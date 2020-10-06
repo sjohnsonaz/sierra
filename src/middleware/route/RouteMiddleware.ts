@@ -21,7 +21,7 @@ export default class RouteMiddleware {
                 result = await route.middlewares[index](context, result);
             }
             if (route.pipeArgs) {
-                let contextParams = {
+                const contextParams = {
                     $context: context,
                     $request: context.request,
                     $response: context.response,

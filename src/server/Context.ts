@@ -44,6 +44,7 @@ export default class Context<T extends URLSearchParams = URLSearchParams, U = an
         this.query = url.searchParams as any;
     }
 
+    // TODO: Use this instead of parameter
     private createContentType(request: http.IncomingMessage) {
         let contentTypeHeader = (this.request.headers['content-type'] || '');
         let contentType = contentTypeHeader;
