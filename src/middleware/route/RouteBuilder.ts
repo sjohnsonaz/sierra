@@ -113,6 +113,7 @@ export default class RouteBuilder {
                 }
             }
 
+            let regex: RegExp;
             // If name is a RegExp, we are done
             if (!(name instanceof RegExp)) {
                 // If name starts with ~/, we must only remove the ~, and we are done
@@ -145,9 +146,9 @@ export default class RouteBuilder {
                     }
                 }
                 name = path.posix.normalize(name);
-                var regex = stringToRegex(name);
+                regex = stringToRegex(name);
             } else {
-                var regex = name;
+                regex = name;
             }
 
             let template = Controller.getTemplate(controller, methodName);

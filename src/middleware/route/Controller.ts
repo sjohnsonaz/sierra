@@ -20,7 +20,7 @@ export default class Controller {
         let { name } = controller.constructor;
         if (name) {
             name = name.toLowerCase();
-            var results = name.match(/(.*)(service|controller|router)/);
+            const results = name.match(/(.*)(service|controller|router)/);
             if (results && results[1]) {
                 name = results[1].toLowerCase();
             }

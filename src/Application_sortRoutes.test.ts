@@ -1,4 +1,4 @@
-import { Route, Verb } from './Sierra';
+import { Route } from './Sierra';
 import { sortRoutes } from './Application';
 
 describe('Route.sort', () => {
@@ -18,7 +18,7 @@ describe('Route.sort', () => {
         ];
 
         routes.map(route => {
-            return new Route(Verb.Get, route, undefined, undefined, undefined, undefined, undefined, undefined);
+            return new Route('get', route, undefined, undefined, undefined, undefined, undefined, undefined);
         }).sort(sortRoutes);
 
         expect(true).toBe(true);

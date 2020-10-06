@@ -7,6 +7,8 @@ describe('ConnectMiddleware', () => {
     let application: Sierra;
 
     beforeEach(async () => {
+        // TODO: Use Fake Timers
+        jest.useFakeTimers();
         application = new Sierra();
         application.use(async () => {
             return 'returned';
@@ -31,6 +33,7 @@ describe('ConnectMiddleware', () => {
         application.use(ConnectMiddleware((req, res, next) => {
             next('throw error');
         }));
+        jest.advanceTimersByTime(1000);
 
         await request(application.createServer())
             .get('')

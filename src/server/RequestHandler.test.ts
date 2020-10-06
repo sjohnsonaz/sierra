@@ -18,7 +18,7 @@ describe('RequestHandler', function () {
         };
 
         handler.view = async function (_context, data) {
-            var template = await new Promise((resolve, reject) => {
+            const template = await new Promise((resolve, reject) => {
                 fs.readFile('./view/index.handlebars', {
                     encoding: 'utf8'
                 }, (err, data: string) => {
@@ -29,7 +29,7 @@ describe('RequestHandler', function () {
                     }
                 });
             });
-            var compiledTemplate = Handlebars.compile(template);
+            const compiledTemplate = Handlebars.compile(template);
             return compiledTemplate(data);
         }
         server = http.createServer(handler.callback);

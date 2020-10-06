@@ -1,5 +1,5 @@
-const ESCAPE = 'x1b';
 const RESET = 0;
+const BACKGROUND_OFFSET = 10;
 
 enum ConsoleColor {
     Black = 30,
@@ -10,18 +10,14 @@ enum ConsoleColor {
     Magenta = 35,
     Cyan = 36,
     White = 37,
-    Gray = 90
-}
-
-enum ConsoleBackground {
-    Black = 40,
-    Red = 41,
-    Green = 42,
-    Yellow = 43,
-    Blue = 44,
-    Magenta = 45,
-    Cyan = 46,
-    White = 47
+    BrightBlack = 90,
+    BrightRed = 91,
+    BrightGreen = 92,
+    BrightYellow = 93,
+    BrightBlue = 94,
+    BrightMagenta = 95,
+    BrightCyan = 96,
+    BrightWhite = 97
 }
 
 enum ConsoleStyle {
@@ -47,10 +43,10 @@ enum ConsoleEnd {
 }
 
 function character(value: number) {
-    return `\\${ESCAPE}[${value}m`;
+    return '\x1b[' + value + 'm';
 }
 
-function text(start: ConsoleColor | ConsoleBackground | ConsoleStyle, end: ConsoleEnd, text: any) {
+function text(start: number, end: number, text: any) {
     return `${character(start)}${text}${character(end)}`;
 }
 
@@ -92,45 +88,45 @@ export namespace Color {
     }
 
     export function gray(value: any) {
-        return color(ConsoleColor.Gray, value);
+        return color(ConsoleColor.BrightBlack, value);
     }
 }
 
 export namespace Background {
-    function background(color: ConsoleBackground, value: any) {
-        return text(color, ConsoleEnd.Background, value);
+    function background(color: ConsoleColor, value: any) {
+        return text(color + BACKGROUND_OFFSET, ConsoleEnd.Background, value);
     }
 
     export function black(value: any) {
-        return background(ConsoleBackground.Black, value);
+        return background(ConsoleColor.Black, value);
     }
 
     export function red(value: any) {
-        return background(ConsoleBackground.Red, value);
+        return background(ConsoleColor.Red, value);
     }
 
     export function green(value: any) {
-        return background(ConsoleBackground.Green, value);
+        return background(ConsoleColor.Green, value);
     }
 
     export function yellow(value: any) {
-        return background(ConsoleBackground.Yellow, value);
+        return background(ConsoleColor.Yellow, value);
     }
 
     export function blue(value: any) {
-        return background(ConsoleBackground.Blue, value);
+        return background(ConsoleColor.Blue, value);
     }
 
     export function magenta(value: any) {
-        return background(ConsoleBackground.Magenta, value);
+        return background(ConsoleColor.Magenta, value);
     }
 
     export function cyan(value: any) {
-        return background(ConsoleBackground.Cyan, value);
+        return background(ConsoleColor.Cyan, value);
     }
 
     export function white(value: any) {
-        return background(ConsoleBackground.White, value);
+        return background(ConsoleColor.White, value);
     }
 }
 
