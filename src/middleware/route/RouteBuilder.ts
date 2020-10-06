@@ -4,8 +4,7 @@ import 'reflect-metadata';
 import { IServerMiddleware } from '../../server/IServerMiddleware';
 import { Verb, VerbLookup } from './Verb';
 
-import { getArgumentNames } from '../../utils/FunctionUtil';
-import { stringToRegex } from '../../utils/RouteUtil';
+import { getArgumentNames, stringToRegex } from '../../utils/RouteUtil';
 import Controller from './Controller';
 import Route from './Route';
 
