@@ -1,42 +1,81 @@
 import { Pipeline } from '../Sierra';
+import { exit, PipelineExit } from './Pipeline';
 
 describe('Pipeline', function () {
-    it('should run middleware', async function () {
-        let pipeline = new Pipeline();
-        pipeline.use(async () => {
-            return true;
+    describe('run', function () {
+        it('should run middleware', async function () {
+            let pipeline = new Pipeline();
+            pipeline.use(async () => {
+                return true;
+            });
+            let result = await pipeline.run({});
+            expect(result).toBe(true);
         });
-        let result = await pipeline.run({});
-        expect(result).toBe(true);
+
+        it('should run middleware in order', async function () {
+            let pipeline = new Pipeline<any, string, string>();
+            pipeline.use(async (context, value: string) => {
+                return value + 'b';
+            });
+            pipeline.use(async (context, value: string) => {
+                return value + 'c';
+            });
+            let result = await pipeline.run({}, 'a');
+            expect(result).toBe('abc');
+        });
+
+        it('should throw exceptions', async function () {
+            let pipeline = new Pipeline<any, string, string>();
+            pipeline.use(async (context, value) => {
+                throw 'exception';
+            });
+            pipeline.use(async (context, value) => {
+                return 'success';
+            });
+            let result: string;
+            try {
+                result = await pipeline.run({}, 'a');
+            }
+            catch (e) {
+                result = e;
+            }
+            expect(result).toBe('exception');
+        });
     });
 
-    it('should run middleware in order', async function () {
-        let pipeline = new Pipeline<any, string, string>();
-        pipeline.use(async (context, value: string) => {
-            return value + 'b';
+    describe('use', function () {
+        it('should add middleware', function () {
+            const pipeline = new Pipeline();
+            const middleware = async () => { };
+            pipeline.use(middleware);
+            expect(pipeline.middlewares.length).toBe(1);
+            expect(pipeline.middlewares[0]).toBe(middleware);
         });
-        pipeline.use(async (context, value: string) => {
-            return value + 'c';
-        });
-        let result = await pipeline.run({}, 'a');
-        expect(result).toBe('abc');
     });
 
-    it('should throw exceptions', async function () {
-        let pipeline = new Pipeline<any, string, string>();
-        pipeline.use(async (context, value) => {
-            throw 'exception';
+    describe('remove', function () {
+        it('should remove middleware', function () {
+            const pipeline = new Pipeline();
+            const middleware = async () => { };
+            pipeline.use(middleware);
+            pipeline.remove(middleware);
+            expect(pipeline.middlewares.length).toBe(0);
         });
-        pipeline.use(async (context, value) => {
-            return 'success';
+
+        it('should handle non-contained middleware', function () {
+            const pipeline = new Pipeline();
+            const middleware = async () => { };
+            pipeline.remove(middleware);
+            expect(pipeline.middlewares.length).toBe(0);
         });
-        let result: string;
-        try {
-            result = await pipeline.run({}, 'a');
-        }
-        catch (e) {
-            result = e;
-        }
-        expect(result).toBe('exception');
-    })
+    });
+});
+
+describe('PipelineExit', function () {
+    describe('exit', function () {
+        it('should create a new PipelineExit', function () {
+            const pipelineExit = exit();
+            expect(pipelineExit).toBeInstanceOf(PipelineExit);
+        });
+    });
 });

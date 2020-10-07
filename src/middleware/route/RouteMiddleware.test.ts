@@ -1,9 +1,33 @@
 import * as request from 'supertest';
 
-import Sierra, { BodyMiddleware, Controller } from "../../Sierra";
+import Sierra, { BodyMiddleware, Controller, RouteMiddleware } from "../../Sierra";
 import { method } from "../../utils/Decorators";
 
 describe('RouteMiddleware', () => {
+    describe('route matching', function () {
+        let application: Sierra;
+
+        beforeAll(async () => {
+            application = new Sierra();
+
+            class IndexController extends Controller {
+                @method('get')
+                async get() {
+                    return true;
+                }
+            }
+
+            application.addController(new IndexController());
+            await application.init();
+        });
+
+        it('should return "no route found" if no route is found', async () => {
+            await request(application.createServer())
+                .get('/notfound')
+                .expect(404, JSON.stringify('no route found'));
+        });
+    });
+
     describe('argument mapping', () => {
         let application: Sierra;
 
@@ -466,6 +490,7 @@ describe('RouteMiddleware', () => {
                 expect(body.stringIsUndefined).toBe(true);
             });
         });
+
         describe('array', function () {
             let application: Sierra;
 
@@ -548,6 +573,36 @@ describe('RouteMiddleware', () => {
                         stringIsUndefined: string === undefined
                     };
                 }
+
+                @method('post')
+                async testObject($body: Record<string, any>) {
+                    const { boolean, number, string } = $body;
+                    return {
+                        boolean,
+                        number,
+                        string,
+                        booleanType: typeof boolean,
+                        numberType: typeof number,
+                        stringType: typeof string,
+                        numberIsNan: isNaN(number),
+                        stringIsUndefined: string === undefined
+                    };
+                }
+
+                @method('post')
+                async testAny($body: never) {
+                    const { boolean, number, string } = $body;
+                    return {
+                        boolean,
+                        number,
+                        string,
+                        booleanType: typeof boolean,
+                        numberType: typeof number,
+                        stringType: typeof string,
+                        numberIsNan: isNaN(number),
+                        stringIsUndefined: string === undefined
+                    };
+                }
             }
             application.use(BodyMiddleware.handle);
             application.addController(new IndexController());
@@ -585,6 +640,126 @@ describe('RouteMiddleware', () => {
             expect(body.stringType).toBe('undefined');
             expect(body.numberIsNan).toBe(true);
             expect(body.stringIsUndefined).toBe(true);
+        });
+
+        it('should not cast anonymous body Object params', async () => {
+            const { body } = await request(application.createServer())
+                .post(`/testObject`)
+                .send({
+                    boolean: true,
+                    number: 1,
+                    string: 'test'
+                })
+                .expect(200);
+            expect(body.boolean).toBe(true);
+            expect(body.number).toBe(1);
+            expect(body.string).toBe('test');
+            expect(body.booleanType).toBe('boolean');
+            expect(body.numberType).toBe('number');
+            expect(body.stringType).toBe('string');
+            expect(body.numberIsNan).toBe(false);
+            expect(body.stringIsUndefined).toBe(false);
+        });
+
+        it('should not cast empty anonymous body Object params', async () => {
+            const { body } = await request(application.createServer())
+                .post(`/testObject`)
+                .expect(200);
+            expect(body.boolean).toBe(undefined);
+            expect(body.number).toBe(undefined);
+            expect(body.string).toBe(undefined);
+            expect(body.booleanType).toBe('undefined');
+            expect(body.numberType).toBe('undefined');
+            expect(body.stringType).toBe('undefined');
+            expect(body.numberIsNan).toBe(true);
+            expect(body.stringIsUndefined).toBe(true);
+        });
+
+        it('should not cast unknown body Object params', async () => {
+            const { body } = await request(application.createServer())
+                .post(`/testAny`)
+                .send({
+                    boolean: true,
+                    number: 1,
+                    string: 'test'
+                })
+                .expect(200);
+            expect(body.boolean).toBe(true);
+            expect(body.number).toBe(1);
+            expect(body.string).toBe('test');
+            expect(body.booleanType).toBe('boolean');
+            expect(body.numberType).toBe('number');
+            expect(body.stringType).toBe('string');
+            expect(body.numberIsNan).toBe(false);
+            expect(body.stringIsUndefined).toBe(false);
+        });
+
+        it('should not cast empty unknown body Object params', async () => {
+            const { body } = await request(application.createServer())
+                .post(`/testAny`)
+                .expect(200);
+            expect(body.boolean).toBe(undefined);
+            expect(body.number).toBe(undefined);
+            expect(body.string).toBe(undefined);
+            expect(body.booleanType).toBe('undefined');
+            expect(body.numberType).toBe('undefined');
+            expect(body.stringType).toBe('undefined');
+            expect(body.numberIsNan).toBe(true);
+            expect(body.stringIsUndefined).toBe(true);
+        });
+    });
+
+    describe('Factory', function () {
+        class BodyObject {
+            boolean: boolean;
+            number: number;
+            string: string;
+
+            constructor(boolean: boolean, number: number, string: string) {
+                this.boolean = boolean;
+                this.number = number;
+                this.string = string;
+            }
+        }
+
+        const factory = ({
+            boolean,
+            number,
+            string
+        }: {
+            boolean: boolean;
+            number: number;
+            string: string;
+        }) => {
+            return new BodyObject(boolean, number, string);
+        };
+
+        describe('addFactory', function () {
+            it('should add a Factory', function () {
+                const routeMiddleware = new RouteMiddleware();
+                routeMiddleware.addFactory(BodyObject, factory);
+
+                expect(Object.keys(routeMiddleware.factories).length).toBe(1);
+                expect(routeMiddleware.factories['BodyObject']).toBe(factory);
+            });
+        });
+
+        describe('removeFactory', function () {
+            it('should add a Factory', function () {
+                const routeMiddleware = new RouteMiddleware();
+                routeMiddleware.addFactory(BodyObject, factory);
+                routeMiddleware.removeFactory(BodyObject);
+
+                expect(Object.keys(routeMiddleware.factories).length).toBe(0);
+            });
+        });
+
+        describe('getFactory', function () {
+            const routeMiddleware = new RouteMiddleware();
+            routeMiddleware.addFactory(BodyObject, factory);
+            const testFactory = routeMiddleware.getFactory(BodyObject);
+
+            expect(testFactory).toBe(factory);
         });
     });
 });
