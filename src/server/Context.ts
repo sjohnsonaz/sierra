@@ -5,8 +5,9 @@ import OutgoingMessage from './OutgoingMessage';
 import Session from './Session';
 import { Verb } from '../middleware/route/Verb';
 import { HeaderName } from './HeaderName';
+import { getQueryString, urlStringToObject } from '../utils/EncodeUtil';
 
-export default class Context<T extends URLSearchParams = URLSearchParams, U = any, V = any, X = any> {
+export default class Context<T = any, U = any, V = any, X = any> {
     request: http.IncomingMessage;
     response: http.ServerResponse;
     session: Session<X>
@@ -41,7 +42,7 @@ export default class Context<T extends URLSearchParams = URLSearchParams, U = an
             pathname = pathname.slice(0, -1);
         }
         this.pathname = pathname;
-        this.query = url.searchParams as any;
+        this.query = urlStringToObject(getQueryString(request.url)) as any;
     }
 
     // TODO: Use this instead of parameter

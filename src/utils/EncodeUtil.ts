@@ -16,11 +16,12 @@ export function objectToUrlString(obj: Record<string, any>) {
 }
 
 export function urlStringToObject(url: string): Record<string, string | string[]> {
-    let data: Record<string, string | string[]> = {};
-    url.split('&').forEach(part => {
+    const data: Record<string, string | string[]> = {};
+    const parts = url.split('&');
+    for (let part of parts) {
         let pieces = part.split('=');
         if (pieces.length !== 2) {
-            throw 'Cannot parse URI';
+            continue;
         }
         let name = pieces[0];
         let value = pieces[1];
@@ -65,8 +66,17 @@ export function urlStringToObject(url: string): Record<string, string | string[]
                 }
             }
         }
-    });
+    }
     return data;
+}
+
+export function getQueryString(url: string) {
+    const index = url.indexOf('?');
+    if (index >= 0) {
+        return url.substring(index + 1);
+    } else {
+        return '';
+    }
 }
 
 export function updateUrlStringObject(url: string, obj: Object): string {

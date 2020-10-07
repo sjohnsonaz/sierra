@@ -120,4 +120,25 @@ describe('Session', function () {
             expect(gateway.load.mock.calls.length).toBe(1);
         });
     });
+
+    describe.skip('touch', function () {
+        it('should change the Cookie expires property', function () {
+            const [request, response] = createRequest();
+            const context = new Context(request, response);
+            const gateway = {
+                getId: async () => '',
+                load: async () => '',
+                save: async () => true,
+                destroy: async () => true
+            };
+            const session = new Session(context, 'id', gateway);
+            const now = Date.now();
+            const expires = session.touch(24, now);
+            const nowUTC = (new Date(now)).toUTCString();
+            const nowDate = (new Date(nowUTC)).getTime();
+            const expiresDate = (new Date(expires)).getTime();
+            const delta = expiresDate - nowDate;
+            expect(delta).toBe(60 * 60 * 24);
+        });
+    })
 });

@@ -58,9 +58,9 @@ export default class Session<T> {
         return Session.load(this.context, this.gateway, { regenerate: true });
     }
 
-    touch(): string {
+    touch(minutes: number = 24, now: number = Date.now()): string {
         let cookie = Cookie.getCookie(this.context);
-        let expires = (new Date(Date.now() + 60 * 60 * 1000)).toUTCString();
+        let expires = (new Date(now + 60 * 60 * minutes)).toUTCString();
         cookie['expires'] = expires;
         return expires;
     }
@@ -74,7 +74,7 @@ export default class Session<T> {
     }>) {
         options = Object.assign({
             cookieIdentifier: 'sierra_id',
-            expires: (new Date(Date.now() + 60 * 60 * 1000))
+            expires: (new Date(Date.now() + 60 * 60 * 24))
         }, options);
         let {
             cookieIdentifier,

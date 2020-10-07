@@ -34,7 +34,7 @@ export default class RouteMiddleware {
                     $result: result
                 };
                 return await route.method.apply(route, route.argumentNames.map((name, index) => {
-                    let value = contextParams[name as keyof typeof contextParams] || context.params[name] || context.query.get(name) || context.body[name];
+                    let value = contextParams[name as keyof typeof contextParams] || context.params[name] || context.query[name] || context.body[name];
                     let argumentType = route.argumentTypes[index];
                     if (argumentType) {
                         let output;

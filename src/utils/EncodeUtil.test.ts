@@ -1,4 +1,4 @@
-import { objectToUrlString, urlStringToObject } from './EncodeUtil';
+import { getQueryString, objectToUrlString, urlStringToObject } from './EncodeUtil';
 
 describe('EncodeUtil', function () {
     describe('objectToUrlString', function () {
@@ -74,5 +74,25 @@ describe('EncodeUtil', function () {
             expect(output.a[2]).toBe('third');
             expect(output.a[3]).toBe('fourth');
         });
+    });
+});
+
+describe('getQueryString', function () {
+    it('should return characters after "?"', function () {
+        const url = 'http://localhost?test=1';
+        const result = getQueryString(url);
+        expect(result).toBe('test=1');
+    });
+
+    it('should return empty string if nocharacters are after "?"', function () {
+        const url = 'http://localhost?';
+        const result = getQueryString(url);
+        expect(result).toBe('');
+    });
+
+    it('should return empty string if no "?" is present', function () {
+        const url = 'http://localhost';
+        const result = getQueryString(url);
+        expect(result).toBe('');
     });
 });
