@@ -23,7 +23,7 @@ export function send<T>(data: T, status: number = 200, type: OutputType = 'auto'
     return new OutgoingMessage(data, status, type, template);
 }
 
-export function view<T>(data: T, template?: string) {
+export function view<T>(data: T, template: string = 'index') {
     return new OutgoingMessage(data, 200, 'view', template);
 }
 

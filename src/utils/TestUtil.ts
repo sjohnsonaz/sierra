@@ -11,9 +11,13 @@ export function wait(time: number) {
 export function createRequest(requestInfo: Partial<http.IncomingMessage> = {}): [http.IncomingMessage, http.ServerResponse] {
     const socket = new Socket();
     const request = new http.IncomingMessage(socket);
-    Object.entries(requestInfo).forEach(([key, value]) => {
-        (request as any)[key] = value;
-    });
+    Object.entries(
+        Object.assign({
+            method: 'get'
+        }, requestInfo))
+        .forEach(([key, value]) => {
+            (request as any)[key] = value;
+        });
     const response = new http.ServerResponse(request);
     return [request, response];
 }

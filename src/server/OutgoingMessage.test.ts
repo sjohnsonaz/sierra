@@ -48,7 +48,7 @@ describe('OutgoingMessage', function () {
             expect(outgoingMessage.data).toBe('data');
             expect(outgoingMessage.status).toBe(200);
             expect(outgoingMessage.type).toBe('view');
-            expect(outgoingMessage.template).toBeUndefined();
+            expect(outgoingMessage.template).toBe('index');
             expect(outgoingMessage.contentType).toBeUndefined();
         });
 
