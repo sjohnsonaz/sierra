@@ -20,7 +20,7 @@ describe('ConnectMiddleware', () => {
     });
 
     it('should continue on next()', async () => {
-        application.use(ConnectMiddleware((req, res, next) => {
+        application.use(ConnectMiddleware((_req, _res, next) => {
             next();
         }));
 
@@ -30,7 +30,7 @@ describe('ConnectMiddleware', () => {
     });
 
     it('should throw on next(err)', async () => {
-        application.use(ConnectMiddleware((req, res, next) => {
+        application.use(ConnectMiddleware((_req, _res, next) => {
             next('throw error');
         }));
         jest.advanceTimersByTime(1000);
@@ -40,10 +40,26 @@ describe('ConnectMiddleware', () => {
             .expect(500, JSON.stringify('errored'));
     });
 
-    it('should continue on send()', async () => {
-        application.use(ConnectMiddleware((req, res, next) => {
+    // TODO: Confirm this calls interval
+    it('should end on send()', async () => {
+        application.use(ConnectMiddleware((_req, res) => {
             res.write(JSON.stringify('returned'));
             res.end();
+        }));
+        application.use(async () => {
+
+        });
+
+        await request(application.createServer())
+            .get('')
+            .expect(200, JSON.stringify('returned'));
+    });
+
+    it('should end on done()', async () => {
+        application.use(ConnectMiddleware((_req, res, _next, done) => {
+            res.write(JSON.stringify('returned'));
+            res.end();
+            done();
         }));
 
         await request(application.createServer())
