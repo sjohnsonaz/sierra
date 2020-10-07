@@ -10,6 +10,7 @@ examples/
 
 # Build directory
 dist/examples/
+coverage
 
 # Sourcemap, log, packed files
 # *.map
