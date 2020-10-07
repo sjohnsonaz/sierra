@@ -68,6 +68,29 @@ describe('Cookie', function () {
             expect(result['a']).toBe('1');
             expect(result['b']).toBe('2');
         });
+
+        it('should ignore keys with multiple "="', function () {
+            const result = Cookie.stringToHash('a=1=3; b=2');
+            expect(Object.keys(result).length).toBe(1);
+            expect(result['b']).toBe('2');
+        });
+
+        it('should ignore keys with undefined name', function () {
+            const result = Cookie.stringToHash('=1; b=2');
+            expect(Object.keys(result).length).toBe(1);
+            expect(result['b']).toBe('2');
+        });
+
+        it('should ignore keys with undefined value', function () {
+            const result = Cookie.stringToHash('a=; b=2');
+            expect(Object.keys(result).length).toBe(1);
+            expect(result['b']).toBe('2');
+        });
+
+        it('should ignore keys without ";" delimeter', function () {
+            const result = Cookie.stringToHash('a=1 b=2');
+            expect(Object.keys(result).length).toBe(0);
+        });
     });
 
     describe('hashToCookie', function () {
