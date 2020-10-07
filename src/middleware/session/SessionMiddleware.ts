@@ -11,6 +11,6 @@ export default class SessionMiddleware<T> {
     }
 
     handle = async (context: Context) => {
-        return await Session.load(context, this.gateway);
+        await Session.load(context, this.gateway);
     }
 }
