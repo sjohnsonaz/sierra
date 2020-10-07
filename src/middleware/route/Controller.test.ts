@@ -38,6 +38,11 @@ describe('Controller', function () {
             let base = Controller.getName(new (class extends Controller { }));
             expect(base).toBe('');
         });
+
+        it('should return empty string for Controllers with the name Controller', function () {
+            let base = Controller.getName(new Controller());
+            expect(base).toBe('');
+        });
     });
 
     describe('getBase', function () {
