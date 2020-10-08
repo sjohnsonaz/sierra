@@ -4,6 +4,9 @@ import Cookie from './Cookie';
 import { NoSessionGatewayError } from './Errors';
 import { ISessionGateway } from './ISessionGateway';
 
+const MILLISECONDS = 1000;
+const SECONDS = 60;
+
 export default class Session<T> {
     context: Context;
     id: string;
@@ -58,9 +61,9 @@ export default class Session<T> {
         return Session.load(this.context, this.gateway, { regenerate: true });
     }
 
-    touch(minutes: number = 24, now: number = Date.now()): string {
+    touch(minutes: number = 60, now: number = Date.now()): string {
         let cookie = Cookie.getCookie(this.context);
-        let expires = (new Date(now + 60 * 60 * minutes)).toUTCString();
+        let expires = (new Date(now + MILLISECONDS * SECONDS * minutes)).toUTCString();
         cookie['expires'] = expires;
         return expires;
     }

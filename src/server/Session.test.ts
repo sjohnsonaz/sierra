@@ -121,7 +121,10 @@ describe('Session', function () {
         });
     });
 
-    describe.skip('touch', function () {
+    describe('touch', function () {
+        const MILLISECONDS = 1000;
+        const SECONDS = 60;
+
         it('should change the Cookie expires property', function () {
             const [request, response] = createRequest();
             const context = new Context(request, response);
@@ -133,12 +136,15 @@ describe('Session', function () {
             };
             const session = new Session(context, 'id', gateway);
             const now = Date.now();
-            const expires = session.touch(24, now);
+            const minutes = 60;
+
+            const expiresUTC = session.touch(minutes, now);
+
+            const expiresDate = new Date(expiresUTC);
             const nowUTC = (new Date(now)).toUTCString();
-            const nowDate = (new Date(nowUTC)).getTime();
-            const expiresDate = (new Date(expires)).getTime();
-            const delta = expiresDate - nowDate;
-            expect(delta).toBe(60 * 60 * 24);
+            const nowDate = new Date(nowUTC);
+            const delta = expiresDate.getTime() - nowDate.getTime();
+            expect(delta).toBe(MILLISECONDS * SECONDS * minutes);
         });
     })
 });

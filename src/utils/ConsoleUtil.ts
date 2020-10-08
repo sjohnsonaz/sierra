@@ -1,7 +1,6 @@
-const RESET = 0;
 const BACKGROUND_OFFSET = 10;
 
-enum ConsoleColor {
+export enum ConsoleColor {
     Black = 30,
     Red = 31,
     Green = 32,
@@ -20,7 +19,8 @@ enum ConsoleColor {
     BrightWhite = 97
 }
 
-enum ConsoleStyle {
+export enum ConsoleStyle {
+    Reset = 0,
     Bold = 1,
     Dim = 2,
     Italic = 3,
@@ -30,7 +30,7 @@ enum ConsoleStyle {
     Strikethrough = 9
 }
 
-enum ConsoleEnd {
+export enum ConsoleEnd {
     Bold = 22,
     Italic = 23,
     Underline = 24,
@@ -42,125 +42,187 @@ enum ConsoleEnd {
     Background = 49
 }
 
-function character(value: number) {
-    return '\x1b[' + value + 'm';
-}
+export namespace ConsoleFormat {
+    export function character(value: number) {
+        return '\x1b[' + value + 'm';
+    }
 
-function text(start: number, end: number, text: any) {
-    return `${character(start)}${text}${character(end)}`;
-}
+    export function text(start: number, end: number, text: any) {
+        return `${character(start)}${text}${character(end)}`;
+    }
 
-export namespace Color {
-    function color(color: ConsoleColor, value: any) {
+    export function color(color: ConsoleColor, value: any) {
         return text(color, ConsoleEnd.Color, value);
     }
 
+    export function background(color: ConsoleColor, value: any) {
+        return text(color + BACKGROUND_OFFSET, ConsoleEnd.Background, value);
+    }
+}
+
+export namespace Color {
     export function black(value: any) {
-        return color(ConsoleColor.Black, value);
+        return ConsoleFormat.color(ConsoleColor.Black, value);
     }
 
     export function red(value: any) {
-        return color(ConsoleColor.Red, value);
+        return ConsoleFormat.color(ConsoleColor.Red, value);
     }
 
     export function green(value: any) {
-        return color(ConsoleColor.Green, value);
+        return ConsoleFormat.color(ConsoleColor.Green, value);
     }
 
     export function yellow(value: any) {
-        return color(ConsoleColor.Yellow, value);
+        return ConsoleFormat.color(ConsoleColor.Yellow, value);
     }
 
     export function blue(value: any) {
-        return color(ConsoleColor.Blue, value);
+        return ConsoleFormat.color(ConsoleColor.Blue, value);
     }
 
     export function magenta(value: any) {
-        return color(ConsoleColor.Magenta, value);
+        return ConsoleFormat.color(ConsoleColor.Magenta, value);
     }
 
     export function cyan(value: any) {
-        return color(ConsoleColor.Cyan, value);
+        return ConsoleFormat.color(ConsoleColor.Cyan, value);
     }
 
     export function white(value: any) {
-        return color(ConsoleColor.White, value);
+        return ConsoleFormat.color(ConsoleColor.White, value);
     }
 
-    export function gray(value: any) {
-        return color(ConsoleColor.BrightBlack, value);
+    export function brightBlack(value: any) {
+        return ConsoleFormat.color(ConsoleColor.BrightBlack, value);
+    }
+
+    export function brightRed(value: any) {
+        return ConsoleFormat.color(ConsoleColor.BrightRed, value);
+    }
+
+    export function brightGreen(value: any) {
+        return ConsoleFormat.color(ConsoleColor.BrightGreen, value);
+    }
+
+    export function brightYellow(value: any) {
+        return ConsoleFormat.color(ConsoleColor.BrightYellow, value);
+    }
+
+    export function brightBlue(value: any) {
+        return ConsoleFormat.color(ConsoleColor.BrightBlue, value);
+    }
+
+    export function brightMagenta(value: any) {
+        return ConsoleFormat.color(ConsoleColor.BrightMagenta, value);
+    }
+
+    export function brightCyan(value: any) {
+        return ConsoleFormat.color(ConsoleColor.BrightCyan, value);
+    }
+
+    export function brightWhite(value: any) {
+        return ConsoleFormat.color(ConsoleColor.BrightWhite, value);
     }
 }
 
 export namespace Background {
-    function background(color: ConsoleColor, value: any) {
-        return text(color + BACKGROUND_OFFSET, ConsoleEnd.Background, value);
-    }
-
     export function black(value: any) {
-        return background(ConsoleColor.Black, value);
+        return ConsoleFormat.background(ConsoleColor.Black, value);
     }
 
     export function red(value: any) {
-        return background(ConsoleColor.Red, value);
+        return ConsoleFormat.background(ConsoleColor.Red, value);
     }
 
     export function green(value: any) {
-        return background(ConsoleColor.Green, value);
+        return ConsoleFormat.background(ConsoleColor.Green, value);
     }
 
     export function yellow(value: any) {
-        return background(ConsoleColor.Yellow, value);
+        return ConsoleFormat.background(ConsoleColor.Yellow, value);
     }
 
     export function blue(value: any) {
-        return background(ConsoleColor.Blue, value);
+        return ConsoleFormat.background(ConsoleColor.Blue, value);
     }
 
     export function magenta(value: any) {
-        return background(ConsoleColor.Magenta, value);
+        return ConsoleFormat.background(ConsoleColor.Magenta, value);
     }
 
     export function cyan(value: any) {
-        return background(ConsoleColor.Cyan, value);
+        return ConsoleFormat.background(ConsoleColor.Cyan, value);
     }
 
     export function white(value: any) {
-        return background(ConsoleColor.White, value);
+        return ConsoleFormat.background(ConsoleColor.White, value);
+    }
+
+    export function brightBlack(value: any) {
+        return ConsoleFormat.background(ConsoleColor.BrightBlack, value);
+    }
+
+    export function brightRed(value: any) {
+        return ConsoleFormat.background(ConsoleColor.BrightRed, value);
+    }
+
+    export function brightGreen(value: any) {
+        return ConsoleFormat.background(ConsoleColor.BrightGreen, value);
+    }
+
+    export function brightYellow(value: any) {
+        return ConsoleFormat.background(ConsoleColor.BrightYellow, value);
+    }
+
+    export function brightBlue(value: any) {
+        return ConsoleFormat.background(ConsoleColor.BrightBlue, value);
+    }
+
+    export function brightMagenta(value: any) {
+        return ConsoleFormat.background(ConsoleColor.BrightMagenta, value);
+    }
+
+    export function brightCyan(value: any) {
+        return ConsoleFormat.background(ConsoleColor.BrightCyan, value);
+    }
+
+    export function brightWhite(value: any) {
+        return ConsoleFormat.background(ConsoleColor.BrightWhite, value);
     }
 }
 
-export namespace style {
+export namespace Style {
     export function reset(value: any) {
-        return text(RESET, RESET, value);
+        return ConsoleFormat.text(ConsoleStyle.Reset, ConsoleStyle.Reset, value);
     }
 
     export function bold(value: any) {
-        return text(ConsoleStyle.Bold, ConsoleEnd.Bold, value);
+        return ConsoleFormat.text(ConsoleStyle.Bold, ConsoleEnd.Bold, value);
     }
 
     // TODO: Test this
     export function dim(value: any) {
-        return text(ConsoleStyle.Dim, ConsoleEnd.Bold, value);
+        return ConsoleFormat.text(ConsoleStyle.Dim, ConsoleEnd.Bold, value);
     }
 
     export function italic(value: any) {
-        return text(ConsoleStyle.Italic, ConsoleEnd.Italic, value);
+        return ConsoleFormat.text(ConsoleStyle.Italic, ConsoleEnd.Italic, value);
     }
 
     export function underline(value: any) {
-        return text(ConsoleStyle.Underline, ConsoleEnd.Underline, value);
+        return ConsoleFormat.text(ConsoleStyle.Underline, ConsoleEnd.Underline, value);
     }
 
     export function inverse(value: any) {
-        return text(ConsoleStyle.Inverse, ConsoleEnd.Inverse, value);
+        return ConsoleFormat.text(ConsoleStyle.Inverse, ConsoleEnd.Inverse, value);
     }
 
     export function hidden(value: any) {
-        return text(ConsoleStyle.Hidden, ConsoleEnd.Hidden, value);
+        return ConsoleFormat.text(ConsoleStyle.Hidden, ConsoleEnd.Hidden, value);
     }
 
     export function strikethrough(value: any) {
-        return text(ConsoleStyle.Strikethrough, ConsoleEnd.Strikethrough, value);
+        return ConsoleFormat.text(ConsoleStyle.Strikethrough, ConsoleEnd.Strikethrough, value);
     }
 }
