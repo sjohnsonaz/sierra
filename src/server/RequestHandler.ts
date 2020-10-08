@@ -203,6 +203,6 @@ function colorStatus(status: number) {
         case 5:
             return Color.red(status);
         default:
-            return Color.gray(status);
+            return Color.brightBlack(status);
     }
 }
