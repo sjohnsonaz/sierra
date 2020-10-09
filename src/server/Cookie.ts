@@ -1,6 +1,6 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
-const SET_COOKIE = 'set-cookie';
+const SET_COOKIE = 'Set-Cookie';
 const COOKIE = 'cookie';
 const DOMAIN = 'Domain';
 const EXPIRES = 'Expires';
