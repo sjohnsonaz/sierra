@@ -66,6 +66,64 @@ describe('RouteBuilder', function () {
             expect(routeBuilder.routeDefinitions['get'].method).toBeInstanceOf(RouteMethod);
         });
     });
+
+    describe('getRouteBuilder', function () {
+        it('should create a RouteBuilder on target', function () {
+            class Target {
+                _routeBuilder: RouteBuilder
+            }
+
+            const target = new Target();
+            expect(target._routeBuilder).toBeUndefined();
+
+            const routeBuilder = RouteBuilder.getRouteBuilder(target);
+            expect(routeBuilder).toBeInstanceOf(RouteBuilder);
+
+            expect(target._routeBuilder).toBeInstanceOf(RouteBuilder);
+            expect(target._routeBuilder).toBe(routeBuilder);
+        });
+
+        it('should build a child RouteBuilder targets with parent RouteBuilders', function () {
+            interface ITarget {
+                _routeBuilder: RouteBuilder
+            }
+            const Target: (new (...args: any) => ITarget) = (() => {
+                function Target() {
+
+                }
+                Target.prototype = {
+                    _routeBuilder: new RouteBuilder()
+                };
+                return Target;
+            })() as any;
+
+            const target = new Target();
+            expect(target._routeBuilder).toBeInstanceOf(RouteBuilder);
+            expect(target.hasOwnProperty('_routeBuilder')).toBe(false);
+
+            const routeBuilder = RouteBuilder.getRouteBuilder(target);
+            expect(routeBuilder).toBeInstanceOf(RouteBuilder);
+
+            expect(target._routeBuilder).toBeInstanceOf(RouteBuilder);
+            expect(target._routeBuilder).toBe(routeBuilder);
+            expect(target.hasOwnProperty('_routeBuilder')).toBe(true);
+        });
+    });
+
+    describe('getKeys', function () {
+        it('should get keys of multiple Objects', function () {
+            const object0 = {
+                a: 0,
+                b: 1
+            };
+            const object1 = {
+                c: 2,
+                d: 3
+            };
+            const keys = RouteBuilder.getKeys(object0, object1);
+            expect(keys).toStrictEqual(['a', 'b', 'c', 'd']);
+        });
+    });
 });
 
 // TODO: Move these to decorator tests
