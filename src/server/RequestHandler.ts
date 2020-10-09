@@ -195,7 +195,7 @@ export function errorTemplate(error: any) {
     );
 }
 
-function colorStatus(status: number) {
+export function colorStatus(status: number) {
     switch (Math.floor(status / 100)) {
         case 1:
             return Color.white(status);

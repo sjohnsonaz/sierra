@@ -2,11 +2,12 @@ import * as http from 'http';
 
 import * as request from 'supertest';
 
-import { RequestHandler, errorTemplate } from './RequestHandler';
+import { RequestHandler, errorTemplate, colorStatus } from './RequestHandler';
 import { json, raw, view } from './OutgoingMessage';
 import { NotFoundError, NoRouteFoundError, NoViewTemplateError, NoViewMiddlwareError } from './Errors';
 import { LogLevel } from './LogLevel';
 import { OutgoingMessage } from '../Sierra';
+import { Color } from '../utils/ConsoleUtil';
 
 describe('RequestHandler', function () {
     describe('pipeline', function () {
@@ -515,6 +516,59 @@ describe('RequestHandler', function () {
                 .get('/')
                 .expect(500, JSON.stringify("inner error thrown"));
             expect(errorHandler.mock.calls.length).toBe(1);
+        });
+    });
+
+    describe('logging', function () {
+        describe('colorStatus', function () {
+            it('should show white on 100', function () {
+                const status = 100;
+                const result = colorStatus(status);
+                const expected = Color.white(status);
+                expect(result).toBe(expected);
+            });
+
+            it('should show green on 200', function () {
+                const status = 200;
+                const result = colorStatus(status);
+                const expected = Color.green(status);
+                expect(result).toBe(expected);
+            });
+
+            it('should show blue on 300', function () {
+                const status = 300;
+                const result = colorStatus(status);
+                const expected = Color.blue(status);
+                expect(result).toBe(expected);
+            });
+
+            it('should show yellow on 400', function () {
+                const status = 400;
+                const result = colorStatus(status);
+                const expected = Color.yellow(status);
+                expect(result).toBe(expected);
+            });
+
+            it('should show red on 500', function () {
+                const status = 500;
+                const result = colorStatus(status);
+                const expected = Color.red(status);
+                expect(result).toBe(expected);
+            });
+
+            it('should show brightBlack on < 100', function () {
+                const status = 0;
+                const result = colorStatus(status);
+                const expected = Color.brightBlack(status);
+                expect(result).toBe(expected);
+            });
+
+            it('should show brightBlack on >= 600', function () {
+                const status = 600;
+                const result = colorStatus(status);
+                const expected = Color.brightBlack(status);
+                expect(result).toBe(expected);
+            });
         });
     });
 });
