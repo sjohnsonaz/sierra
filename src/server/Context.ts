@@ -6,11 +6,13 @@ import Session from './Session';
 import { Verb } from '../middleware/route/Verb';
 import { HeaderName } from './HeaderName';
 import { getQueryString, urlStringToObject } from '../utils/EncodeUtil';
+import { CookieRegistry } from './Cookie';
 
 export default class Context<T = any, U = any, V = any, X = any> {
     request: http.IncomingMessage;
     response: http.ServerResponse;
-    session: Session<X>
+    session: Session<X>;
+    cookies: CookieRegistry;
     body: V;
     method: Verb;
     contentType: string;
@@ -26,6 +28,7 @@ export default class Context<T = any, U = any, V = any, X = any> {
         this.request = request;
         this.response = response;
         this.method = request.method.toLowerCase() as any;
+        this.cookies = new CookieRegistry(request);
 
         // Content Type
         this.createContentType(request);

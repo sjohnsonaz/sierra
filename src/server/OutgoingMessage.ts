@@ -2,6 +2,7 @@ import { PipelineExit } from "../pipeline/Pipeline";
 
 export type OutputType = 'auto' | 'json' | 'view' | 'text' | 'raw';
 
+// TODO: Rename this to be different from http class
 export default class OutgoingMessage<T> extends PipelineExit {
     data: T;
     status: number;

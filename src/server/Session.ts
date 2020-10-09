@@ -1,11 +1,14 @@
 
 import Context from './Context';
-import Cookie from './Cookie';
 import { NoSessionGatewayError } from './Errors';
 import { ISessionGateway } from './ISessionGateway';
 
-const MILLISECONDS = 1000;
-const SECONDS = 60;
+//const MILLISECONDS = 1;
+//const SECONDS = 1000 * MILLISECONDS;
+//const MINUTES = 60 * SECONDS;
+//const HOURS = 60 * MINUTES;
+
+const SIERRA_ID = 'sierra_id';
 
 export default class Session<T> {
     context: Context;
@@ -16,11 +19,9 @@ export default class Session<T> {
     maxAge: number;
     cookieIdentifier: string;
 
-    constructor(context: Context, id: string, gateway: ISessionGateway<T>, data?: T, cookieIdentifier?: string) {
+    constructor(context: Context, gateway: ISessionGateway<T>, cookieIdentifier: string = SIERRA_ID) {
         this.context = context;
-        this.id = id;
         this.gateway = gateway;
-        this.data = data;
         this.cookieIdentifier = cookieIdentifier;
     }
 
@@ -31,76 +32,64 @@ export default class Session<T> {
         return await this.gateway.save(this.context, this.id, this.data);
     }
 
-    async reload(): Promise<T> {
+    async init(maxAge: number = 60) {
         if (!this.gateway) {
             throw new NoSessionGatewayError();
         }
-        this.data = await this.gateway.load(this.context, this.id);
-        return this.data;
+        const cookie = this.context.cookies.getOrCreateCookie(this.cookieIdentifier);
+        if (!cookie.value) {
+            const id = await this.gateway.getId(this.context);
+            this.id = id;
+            cookie.value = id;
+            cookie.maxAge = maxAge;
+        } else {
+            this.id = cookie.value;
+        }
+        const data = await this.gateway.load(this.context, this.id);
+        this.data = data;
     }
 
-    async destroy(): Promise<boolean> {
+    async destroy() {
         if (!this.gateway) {
             throw new NoSessionGatewayError();
         }
 
         // Try to remove cookie from client
-        let cookie = Cookie.getCookie(this.context);
-        cookie[this.cookieIdentifier] = '';
-        cookie['path'] = '/';
-        cookie['expires'] = (new Date(Date.now() + 60 * 60 * 1000)).toUTCString();
-        Cookie.setCookie(this.context, cookie);
-
-        return await this.gateway.destroy(this.context, this.id);
-    }
-
-    async regenerate(): Promise<Session<T>> {
-        if (!this.gateway) {
-            throw new NoSessionGatewayError();
-        }
-        return Session.load(this.context, this.gateway, { regenerate: true });
-    }
-
-    touch(minutes: number = 60, now: number = Date.now()): string {
-        let cookie = Cookie.getCookie(this.context);
-        let expires = (new Date(now + MILLISECONDS * SECONDS * minutes)).toUTCString();
-        cookie['expires'] = expires;
-        return expires;
-    }
-
-    static async load<T>(context: Context, gateway: ISessionGateway<T>, options?: Partial<{
-        data: T;
-        expires: Date;
-        maxAge: number;
-        cookieIdentifier: string;
-        regenerate: boolean;
-    }>) {
-        options = Object.assign({
-            cookieIdentifier: 'sierra_id',
-            expires: (new Date(Date.now() + 60 * 60 * 24))
-        }, options);
-        let {
-            cookieIdentifier,
-            regenerate
-        } = options;
-
-        let cookie = Cookie.getCookie(context);
-        let id = cookie[cookieIdentifier];
-
-        // Do we have a cookie?
-        if (regenerate || !id) {
-            id = await gateway.getId(context);
-            cookie[cookieIdentifier] = id;
-            cookie['path'] = '/';
-            cookie['expires'] = options.expires.toUTCString();
-            Cookie.setCookie(context, cookie);
+        let cookie = this.context.cookies.getCookie(this.cookieIdentifier);
+        if (cookie) {
+            cookie.maxAge = -1;
         }
 
-        // Load data for this id
-        let data = await gateway.load(context, id);
+        const id = this.id;
+        this.id = undefined;
+        return await this.gateway.destroy(this.context, id);
+    }
 
+    async regenerate(maxAge = 60) {
+        await this.destroy();
+        return this.init(maxAge);
+    }
+
+    touch(maxAge: number = 60) {
+        const cookie = this.context.cookies.getCookie(this.cookieIdentifier);
+        cookie.maxAge = maxAge;
+        return cookie;
+    }
+
+    static async load<T>(
+        context: Context,
+        gateway: ISessionGateway<T>,
+        {
+            maxAge = 60,
+            cookieIdentifier = SIERRA_ID,
+        }: {
+            maxAge?: number;
+            cookieIdentifier?: string;
+        } = {}
+    ) {
         // Create session object for this
-        let session = new Session(context, id, gateway, data, cookieIdentifier);
+        const session = new Session(context, gateway, cookieIdentifier);
+        await session.init(maxAge);
         context.session = session;
 
         return session;

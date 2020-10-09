@@ -7,7 +7,7 @@ export { IMiddleware } from './pipeline/IMiddleware';
 export { default as Context } from './server/Context';
 export * from './server/Errors';
 export { LogLevel } from './server/LogLevel';
-export { default as Cookie } from './server/Cookie';
+export { CookieRegistry, Cookie } from './server/Cookie';
 export { IMethod } from './server/IMethod';
 export { ISessionGateway } from './server/ISessionGateway';
 export { IServerMiddleware } from './server/IServerMiddleware';
