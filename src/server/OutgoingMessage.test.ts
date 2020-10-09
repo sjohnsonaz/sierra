@@ -48,7 +48,7 @@ describe('OutgoingMessage', function () {
             expect(outgoingMessage.data).toBe('data');
             expect(outgoingMessage.status).toBe(200);
             expect(outgoingMessage.type).toBe('view');
-            expect(outgoingMessage.template).toBe('index');
+            expect(outgoingMessage.template).toBeUndefined();
             expect(outgoingMessage.contentType).toBeUndefined();
         });
 
@@ -63,10 +63,19 @@ describe('OutgoingMessage', function () {
     });
 
     describe('json', function () {
-        it('should create an OutgoingMessage', function () {
-            const outgoingMessage = json('data', 200);
+        it('should create an OutgoingMessage with defaults', function () {
+            const outgoingMessage = json('data');
             expect(outgoingMessage.data).toBe('data');
             expect(outgoingMessage.status).toBe(200);
+            expect(outgoingMessage.type).toBe('json');
+            expect(outgoingMessage.template).toBeUndefined();
+            expect(outgoingMessage.contentType).toBeUndefined();
+        });
+
+        it('should create an OutgoingMessage', function () {
+            const outgoingMessage = json('data', 300);
+            expect(outgoingMessage.data).toBe('data');
+            expect(outgoingMessage.status).toBe(300);
             expect(outgoingMessage.type).toBe('json');
             expect(outgoingMessage.template).toBeUndefined();
             expect(outgoingMessage.contentType).toBeUndefined();
@@ -74,10 +83,19 @@ describe('OutgoingMessage', function () {
     });
 
     describe('raw', function () {
-        it('should create an OutgoingMessage', function () {
-            const outgoingMessage = raw('data', 200, 'application/json');
+        it('should create an OutgoingMessage with defaults', function () {
+            const outgoingMessage = raw('data');
             expect(outgoingMessage.data).toBe('data');
             expect(outgoingMessage.status).toBe(200);
+            expect(outgoingMessage.type).toBe('raw');
+            expect(outgoingMessage.template).toBeUndefined();
+            expect(outgoingMessage.contentType).toBeUndefined();
+        });
+
+        it('should create an OutgoingMessage', function () {
+            const outgoingMessage = raw('data', 300, 'application/json');
+            expect(outgoingMessage.data).toBe('data');
+            expect(outgoingMessage.status).toBe(300);
             expect(outgoingMessage.type).toBe('raw');
             expect(outgoingMessage.template).toBeUndefined();
             expect(outgoingMessage.contentType).toBe('application/json');

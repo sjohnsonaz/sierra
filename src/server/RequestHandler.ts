@@ -10,11 +10,15 @@ import OutgoingMessage, { OutputType } from './OutgoingMessage';
 import { LogLevel } from './LogLevel';
 import { ErrorMessage, NoViewMiddlwareError, NoViewTemplateError, SierraError } from './Errors';
 
+const DEFAULT_TEMPLATE = 'index';
+const ERROR_TEMPLATE = 'error';
+
 export class RequestHandler {
     pipeline: Pipeline<Context, any, any> = new Pipeline();
     error: IServerMiddleware<any, any>;
     view: IViewMiddleware<any>;
     logging: LogLevel = LogLevel.errors;
+    defaultTemplate = DEFAULT_TEMPLATE;
 
     callback = async (request: http.IncomingMessage, response: http.ServerResponse) => {
         let context = new Context(request, response);
@@ -45,7 +49,7 @@ export class RequestHandler {
                     if (result instanceof OutgoingMessage) {
                         this.send(context, result.data, result.status, result.type, result.template, result.contentType);
                     } else {
-                        this.send(context, result, errorStatus, 'auto', 'error');
+                        this.send(context, result, errorStatus, 'auto', ERROR_TEMPLATE);
                     }
                 }
                 catch (e) {
@@ -86,7 +90,7 @@ export class RequestHandler {
             if (!this.view) {
                 throw new NoViewMiddlwareError();
             }
-            let output = await this.view(context, data, template ?? context.template);
+            let output = await this.view(context, data, template ?? context.template ?? this.defaultTemplate);
             this.log(context, data, status);
             context.response.statusCode = status;
             context.response.setHeader('Content-Type', 'text/html');
@@ -141,7 +145,7 @@ export class RequestHandler {
     }
 
     async sendError<T>(context: Context, data: Error, status: number = 500) {
-        let accept = context.request.headers.accept;
+        const { accept } = context.request.headers;
         if (!(data instanceof Error)) {
             data = new Error(data);
         }
@@ -152,7 +156,7 @@ export class RequestHandler {
         }
         try {
             if (this.view && accept && accept.indexOf('text/html') > -1) {
-                await this.sendView(context, data, status, 'error');
+                await this.sendView(context, data, status, ERROR_TEMPLATE);
             } else {
                 await this.sendJson(context, data.message ?? data.name, status);
             }
@@ -176,7 +180,7 @@ export class RequestHandler {
     }
 }
 
-function errorTemplate(error: any) {
+export function errorTemplate(error: any) {
     return (
         `<!DOCTYPE html>
 <html>

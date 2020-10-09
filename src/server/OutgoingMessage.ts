@@ -24,8 +24,9 @@ export function send<T>(data: T, status: number = 200, type: OutputType = 'auto'
     return new OutgoingMessage(data, status, type, template);
 }
 
-export function view<T>(data: T, template: string = 'index') {
-    return new OutgoingMessage(data, 200, 'view', template);
+// TODO: Change to options parameter
+export function view<T>(data: T, template?: string, status: number = 200) {
+    return new OutgoingMessage(data, status, 'view', template);
 }
 
 export function json<T>(data: T, status: number = 200) {
