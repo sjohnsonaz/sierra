@@ -1,6 +1,7 @@
 import { Session } from "../Sierra";
 import { createRequest } from "../utils/TestUtil";
 import Context from "./Context";
+import { Cookie } from "./Cookie";
 import { NoSessionGatewayError } from "./Errors";
 
 describe('Session', function () {
@@ -62,6 +63,23 @@ describe('Session', function () {
 
         it('should call ISessionGateway.load', async function () {
             const [request, response] = createRequest();
+            const cookie = new Cookie('sierra_id', 'id');
+            request.headers['cookie'] = cookie.toString();
+            const context = new Context(request, response);
+            const gateway = {
+                getId: jest.fn(async () => ''),
+                load: jest.fn(async () => ''),
+                save: async () => true,
+                destroy: async () => true
+            };
+            const session = new Session(context, gateway);
+            await session.init();
+            expect(gateway.getId.mock.calls.length).toBe(0);
+            expect(gateway.load.mock.calls.length).toBe(1);
+        });
+
+        it('should call ISessionGateway.getId if no Cookie is present', async function () {
+            const [request, response] = createRequest();
             const context = new Context(request, response);
             const gateway = {
                 getId: jest.fn(async () => ''),
@@ -88,6 +106,8 @@ describe('Session', function () {
 
         it('should call ISessionGateway.destroy', async function () {
             const [request, response] = createRequest();
+            const cookie = new Cookie('sierra_id', 'id');
+            request.headers['cookie'] = cookie.toString();
             const context = new Context(request, response);
             const gateway = {
                 getId: async () => '',
@@ -129,23 +149,28 @@ describe('Session', function () {
     });
 
     describe('touch', function () {
-        it.skip('should change the Cookie expires property', function () {
-            // const [request, response] = createRequest();
-            // const context = new Context(request, response);
-            // const gateway = {
-            //     getId: async () => '',
-            //     load: async () => '',
-            //     save: async () => true,
-            //     destroy: async () => true
-            // };
-            // const session = new Session(context, gateway);
+        it('should change the Cookie expires property', function () {
+            const [request, response] = createRequest();
+            const cookie = new Cookie('sierra_id', 'id');
+            request.headers['cookie'] = cookie.toString();
+            const context = new Context(request, response);
+            const gateway = {
+                getId: async () => '',
+                load: async () => '',
+                save: async () => true,
+                destroy: async () => true
+            };
+            const session = new Session(context, gateway);
+            const updatedCookie = session.touch();
+            expect(updatedCookie.maxAge).toBe(60);
         });
     })
 
     describe('load', function () {
-        // TODO: Initialize cookie so that getId is not called
         it('should call gateway.load', async function () {
             const [request, response] = createRequest();
+            const cookie = new Cookie('sierra_id', 'id');
+            request.headers['cookie'] = cookie.toString();
             const context = new Context(request, response);
             const gateway = {
                 getId: jest.fn(async () => ''),
@@ -154,7 +179,7 @@ describe('Session', function () {
                 destroy: async () => true
             };
             await Session.load(context, gateway);
-            expect(gateway.getId.mock.calls.length).toBe(1);
+            expect(gateway.getId.mock.calls.length).toBe(0);
             expect(gateway.load.mock.calls.length).toBe(1);
         });
 
