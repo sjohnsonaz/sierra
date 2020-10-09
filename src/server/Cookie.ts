@@ -184,6 +184,15 @@ export class CookieRegistry {
                 cookies.push(b.toString());
             }
         });
+        // TODO: Merge Set-Cookie Header
+        // const setCookieHeader = response.getHeader(SET_COOKIE);
+        // if (setCookieHeader) {
+        //     if (setCookieHeader instanceof Array) {
+
+        //     } else {
+
+        //     }
+        // }
         response.setHeader(SET_COOKIE, cookies);
     }
 

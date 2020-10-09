@@ -93,6 +93,7 @@ export default class Session<T> {
         const session = new Session(context, gateway, cookieIdentifier);
         await session.init(maxAge);
         context.session = session;
+        // TODO: Set only sierra_id cookie
         context.cookies.setCookies(context.response);
 
         return session;
