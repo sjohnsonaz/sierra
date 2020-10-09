@@ -41,11 +41,11 @@ export default class Session<T> {
             const id = await this.gateway.getId(this.context);
             this.id = id;
             cookie.value = id;
-            cookie.maxAge = maxAge;
+            // cookie.maxAge = maxAge;
         } else {
             this.id = cookie.value;
             // TODO: Don't update on every call
-            cookie.maxAge = maxAge;
+            // cookie.maxAge = maxAge;
         }
         const data = await this.gateway.load(this.context, this.id);
         this.data = data;
@@ -74,7 +74,7 @@ export default class Session<T> {
 
     touch(maxAge: number = 60) {
         const cookie = this.context.cookies.getCookie(this.cookieIdentifier);
-        cookie.maxAge = maxAge;
+        // cookie.maxAge = maxAge;
         return cookie;
     }
 
@@ -94,7 +94,7 @@ export default class Session<T> {
         await session.init(maxAge);
         context.session = session;
         // TODO: Set only sierra_id cookie
-        context.cookies.setCookies(context.response);
+        // context.cookies.setCookies(context.response);
 
         return session;
     }

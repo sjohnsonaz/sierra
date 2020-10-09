@@ -110,6 +110,7 @@ export class RequestHandler {
     }
 
     send<T>(context: Context, data: T, status: number = 200, type: OutputType = 'auto', template?: string, contentType?: string) {
+        context.cookies.setCookies(context.response);
         let accept = context.accept;
         switch (type) {
             case 'auto':
