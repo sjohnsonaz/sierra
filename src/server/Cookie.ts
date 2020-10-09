@@ -148,7 +148,12 @@ export class CookieRegistry {
     }
 
     getOrCreateCookie(name: string) {
-        return this.outgoing[name] || new Cookie(name, '');
+        let cookie = this.outgoing[name];
+        if (!cookie) {
+            cookie = new Cookie(name, '');
+            this.outgoing[name] = cookie;
+        }
+        return cookie;
     }
 
     getCookies() {

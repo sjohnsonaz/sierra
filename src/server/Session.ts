@@ -44,6 +44,8 @@ export default class Session<T> {
             cookie.maxAge = maxAge;
         } else {
             this.id = cookie.value;
+            // TODO: Don't update on every call
+            cookie.maxAge = maxAge;
         }
         const data = await this.gateway.load(this.context, this.id);
         this.data = data;
@@ -91,6 +93,7 @@ export default class Session<T> {
         const session = new Session(context, gateway, cookieIdentifier);
         await session.init(maxAge);
         context.session = session;
+        context.cookies.setCookies(context.response);
 
         return session;
     }
