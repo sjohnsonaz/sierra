@@ -175,10 +175,8 @@ export class CookieRegistry {
                     // Delete?
                 }
             } else {
-                if (b) {
-                    // Create
-                    cookies.push(b.toString());
-                }
+                // Create
+                cookies.push(b.toString());
             }
         });
         response.setHeader(SET_COOKIE, cookies);

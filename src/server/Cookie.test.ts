@@ -72,9 +72,18 @@ describe('Cookie', function () {
 });
 
 describe('CookieRegistry', function () {
-    // describe('constructor', function () {
-
-    // });
+    describe('constructor', function () {
+        it('should initialize Cookie hashes', function () {
+            const [request] = createRequest();
+            const cookie = new Cookie('name', 'value');
+            request.headers['cookie'] = cookie.toString();
+            const cookieRegistry = new CookieRegistry(request);
+            expect(Object.keys(cookieRegistry.incoming).length).toBe(1);
+            expect(Object.keys(cookieRegistry.outgoing).length).toBe(1);
+            expect(cookieRegistry.incoming['name']).toBeInstanceOf(Cookie);
+            expect(cookieRegistry.outgoing['name']).toBeInstanceOf(Cookie);
+        });
+    });
 
     describe('addCookie', function () {
         it('should accept a Cookie', function () {
@@ -164,6 +173,72 @@ describe('CookieRegistry', function () {
             expect(result.length).toBe(2);
             expect(result[0].name).toBe('a');
             expect(result[1].name).toBe('b');
+        });
+    });
+
+    describe('setCookies', function () {
+        it('should not set unchanged Cookies', function () {
+            const [request, response] = createRequest();
+            const cookie = new Cookie('name', 'value');
+            request.headers['cookie'] = cookie.toString();
+            const cookieRegistry = new CookieRegistry(request);
+
+            const nameCookie = cookieRegistry.getCookie('name');
+            nameCookie.value = 'value';
+            cookieRegistry.setCookies(response);
+
+            const setCookie = response.getHeader('set-cookie') as string[];
+            expect(setCookie.length).toBe(0);
+        });
+
+        it('should update changed Cookies', function () {
+            const [request, response] = createRequest();
+            const cookie = new Cookie('name', 'value');
+            request.headers['cookie'] = cookie.toString();
+            const cookieRegistry = new CookieRegistry(request);
+
+            const nameCookie = cookieRegistry.getCookie('name');
+            nameCookie.value = 'new value';
+            cookieRegistry.setCookies(response);
+
+            const setCookie = response.getHeader('set-cookie') as string[];
+            expect(setCookie.length).toBe(1);
+            expect(setCookie[0]).toBe(nameCookie.toString());
+        });
+
+        it('should create Cookies', function () {
+            const [request, response] = createRequest();
+            const cookieRegistry = new CookieRegistry(request);
+
+            const nameCookie = cookieRegistry.addCookie('name', 'value');
+            cookieRegistry.setCookies(response);
+
+            const setCookie = response.getHeader('set-cookie') as string[];
+            expect(setCookie.length).toBe(1);
+            expect(setCookie[0]).toBe(nameCookie.toString());
+        });
+
+        it('should do nothing if a Cookie is removed', function () {
+            const [request, response] = createRequest();
+            const cookie = new Cookie('name', 'value');
+            request.headers['cookie'] = cookie.toString();
+            const cookieRegistry = new CookieRegistry(request);
+
+            cookieRegistry.removeCookie('name')
+            cookieRegistry.setCookies(response);
+
+            const setCookie = response.getHeader('set-cookie') as string[];
+            expect(setCookie.length).toBe(0);
+        });
+
+        it('should do nothing if no Cookies are present', function () {
+            const [request, response] = createRequest();
+            const cookieRegistry = new CookieRegistry(request);
+
+            cookieRegistry.setCookies(response);
+
+            const setCookie = response.getHeader('set-cookie') as string[];
+            expect(setCookie.length).toBe(0);
         });
     });
 
