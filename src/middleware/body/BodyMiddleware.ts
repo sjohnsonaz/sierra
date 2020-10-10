@@ -25,24 +25,27 @@ export default class BodyMiddleware {
         let body: Buffer[] = [];
         return new Promise<any>((resolve, reject) => {
             try {
-                context.request.on('error', (e) => {
-                    reject(e);
-                }).on('data', (data) => {
-                    if (typeof data === 'string') {
-                        body.push(new Buffer(data));
-                    } else {
-                        body.push(data);
-                    }
-                }).on('end', () => {
-                    try {
-                        let bufferedData = Buffer.concat(body).toString().trim();
-                        context.body = bufferedData ? JSON.parse(bufferedData) : null;
-                        resolve(context.body);
-                    }
-                    catch (e) {
+                context.request
+                    .on('error', (e) => {
                         reject(e);
-                    }
-                });
+                    })
+                    .on('data', (data) => {
+                        if (typeof data === 'string') {
+                            body.push(Buffer.from(data));
+                        } else {
+                            body.push(data);
+                        }
+                    })
+                    .on('end', () => {
+                        try {
+                            let bufferedData = Buffer.concat(body).toString().trim();
+                            context.body = bufferedData ? JSON.parse(bufferedData) : null;
+                            resolve(context.body);
+                        }
+                        catch (e) {
+                            reject(e);
+                        }
+                    });
             }
             catch (e) {
                 reject(e);
@@ -58,7 +61,7 @@ export default class BodyMiddleware {
                     reject(e);
                 }).on('data', (data) => {
                     if (typeof data === 'string') {
-                        body.push(new Buffer(data));
+                        body.push(Buffer.from(data));
                     } else {
                         body.push(data);
                     }
@@ -92,7 +95,7 @@ export default class BodyMiddleware {
                     reject(e);
                 }).on('data', (data) => {
                     if (typeof data === 'string') {
-                        body.push(new Buffer(data));
+                        body.push(Buffer.from(data));
                     } else {
                         body.push(data);
                     }
@@ -121,7 +124,7 @@ export default class BodyMiddleware {
                     reject(e);
                 }).on('data', (data) => {
                     if (typeof data === 'string') {
-                        bufferDecoder.addData(new Buffer(data));
+                        bufferDecoder.addData(Buffer.from(data));
                     } else {
                         bufferDecoder.addData(data);
                     }
