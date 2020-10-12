@@ -11,6 +11,9 @@ import RouteMiddleware from './middleware/route/RouteMiddleware';
 import { LogLevel } from './server/LogLevel';
 import { NeverStartedError } from './server/Errors';
 
+/**
+ * A Sierra Application
+ */
 export class Application {
     requestHandler: RequestHandler = new RequestHandler();
     routeMiddleware: RouteMiddleware = new RouteMiddleware();
@@ -25,20 +28,22 @@ export class Application {
         this.requestHandler.logging = logging;
     }
 
+    /**
+     * Initializes Middleware and builds Controllers
+     * @returns Promise<void>
+     */
     async init() {
-        await this.addMiddleware(this.requestHandler);
         await this.buildControllers();
         return this.requestHandler;
-    }
-
-    addMiddleware(requestHandler: RequestHandler): Promise<void> {
-        return Promise.resolve();
     }
 
     addController(controller: Controller) {
         this.controllers.push(controller);
     }
 
+    /**
+     * Create Routes for all Controllers
+     */
     async buildControllers() {
         this.controllers.forEach(controller => {
             Controller.build(controller).forEach(route => {
@@ -71,22 +76,41 @@ export class Application {
         }
     }
 
+    /**
+     * Add Middleware to the Pipeline.
+     * @param middleware - the Middleware to add
+     */
     use(middleware: IServerMiddleware<any, any>) {
         this.requestHandler.use(middleware);
     }
 
+    /**
+     * Set View Middleware.  Only one is enabled at a time.
+     * @param viewMiddlware - the View Middleware
+     */
     view(viewMiddlware: IViewMiddleware<any>) {
         this.requestHandler.view = viewMiddlware;
     }
 
+    /**
+     * Set Error Middleware.  Only one is enabled at a time.
+     * @param errorMiddleware - the Error Middleware
+     */
     error(errorMiddleware: IServerMiddleware<any, any>) {
         this.requestHandler.error = errorMiddleware;
     }
 
+    /**
+     * Creates the `http.Server`.
+     */
     createServer() {
         return http.createServer(this.requestHandler.callback);
     }
 
+    /**
+     * Opens the `http.Server` to listen on the specified Port.
+     * @param port - the Port to open
+     */
     listen(port: number): Promise<http.Server> {
         if (!this.server) {
             this.server = this.createServer();
@@ -113,6 +137,9 @@ export class Application {
         });
     }
 
+    /**
+     * Closes the `http.Server`.
+     */
     close(): Promise<void> {
         return new Promise((resolve, reject) => {
             if (!this.server) {
@@ -129,6 +156,9 @@ export class Application {
         });
     }
 
+    /**
+     * Waits for `SIGINT` or `SIGTERM` signals on the `Process` object.
+     */
     async wait() {
         return new Promise<void>(resolve => {
             process.on('SIGINT', () => {
@@ -141,6 +171,11 @@ export class Application {
     }
 }
 
+/**
+ * Compares two Routes for sorting.
+ * @param routeA - the first Route
+ * @param routeB - the second Route
+ */
 export function sortRoutes(routeA: Route<any, any>, routeB: Route<any, any>) {
     let a = routeA.name as string;
     let b = routeB.name as string;
