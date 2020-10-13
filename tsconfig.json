@@ -11,6 +11,8 @@
     "declarationMap": true,
     "noImplicitAny": true,
     "noUnusedLocals": true,
+    //"strictNullChecks": true,
+    //"strictPropertyInitialization": true,
     "removeComments": true,
     "noLib": false,
     "preserveConstEnums": true,
