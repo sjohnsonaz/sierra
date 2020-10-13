@@ -1,10 +1,10 @@
-import Context from '../../server/Context';
+import { Context } from '../../server/Context';
 import { NoRouteFoundError } from '../../server/Errors';
-import { Controller } from '../../Sierra';
 
-import Route from './Route';
+import { Controller } from './Controller';
+import { Route } from './Route';
 
-export default class RouteMiddleware {
+export class RouteMiddleware {
     routes: Route<any, any>[] = [];
     controllers: Controller[] = [];
     factories: Record<string, { (...args: any): any }> = {};

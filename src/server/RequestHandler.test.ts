@@ -1,22 +1,22 @@
-import * as http from 'http';
+import { createServer, Server } from 'http';
 
 import * as request from 'supertest';
 
+import { Color } from '../utils/ConsoleUtil';
+
 import { RequestHandler, errorTemplate, colorStatus } from './RequestHandler';
-import { json, raw, view } from './OutgoingMessage';
+import { OutgoingMessage, json, raw, view } from './OutgoingMessage';
 import { NotFoundError, NoRouteFoundError, NoViewTemplateError, NoViewMiddlwareError } from './Errors';
 import { LogLevel } from './LogLevel';
-import { OutgoingMessage } from '../Sierra';
-import { Color } from '../utils/ConsoleUtil';
 
 describe('RequestHandler', function () {
     describe('pipeline', function () {
-        let server: http.Server;
+        let server: Server;
         let handler: RequestHandler;
 
         beforeEach(async function () {
             handler = new RequestHandler();
-            server = http.createServer(handler.callback);
+            server = createServer(handler.callback);
         });
 
         it('should run requests through a Pipeline', async function () {
@@ -36,13 +36,13 @@ describe('RequestHandler', function () {
     });
 
     describe('status', function () {
-        let server: http.Server;
+        let server: Server;
         let handler: RequestHandler;
 
         beforeEach(async function () {
             handler = new RequestHandler();
             handler.logging = LogLevel.none;
-            server = http.createServer(handler.callback);
+            server = createServer(handler.callback);
         });
 
         it('should send 200 on success', async function () {
@@ -83,7 +83,7 @@ describe('RequestHandler', function () {
     });
 
     describe('send', function () {
-        let server: http.Server;
+        let server: Server;
         let handler: RequestHandler;
 
         beforeEach(async function () {
@@ -106,7 +106,7 @@ describe('RequestHandler', function () {
                 return templateFunction(data);
             };
 
-            server = http.createServer(handler.callback);
+            server = createServer(handler.callback);
         });
 
         describe('OutgoingMessage type: "auto"', function () {
@@ -210,12 +210,12 @@ describe('RequestHandler', function () {
     });
 
     describe('sendJson', function () {
-        let server: http.Server;
+        let server: Server;
         let handler: RequestHandler;
 
         beforeEach(async function () {
             handler = new RequestHandler();
-            server = http.createServer(handler.callback);
+            server = createServer(handler.callback);
         });
 
         it('should handle HTTP requests', async function () {
@@ -266,7 +266,7 @@ describe('RequestHandler', function () {
 
     describe('sendView', function () {
         describe('NoViewMiddlewareError', function () {
-            let server: http.Server;
+            let server: Server;
             let handler: RequestHandler;
 
             beforeEach(async function () {
@@ -277,7 +277,7 @@ describe('RequestHandler', function () {
                     return error;
                 };
 
-                server = http.createServer(handler.callback);
+                server = createServer(handler.callback);
             });
 
             it('should throw NoViewTemplateError when no template is found', async function () {
@@ -292,7 +292,7 @@ describe('RequestHandler', function () {
         });
 
         describe('middleware available', function () {
-            let server: http.Server;
+            let server: Server;
             let handler: RequestHandler;
 
             beforeEach(async function () {
@@ -319,7 +319,7 @@ describe('RequestHandler', function () {
                     return templateFunction(data);
                 };
 
-                server = http.createServer(handler.callback);
+                server = createServer(handler.callback);
             });
             it('should send index view by default', async function () {
                 handler.use(async function () {
@@ -354,12 +354,12 @@ describe('RequestHandler', function () {
     });
 
     describe('sendRaw', function () {
-        let server: http.Server;
+        let server: Server;
         let handler: RequestHandler;
 
         beforeEach(async function () {
             handler = new RequestHandler();
-            server = http.createServer(handler.callback);
+            server = createServer(handler.callback);
         });
 
         it('should send text/plain', async function () {
@@ -395,7 +395,7 @@ describe('RequestHandler', function () {
     });
 
     describe('error', function () {
-        let server: http.Server;
+        let server: Server;
         let handler: RequestHandler;
 
         beforeEach(async function () {
@@ -418,7 +418,7 @@ describe('RequestHandler', function () {
                 return templateFunction(data);
             };
 
-            server = http.createServer(handler.callback);
+            server = createServer(handler.callback);
         });
         it('should not run error by default', async function () {
             const errorHandler = jest.fn(async function (_context, error) {

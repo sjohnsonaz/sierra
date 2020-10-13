@@ -1,5 +1,4 @@
-import { OutgoingMessage } from "../Sierra";
-import { json, raw, send, view } from "./OutgoingMessage";
+import { OutgoingMessage, json, raw, send, view } from "./OutgoingMessage";
 
 describe('OutgoingMessage', function () {
     describe('constructor', function () {

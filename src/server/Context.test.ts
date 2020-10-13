@@ -1,5 +1,7 @@
-import { Context, OutgoingMessage } from '../Sierra';
+
 import { createRequest } from '../utils/TestUtil';
+import { Context } from './Context';
+import { OutgoingMessage } from './OutgoingMessage';
 
 describe('Context', function () {
     describe('constructor', function () {

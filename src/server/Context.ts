@@ -1,18 +1,19 @@
-import * as http from 'http';
+import { IncomingMessage, ServerResponse } from 'http';
 import { URL } from 'url';
 
-import OutgoingMessage, { OutputType } from './OutgoingMessage';
-import Session from './Session';
-import { Verb } from '../middleware/route/Verb';
 import { getQueryString, urlStringToObject } from '../utils/EncodeUtil';
+import { Verb } from '../middleware/route/Verb';
+
+import { OutgoingMessage, OutputType } from './OutgoingMessage';
+import { Session } from './Session';
 import { CookieRegistry } from './Cookie';
 
 /**
  * The Context object for the RequestHandler Pipeline
  */
-export default class Context<T = any, U = any, V = any, X = any> {
-    request: http.IncomingMessage;
-    response: http.ServerResponse;
+export class Context<T = any, U = any, V = any, X = any> {
+    request: IncomingMessage;
+    response: ServerResponse;
     session?: Session<X>;
     cookies: CookieRegistry;
     body?: V;
@@ -32,7 +33,7 @@ export default class Context<T = any, U = any, V = any, X = any> {
      * @param request - an incoming request
      * @param response - an outgoing response
      */
-    constructor(request: http.IncomingMessage, response: http.ServerResponse) {
+    constructor(request: IncomingMessage, response: ServerResponse) {
         this.request = request;
         this.response = response;
         this.method = request.method.toLowerCase() as any;
@@ -72,7 +73,7 @@ export default class Context<T = any, U = any, V = any, X = any> {
     }
 }
 
-export function getContentType(request: http.IncomingMessage) {
+export function getContentType(request: IncomingMessage) {
     const contentTypeHeader = request.headers['content-type'];
     const contentType: {
         mediaType?: string;
@@ -98,7 +99,7 @@ export function getContentType(request: http.IncomingMessage) {
     return contentType;
 }
 
-export function getAccept(request: http.IncomingMessage) {
+export function getAccept(request: IncomingMessage) {
     const accept = request.headers['accept'];
     if (accept) {
         let types = accept.split(',');

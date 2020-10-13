@@ -18,7 +18,7 @@ export function exit() {
 /**
  * The Pipeline class runs a series of Middleware async functions.
  */
-export default class Pipeline<T extends IPipelineContext, U, V> {
+export class Pipeline<T extends IPipelineContext, U, V> {
     middlewares: IMiddleware<T, any, any>[] = [];
 
     async run(context?: T, value?: U) {

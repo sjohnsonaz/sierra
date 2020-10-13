@@ -1,9 +1,9 @@
 import { Duplex } from 'stream';
-import FormDataHeader from './FormDataHeader';
+import { FormDataHeader } from './FormDataHeader';
 import { IFileHandler } from './IFileHandler';
 import { IFileField } from './IFileField';
 
-export default class Field {
+export class Field {
     header: FormDataHeader;
     name: string;
     fileName: string;

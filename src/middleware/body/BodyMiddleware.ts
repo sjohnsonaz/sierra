@@ -1,9 +1,9 @@
-import Context from '../../server/Context';
+import { Context } from '../../server/Context';
 import { urlStringToObject } from '../../utils/EncodeUtil';
 
-import BufferDecoder from './BufferDecoder';
+import { BufferDecoder } from './BufferDecoder';
 
-export default class BodyMiddleware {
+export class BodyMiddleware {
     static async handle(context: Context) {
         let verb = context.request.method.toLowerCase();
         if (verb === 'post' || verb === 'put') {

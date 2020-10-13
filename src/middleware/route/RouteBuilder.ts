@@ -1,17 +1,16 @@
 import * as path from 'path';
 import 'reflect-metadata';
 
-import { IServerMiddleware } from '../../server/IServerMiddleware';
-import { Verb, VerbLookup } from './Verb';
-
 import { getArgumentNames, stringToRegex } from '../../utils/RouteUtil';
-import Controller from './Controller';
-import Route from './Route';
-
-import RouteDefinition, { RouteMethod } from './RouteDefinition';
+import { IServerMiddleware } from '../../server/IServerMiddleware';
 import { NoMethodError } from '../../server/Errors';
 
-export default class RouteBuilder {
+import { Controller } from './Controller';
+import { Route } from './Route';
+import { RouteDefinition, RouteMethod } from './RouteDefinition';
+import { Verb, VerbLookup } from './Verb';
+
+export class RouteBuilder {
     routeDefinitions: Record<string, RouteDefinition<IServerMiddleware<any, any>>> = {};
     parent: RouteBuilder;
 

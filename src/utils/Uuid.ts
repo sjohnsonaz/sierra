@@ -1,6 +1,6 @@
 import * as Crypto from 'crypto';
 
-export default class Uuid {
+export class Uuid {
 
     static create() {
         const rnds = Crypto.randomBytes(16);

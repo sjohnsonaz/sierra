@@ -1,9 +1,13 @@
 import * as request from 'supertest';
 
-import Sierra, { Controller, route, Context } from '../../Sierra';
+import { Application } from '../../Application';
+import { Context } from '../../server/Context';
+import { route } from '../../utils/Decorators';
+
+import { Controller } from './Controller';
 
 describe('Default route', () => {
-    let application: Sierra;
+    let application: Application;
 
     beforeAll(async function () {
         class TestController extends Controller {
@@ -17,7 +21,7 @@ describe('Default route', () => {
             }
         }
 
-        application = new Sierra();
+        application = new Application();
         application.addController(new TestController());
         application.init();
     });

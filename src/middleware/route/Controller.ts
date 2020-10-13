@@ -1,9 +1,9 @@
 import * as path from 'path';
 
-import RouteBuilder from './RouteBuilder';
-import Route from './Route';
+import { RouteBuilder } from './RouteBuilder';
+import { Route } from './Route';
 
-export default class Controller {
+export class Controller {
     _base: string;
     _routeBuilder: RouteBuilder;
 

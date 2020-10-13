@@ -4,8 +4,8 @@ import { IServerMiddleware } from './server/IServerMiddleware';
 import { IViewMiddleware } from './server/IViewMiddleware';
 
 import { RequestHandler } from './server/RequestHandler';
-import RouteMiddleware from './middleware/route/RouteMiddleware';
-import Controller from './middleware/route/Controller';
+import { RouteMiddleware } from './middleware/route/RouteMiddleware';
+import { Controller } from './middleware/route/Controller';
 import { LogLevel } from './server/LogLevel';
 import { NeverStartedError } from './server/Errors';
 

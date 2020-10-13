@@ -1,7 +1,12 @@
 import * as request from 'supertest';
 
-import Sierra, { Controller, route, Context, middleware, RouteBuilder, RouteDefinition } from '../../Sierra';
-import { RouteMethod } from './RouteDefinition';
+import { Application } from '../../Application';
+import { Context } from '../../server/Context';
+import { middleware, route } from '../../utils/Decorators';
+
+import { Controller } from './Controller';
+import { RouteBuilder } from './RouteBuilder';
+import { RouteDefinition, RouteMethod } from './RouteDefinition';
 
 describe('RouteBuilder', function () {
     describe('constructor', function () {
@@ -128,7 +133,7 @@ describe('RouteBuilder', function () {
 
 // TODO: Move these to decorator tests
 describe('middleware decorator', () => {
-    let application: Sierra = undefined;
+    let application: Application = undefined;
 
     beforeAll(async () => {
         class TestController extends Controller {
@@ -156,7 +161,7 @@ describe('middleware decorator', () => {
             }
         }
 
-        application = new Sierra();
+        application = new Application();
         application.addController(new TestController());
         application.init();
     });

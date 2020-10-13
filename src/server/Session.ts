@@ -1,5 +1,5 @@
 
-import Context from './Context';
+import { Context } from './Context';
 import { NoSessionGatewayError } from './Errors';
 import { ISessionGateway } from './ISessionGateway';
 
@@ -10,7 +10,7 @@ import { ISessionGateway } from './ISessionGateway';
 
 const SIERRA_ID = 'sierra_id';
 
-export default class Session<T> {
+export class Session<T> {
     context: Context;
     id: string;
     gateway: ISessionGateway<T>;

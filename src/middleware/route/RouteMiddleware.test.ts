@@ -1,15 +1,20 @@
 import * as request from 'supertest';
 
-import Sierra, { BodyMiddleware, Controller, Route, RouteMiddleware } from "../../Sierra";
+import { Application } from '../../Application';
+
 import { method } from "../../utils/Decorators";
-import { sortRoutes } from './RouteMiddleware';
+import { BodyMiddleware } from '../body/BodyMiddleware';
+
+import { Controller } from './Controller';
+import { Route } from './Route';
+import { RouteMiddleware, sortRoutes } from './RouteMiddleware';
 
 describe('RouteMiddleware', () => {
     describe('route matching', function () {
-        let application: Sierra;
+        let application: Application;
 
         beforeAll(async () => {
-            application = new Sierra();
+            application = new Application();
 
             class IndexController extends Controller {
                 @method('get')
@@ -30,10 +35,10 @@ describe('RouteMiddleware', () => {
     });
 
     describe('argument mapping', () => {
-        let application: Sierra;
+        let application: Application;
 
         beforeAll(async () => {
-            application = new Sierra();
+            application = new Application();
 
             class IndexController extends Controller {
                 @method('get')
@@ -85,10 +90,10 @@ describe('RouteMiddleware', () => {
 
     describe('query param casting', () => {
         describe('boolean', function () {
-            let application: Sierra;
+            let application: Application;
 
             beforeAll(async () => {
-                application = new Sierra();
+                application = new Application();
 
                 class IndexController extends Controller {
                     @method('get')
@@ -125,10 +130,10 @@ describe('RouteMiddleware', () => {
         });
 
         describe('number', function () {
-            let application: Sierra;
+            let application: Application;
 
             beforeAll(async () => {
-                application = new Sierra();
+                application = new Application();
 
                 class IndexController extends Controller {
                     @method('get')
@@ -168,10 +173,10 @@ describe('RouteMiddleware', () => {
         });
 
         describe('string', function () {
-            let application: Sierra;
+            let application: Application;
 
             beforeAll(async () => {
-                application = new Sierra();
+                application = new Application();
 
                 class IndexController extends Controller {
                     @method('get')
@@ -211,10 +216,10 @@ describe('RouteMiddleware', () => {
         });
 
         describe('array', function () {
-            let application: Sierra;
+            let application: Application;
 
             beforeAll(async () => {
-                application = new Sierra();
+                application = new Application();
 
                 class IndexController extends Controller {
                     @method('get')
@@ -251,10 +256,10 @@ describe('RouteMiddleware', () => {
 
     describe('route param casting', () => {
         describe('boolean', function () {
-            let application: Sierra;
+            let application: Application;
 
             beforeAll(async () => {
-                application = new Sierra();
+                application = new Application();
 
                 class IndexController extends Controller {
                     @method('get', '/testBoolean/:boolean')
@@ -288,10 +293,10 @@ describe('RouteMiddleware', () => {
         });
 
         describe('number', function () {
-            let application: Sierra;
+            let application: Application;
 
             beforeAll(async () => {
-                application = new Sierra();
+                application = new Application();
 
                 class IndexController extends Controller {
                     @method('get', '/testNumber/:number')
@@ -328,10 +333,10 @@ describe('RouteMiddleware', () => {
         });
 
         describe('string', function () {
-            let application: Sierra;
+            let application: Application;
 
             beforeAll(async () => {
-                application = new Sierra();
+                application = new Application();
 
                 class IndexController extends Controller {
                     @method('get', '/testString/:string')
@@ -370,10 +375,10 @@ describe('RouteMiddleware', () => {
 
     describe('body param casting', () => {
         describe('boolean', function () {
-            let application: Sierra;
+            let application: Application;
 
             beforeAll(async () => {
-                application = new Sierra();
+                application = new Application();
                 class IndexController extends Controller {
                     @method('post')
                     async testBoolean(boolean: boolean) {
@@ -409,10 +414,10 @@ describe('RouteMiddleware', () => {
         });
 
         describe('number', function () {
-            let application: Sierra;
+            let application: Application;
 
             beforeAll(async () => {
-                application = new Sierra();
+                application = new Application();
                 class IndexController extends Controller {
                     @method('post')
                     async testNumber(number: number) {
@@ -451,10 +456,10 @@ describe('RouteMiddleware', () => {
         });
 
         describe('string', function () {
-            let application: Sierra;
+            let application: Application;
 
             beforeAll(async () => {
-                application = new Sierra();
+                application = new Application();
                 class IndexController extends Controller {
                     @method('post')
                     async testString(string: string) {
@@ -493,10 +498,10 @@ describe('RouteMiddleware', () => {
         });
 
         describe('array', function () {
-            let application: Sierra;
+            let application: Application;
 
             beforeAll(async () => {
-                application = new Sierra();
+                application = new Application();
                 class IndexController extends Controller {
                     @method('post')
                     async testArray(array: number[]) {
@@ -530,10 +535,10 @@ describe('RouteMiddleware', () => {
     });
 
     describe('body object param casting', () => {
-        let application: Sierra;
+        let application: Application;
 
         beforeAll(async () => {
-            application = new Sierra();
+            application = new Application();
 
             class BodyObject {
                 boolean: boolean;

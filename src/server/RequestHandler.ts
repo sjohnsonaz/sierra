@@ -1,12 +1,12 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
 import { Color } from '../utils/ConsoleUtil';
-import Pipeline from '../pipeline/Pipeline';
+import { Pipeline } from '../pipeline/Pipeline';
 
 import { IServerMiddleware } from './IServerMiddleware';
 import { IViewMiddleware } from './IViewMiddleware';
-import Context from './Context';
-import OutgoingMessage, { OutputType } from './OutgoingMessage';
+import { Context } from './Context';
+import { OutgoingMessage, OutputType } from './OutgoingMessage';
 import { LogLevel } from './LogLevel';
 import { ErrorMessage, NoViewMiddlwareError, NoViewTemplateError, SierraError } from './Errors';
 

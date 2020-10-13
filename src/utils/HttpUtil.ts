@@ -6,7 +6,7 @@ export interface IHttpResult<T> {
     body: T;
 }
 
-export default class HttpUtil {
+export class HttpUtil {
     static request<T>(url: string, options: http.RequestOptions = {}) {
         console.log('calling: ', url);
         let body: any[] = [];

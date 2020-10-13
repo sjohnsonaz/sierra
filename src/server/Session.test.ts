@@ -1,6 +1,7 @@
-import { Session } from "../Sierra";
 import { createRequest } from "../utils/TestUtil";
-import Context from "./Context";
+
+import { Session } from "./Session";
+import { Context } from "./Context";
 import { Cookie } from "./Cookie";
 import { NoSessionGatewayError } from "./Errors";
 

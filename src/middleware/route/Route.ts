@@ -1,7 +1,7 @@
 import { Verb } from './Verb';
 import { IServerMiddleware } from '../../server/IServerMiddleware';
 
-export default class Route<T, U> {
+export class Route<T, U> {
     verb: Verb;
     name: string | RegExp;
     regex: RegExp;

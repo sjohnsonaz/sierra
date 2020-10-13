@@ -1,4 +1,4 @@
-import { Uuid } from "../Sierra"
+import { Uuid } from './Uuid';
 
 describe('Uuid', function () {
     describe('create', function () {

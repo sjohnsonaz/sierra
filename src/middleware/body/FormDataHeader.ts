@@ -1,4 +1,4 @@
-export default class FormDataHeader {
+export class FormDataHeader {
     rawHeaders: {
         [index: string]: string;
     } = {};

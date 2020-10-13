@@ -1,4 +1,4 @@
-export default class Boundary {
+export class Boundary {
     start: number;
     end: number;
     final: boolean;

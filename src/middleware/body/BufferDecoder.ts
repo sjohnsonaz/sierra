@@ -1,8 +1,8 @@
-import Field from './Field';
-import Boundary from './Boundary';
+import { Field } from './Field';
+import { Boundary } from './Boundary';
 import { IFileHandler } from './IFileHandler';
 
-export default class BufferDecoder {
+export class BufferDecoder {
     boundary: string;
     //boundaryEnd: string;
     boundaryLength: number;

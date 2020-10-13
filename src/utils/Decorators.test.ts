@@ -1,4 +1,4 @@
-import { Controller } from '../Sierra';
+import { Controller } from '../middleware/route/Controller';
 import { method, middleware, route } from './Decorators';
 
 describe('Decorators', function () {

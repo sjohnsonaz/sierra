@@ -1,15 +1,16 @@
 import * as request from 'supertest';
 
-import Sierra from '../../Sierra';
+import { Application } from '../../Application';
+
 import { ConnectMiddleware } from './ConnectMiddleware';
 
 describe('ConnectMiddleware', () => {
-    let application: Sierra;
+    let application: Application;
 
     beforeEach(async () => {
         // TODO: Use Fake Timers
         jest.useFakeTimers();
-        application = new Sierra();
+        application = new Application();
         application.use(async () => {
             return 'returned';
         });

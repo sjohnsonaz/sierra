@@ -1,7 +1,7 @@
 import { Application } from './Application';
 import { LogLevel } from './server/LogLevel';
 import { NeverStartedError } from './server/Errors';
-import { Controller } from './Sierra';
+import { Controller } from './middleware/route/Controller';
 
 describe('Application', function () {
     describe('use', function () {

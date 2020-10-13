@@ -1,16 +1,18 @@
-import * as http from 'http';
+import { createServer, Server } from 'http';
+
 import * as request from 'supertest';
+
 import { RequestHandler } from '../../server/RequestHandler';
-import { BodyMiddleware } from '../../Sierra';
+import { BodyMiddleware } from './BodyMiddleware';
 
 describe('BodyMiddleware', function () {
     describe('application/json', function () {
-        let server: http.Server;
+        let server: Server;
         let handler: RequestHandler;
 
         beforeEach(async function () {
             handler = new RequestHandler();
-            server = http.createServer(handler.callback);
+            server = createServer(handler.callback);
         });
 
         it('should read "application/json" data', async function () {
@@ -45,12 +47,12 @@ describe('BodyMiddleware', function () {
     });
 
     describe('multipart/form-data', function () {
-        let server: http.Server;
+        let server: Server;
         let handler: RequestHandler;
 
         beforeEach(async function () {
             handler = new RequestHandler();
-            server = http.createServer(handler.callback);
+            server = createServer(handler.callback);
         });
 
         it('should read "multipart/form-data" data', async function () {
@@ -85,12 +87,12 @@ describe('BodyMiddleware', function () {
     });
 
     describe('application/x-www-form-urlencoded', function () {
-        let server: http.Server;
+        let server: Server;
         let handler: RequestHandler;
 
         beforeEach(async function () {
             handler = new RequestHandler();
-            server = http.createServer(handler.callback);
+            server = createServer(handler.callback);
         });
 
         it('should read "application/x-www-form-urlencoded" data', async function () {

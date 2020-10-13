@@ -15,7 +15,7 @@ export class RouteMethod {
     }
 }
 
-export default class RouteDefinition<U extends IServerMiddleware<any, any>> {
+export class RouteDefinition<U extends IServerMiddleware<any, any>> {
     method: RouteMethod;
     middleware: U[] = [];
 }

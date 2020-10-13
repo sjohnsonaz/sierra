@@ -1,16 +1,17 @@
-import * as http from 'http';
+import { createServer, Server } from 'http';
 
 import * as request from 'supertest';
+
 import { RequestHandler } from '../../server/RequestHandler';
-import { SessionMiddleware } from '../../Sierra';
+import { SessionMiddleware } from './SessionMiddleware';
 
 describe('SessionMiddleware', function () {
-    let server: http.Server;
+    let server: Server;
     let handler: RequestHandler;
 
     beforeEach(async function () {
         handler = new RequestHandler();
-        server = http.createServer(handler.callback);
+        server = createServer(handler.callback);
     });
 
     it('should call Session.load', async function () {
