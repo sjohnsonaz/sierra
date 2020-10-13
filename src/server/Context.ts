@@ -1,29 +1,37 @@
 import * as http from 'http';
 import { URL } from 'url';
 
-import OutgoingMessage from './OutgoingMessage';
+import OutgoingMessage, { OutputType } from './OutgoingMessage';
 import Session from './Session';
 import { Verb } from '../middleware/route/Verb';
-import { HeaderName } from './HeaderName';
 import { getQueryString, urlStringToObject } from '../utils/EncodeUtil';
 import { CookieRegistry } from './Cookie';
 
+/**
+ * The Context object for the RequestHandler Pipeline
+ */
 export default class Context<T = any, U = any, V = any, X = any> {
     request: http.IncomingMessage;
     response: http.ServerResponse;
-    session: Session<X>;
+    session?: Session<X>;
     cookies: CookieRegistry;
-    body: V;
+    body?: V;
     method: Verb;
-    contentType: string;
-    accept: string[];
+    contentType?: string;
+    accept?: string[];
     url: string;
     pathname: string;
     query: T;
     params: U;
     template: string;
-    httpBoundary: string;
+    charset?: string;
+    httpBoundary?: string;
 
+    /**
+     * The Context constructor
+     * @param request - an incoming request
+     * @param response - an outgoing response
+     */
     constructor(request: http.IncomingMessage, response: http.ServerResponse) {
         this.request = request;
         this.response = response;
@@ -31,10 +39,13 @@ export default class Context<T = any, U = any, V = any, X = any> {
         this.cookies = new CookieRegistry(request);
 
         // Content Type
-        this.createContentType(request);
+        const contentType = getContentType(request);
+        this.contentType = contentType.mediaType;
+        this.charset = contentType.charset;
+        this.httpBoundary = contentType.boundary;
 
         // Accept Type
-        this.createAccept(request);
+        this.accept = getAccept(request);
 
         this.url = request.url;
 
@@ -48,51 +59,54 @@ export default class Context<T = any, U = any, V = any, X = any> {
         this.query = urlStringToObject(getQueryString(request.url)) as any;
     }
 
-    // TODO: Use this instead of parameter
-    private createContentType(request: http.IncomingMessage) {
-        let contentTypeHeader = (this.request.headers['content-type'] || '');
-        let contentType = contentTypeHeader;
-        if (contentType) {
-            let parts = contentTypeHeader.split('; ');
-            contentType = parts[0].toLowerCase();
-            if (parts.length > 1) {
-                let hash: Record<string, any> = {};
-                parts.shift();
-                parts.forEach(part => {
-                    let hashParts = part.split('=');
-                    if (hashParts.length > 1) {
-                        hash[hashParts[0]] = hashParts[1];
-                    }
-                });
-                this.httpBoundary = hash['boundary'];
+    /**
+     * Creates an OutgoingMessage object.
+     * @param data - the data to send
+     * @param status - the status code
+     * @param type - the type of output
+     * @param template - the template name if sending a View
+     * @param contentType - the Content-Type header
+     */
+    send<U>(data: U, status?: number, type?: OutputType, template?: string, contentType?: string) {
+        return new OutgoingMessage(data, status, type, template, contentType);
+    }
+}
+
+export function getContentType(request: http.IncomingMessage) {
+    const contentTypeHeader = request.headers['content-type'];
+    const contentType: {
+        mediaType?: string;
+        charset?: string;
+        boundary?: string;
+    } = {};
+    if (contentTypeHeader) {
+        let parts = contentTypeHeader.split('; ');
+        contentType.mediaType = parts[0].trim().toLowerCase();
+        if (parts.length > 1) {
+            const hash: Record<string, any> = {};
+            for (let index = 1, length = parts.length; index < length; index++) {
+                const part = parts[index];
+                const hashParts = part.split('=');
+                if (hashParts.length > 1) {
+                    hash[hashParts[0].trim()] = hashParts[1].trim();
+                }
             }
-        }
-        this.contentType = contentType;
-    }
-
-    // TODO: Adjust for priority
-    private createAccept(request: http.IncomingMessage) {
-        let accept: string = request.headers['accept'];
-        if (accept) {
-            let types = accept.split(',');
-            this.accept = types.map(type => {
-                let parts = type.split(';');
-                return parts[0];
-            });
-        } else {
-            this.accept = [];
+            contentType.charset = hash['charset'];
+            contentType.boundary = hash['boundary'];
         }
     }
+    return contentType;
+}
 
-    setResponseHeader(header: HeaderName | string, value: number | string | string[]) {
-        this.response.setHeader(header as string, value);
-    }
-
-    getResponseHeader(header: HeaderName | string) {
-        return this.response.getHeader(header);
-    }
-
-    send<U>(data: U, status: number = 200) {
-        return new OutgoingMessage(data, status);
+export function getAccept(request: http.IncomingMessage) {
+    const accept = request.headers['accept'];
+    if (accept) {
+        let types = accept.split(',');
+        return types.map(type => {
+            let parts = type.split(';');
+            return parts[0];
+        });
+    } else {
+        return [];
     }
 }
