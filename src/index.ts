@@ -38,4 +38,5 @@ export { ConnectMiddleware } from './middleware/connect';
 export { Uuid } from './utils/Uuid';
 export { route, method, middleware } from './utils/Decorators';
 
+export { Application } from './Application';
 export { Application as default } from './Application';

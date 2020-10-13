@@ -1,4 +1,4 @@
-import { Context, ISessionGateway, Uuid } from '../src/Sierra';
+import { Context, ISessionGateway, Uuid } from '../src';
 
 export default class SessionGateway implements ISessionGateway<any> {
     async getId(context: Context): Promise<string> {

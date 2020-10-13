@@ -1,4 +1,4 @@
-import { Pipeline } from '../Sierra';
+import { Pipeline } from './Pipeline';
 import { exit, PipelineExit } from './Pipeline';
 
 describe('Pipeline', function () {

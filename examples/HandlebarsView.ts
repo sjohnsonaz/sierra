@@ -3,7 +3,7 @@ import * as path from 'path';
 
 import Handlebars from 'handlebars';
 
-import { Context } from '../src/Sierra';
+import { Context } from '../src';
 import { NoViewTemplateError } from '../src/server/Errors';
 
 export default class HandlebarsView {

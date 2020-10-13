@@ -1,4 +1,4 @@
-import Sierra, { BodyMiddleware, LogLevel, SessionMiddleware } from '../src/Sierra';
+import Sierra, { BodyMiddleware, LogLevel, SessionMiddleware } from '../src';
 
 import HandlebarsView from './HandlebarsView';
 import HomeController from './HomeController';

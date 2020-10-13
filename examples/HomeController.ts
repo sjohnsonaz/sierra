@@ -1,4 +1,4 @@
-import { Controller, middleware, route, Context, method, json } from '../src/Sierra';
+import { Controller, middleware, route, Context, method, json } from '../src';
 
 async function SimpleMiddleware() {
     return true;
