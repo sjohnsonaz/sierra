@@ -41,38 +41,6 @@ describe('Context', function () {
         });
     });
 
-    describe('setResponseHeader', function () {
-        it('should set response header', function () {
-            const [request, response] = createRequest();
-            const context = new Context(request, response);
-            const contentTypeName = 'Content-Type';
-            const applicationJson = 'application/json';
-
-            const contentTypeBefore = response.getHeader(contentTypeName);
-            expect(contentTypeBefore).toBeUndefined();
-
-            context.setResponseHeader(contentTypeName, applicationJson);
-
-            const contentType = response.getHeader(contentTypeName);
-            expect(contentType).toBe(applicationJson);
-        });
-    });
-
-    describe('getResponseHeader', function () {
-        it('should set response header', function () {
-            const [request, response] = createRequest();
-            const context = new Context(request, response);
-            const contentTypeName = 'Content-Type';
-            const applicationJson = 'application/json';
-
-            context.setResponseHeader(contentTypeName, applicationJson);
-
-            const contentType = context.getResponseHeader(contentTypeName);
-
-            expect(contentType).toBe(applicationJson);
-        });
-    });
-
     describe('send', function () {
         it('should create an OutgoingMessage with default parameters', function () {
             const [request, response] = createRequest();
@@ -93,6 +61,38 @@ describe('Context', function () {
             expect(result).toBeInstanceOf(OutgoingMessage);
             expect(result.data).toBe(data);
             expect(result.status).toBe(status);
+        });
+    });
+
+    describe.skip('getContentType', function () {
+        it('should handle falsey', function () {
+
+        });
+
+        it('should handle media-type', function () {
+
+        });
+
+        it('should handle charset', function () {
+
+        });
+
+        it('should handle boundary', function () {
+
+        });
+    });
+
+    describe.skip('getAccept', function () {
+        it('should handle falsey', function () {
+
+        });
+
+        it('should handle one', function () {
+
+        });
+
+        it('should handle multiple', function () {
+
         });
     });
 });
