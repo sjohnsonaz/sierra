@@ -1,4 +1,4 @@
-import { getArgumentNames, getParameterNames } from "./RouteUtil";
+import { getArgumentNames, getParameterNames } from './RouteUtil';
 
 describe('RouteUtil', function () {
     describe('getParameterNames', function () {

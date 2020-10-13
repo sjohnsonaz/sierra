@@ -2,7 +2,7 @@ import * as request from 'supertest';
 
 import { Application } from '../../Application';
 
-import { method } from "../../utils/Decorators";
+import { method } from '../../utils/Decorators';
 import { BodyMiddleware } from '../body/BodyMiddleware';
 
 import { Controller } from './Controller';

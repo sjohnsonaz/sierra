@@ -1,4 +1,4 @@
-import { Color, Background, Style, ConsoleColor, ConsoleEnd, ConsoleFormat, ConsoleStyle } from "./ConsoleUtil"
+import { Color, Background, Style, ConsoleColor, ConsoleEnd, ConsoleFormat, ConsoleStyle } from './ConsoleUtil';
 
 describe('ConsoleUtil', function () {
     const BACKGROUND_OFFSET = 10;

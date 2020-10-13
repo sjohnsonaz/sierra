@@ -1,9 +1,9 @@
-import { createRequest } from "../utils/TestUtil";
+import { createRequest } from '../utils/TestUtil';
 
-import { Session } from "./Session";
-import { Context } from "./Context";
-import { Cookie } from "./Cookie";
-import { NoSessionGatewayError } from "./Errors";
+import { Session } from './Session';
+import { Context } from './Context';
+import { Cookie } from './Cookie';
+import { NoSessionGatewayError } from './Errors';
 
 describe('Session', function () {
     // const MILLISECONDS = 1;

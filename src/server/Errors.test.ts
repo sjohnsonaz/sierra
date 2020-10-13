@@ -1,4 +1,4 @@
-import { ErrorMessage, NeverStartedError, NoMethodError, NoRouteFoundError, NoSessionGatewayError, NotFoundError, NoViewMiddlwareError, NoViewTemplateError } from "./Errors";
+import { ErrorMessage, NeverStartedError, NoMethodError, NoRouteFoundError, NoSessionGatewayError, NotFoundError, NoViewMiddlwareError, NoViewTemplateError } from './Errors';
 
 describe('Errors', function () {
     describe('NeverStartedError', function () {

@@ -1,5 +1,5 @@
 import * as http from 'http';
-import { createRequest, wait } from "./TestUtil";
+import { createRequest, wait } from './TestUtil';
 
 describe('TestUtil', function () {
     describe('wait', function () {
