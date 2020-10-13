@@ -1,7 +1,8 @@
 import * as request from 'supertest';
 
-import Sierra, { BodyMiddleware, Controller, RouteMiddleware } from "../../Sierra";
+import Sierra, { BodyMiddleware, Controller, Route, RouteMiddleware } from "../../Sierra";
 import { method } from "../../utils/Decorators";
+import { sortRoutes } from './RouteMiddleware';
 
 describe('RouteMiddleware', () => {
     describe('route matching', function () {
@@ -709,6 +710,47 @@ describe('RouteMiddleware', () => {
         });
     });
 
+    describe('Controller', function () {
+        describe.skip('init', function () {
+            it('should build Routes from Controllers', function () {
+
+            });
+
+            it('should sort Routes from Controllers', function () {
+
+            });
+        });
+
+        describe('addController', function () {
+            it('should add a Controller', function () {
+                const routeMiddleware = new RouteMiddleware();
+                expect(routeMiddleware.controllers.length).toBe(0);
+                const controller = new Controller();
+                routeMiddleware.addController(controller);
+                expect(routeMiddleware.controllers.length).toBe(1);
+                expect(routeMiddleware.controllers[0]).toBe(controller);
+            });
+        });
+
+        describe('removeController', function () {
+            it('should remove a Controller', function () {
+                const routeMiddleware = new RouteMiddleware();
+                const controller = new Controller();
+                routeMiddleware.addController(controller);
+                expect(routeMiddleware.controllers.length).toBe(1);
+                routeMiddleware.removeController(controller);
+                expect(routeMiddleware.controllers.length).toBe(0);
+            });
+
+            it('should not remove a Controller that is not present', function () {
+                const routeMiddleware = new RouteMiddleware();
+                const controller = new Controller();
+                routeMiddleware.removeController(controller);
+                expect(routeMiddleware.controllers.length).toBe(0);
+            });
+        });
+    });
+
     describe('Factory', function () {
         class BodyObject {
             boolean: boolean;
@@ -760,6 +802,30 @@ describe('RouteMiddleware', () => {
             const testFactory = routeMiddleware.getFactory(BodyObject);
 
             expect(testFactory).toBe(factory);
+        });
+    });
+
+    describe('Route sorting', function () {
+        it('routes are sorted by RegExp, then location or first \':\', then alphabetical', () => {
+
+            let routes = [
+                '/',
+                '/:id',
+                '/count',
+                '/test/:id',
+                '/:var/a/',
+                '/findit/:name',
+                '/getsomething/:id/:name',
+                '/getsomething/:name/:id',
+                '/getsomething/:another/:id',
+                '/getsomething/:id/fixed'
+            ];
+
+            routes.map(route => {
+                return new Route('get', route, undefined, undefined, undefined, undefined, undefined, undefined);
+            }).sort(sortRoutes);
+
+            expect(true).toBe(true);
         });
     });
 });

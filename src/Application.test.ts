@@ -1,7 +1,7 @@
-import { Route } from './Sierra';
-import { Application, sortRoutes } from './Application';
+import { Application } from './Application';
 import { LogLevel } from './server/LogLevel';
 import { NeverStartedError } from './server/Errors';
+import { Controller } from './Sierra';
 
 describe('Application', function () {
     describe('use', function () {
@@ -69,7 +69,7 @@ describe('Application', function () {
             const application = new Application();
             await application.listen(port);
             await application.close();
-            expect(async () => {
+            await expect(async () => {
                 await application.close();
             }).rejects.toThrow();
         });
@@ -86,27 +86,33 @@ describe('Application', function () {
         });
     });
 
-    describe('Route sorting', function () {
-        it('routes are sorted by RegExp, then location or first \':\', then alphabetical', () => {
 
-            let routes = [
-                '/',
-                '/:id',
-                '/count',
-                '/test/:id',
-                '/:var/a/',
-                '/findit/:name',
-                '/getsomething/:id/:name',
-                '/getsomething/:name/:id',
-                '/getsomething/:another/:id',
-                '/getsomething/:id/fixed'
-            ];
+    describe('addController', function () {
+        it('should add a Controller', function () {
+            const application = new Application();
+            expect(application.routeMiddleware.controllers.length).toBe(0);
+            const controller = new Controller();
+            application.addController(controller);
+            expect(application.routeMiddleware.controllers.length).toBe(1);
+            expect(application.routeMiddleware.controllers[0]).toBe(controller);
+        });
+    });
 
-            routes.map(route => {
-                return new Route('get', route, undefined, undefined, undefined, undefined, undefined, undefined);
-            }).sort(sortRoutes);
+    describe('removeController', function () {
+        it('should remove a Controller', function () {
+            const application = new Application();
+            const controller = new Controller();
+            application.addController(controller);
+            expect(application.routeMiddleware.controllers.length).toBe(1);
+            application.routeMiddleware.removeController(controller);
+            expect(application.routeMiddleware.controllers.length).toBe(0);
+        });
 
-            expect(true).toBe(true);
+        it('should not remove a Controller that is not present', function () {
+            const application = new Application();
+            const controller = new Controller();
+            application.removeController(controller);
+            expect(application.routeMiddleware.controllers.length).toBe(0);
         });
     });
 });

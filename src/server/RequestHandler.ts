@@ -1,4 +1,4 @@
-import * as http from 'http';
+import { IncomingMessage, ServerResponse } from 'http';
 
 import { Color } from '../utils/ConsoleUtil';
 import Pipeline from '../pipeline/Pipeline';
@@ -20,7 +20,7 @@ export class RequestHandler {
     logging: LogLevel = LogLevel.errors;
     defaultTemplate = DEFAULT_TEMPLATE;
 
-    callback = async (request: http.IncomingMessage, response: http.ServerResponse) => {
+    callback = async (request: IncomingMessage, response: ServerResponse) => {
         let context = new Context(request, response);
         try {
             let result = await this.pipeline.run(context, undefined);

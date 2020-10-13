@@ -3,11 +3,9 @@ import * as http from 'http';
 import { IServerMiddleware } from './server/IServerMiddleware';
 import { IViewMiddleware } from './server/IViewMiddleware';
 
-import Controller from './middleware/route/Controller';
-import Route from './middleware/route/Route';
-
 import { RequestHandler } from './server/RequestHandler';
 import RouteMiddleware from './middleware/route/RouteMiddleware';
+import Controller from './middleware/route/Controller';
 import { LogLevel } from './server/LogLevel';
 import { NeverStartedError } from './server/Errors';
 
@@ -18,7 +16,6 @@ export class Application {
     requestHandler: RequestHandler = new RequestHandler();
     routeMiddleware: RouteMiddleware = new RouteMiddleware();
     server: http.Server;
-    controllers: Controller[] = [];
 
     get logging() {
         return this.requestHandler.logging;
@@ -33,51 +30,33 @@ export class Application {
      * @returns Promise<void>
      */
     async init() {
-        await this.buildControllers();
-        return this.requestHandler;
-    }
-
-    addController(controller: Controller) {
-        this.controllers.push(controller);
-    }
-
-    /**
-     * Create Routes for all Controllers
-     */
-    async buildControllers() {
-        this.controllers.forEach(controller => {
-            Controller.build(controller).forEach(route => {
-                this.routeMiddleware.routes.push(route);
-            });
-        });
-
-        // Sort Routes
-
-        // Separate string Routes
-        let regexRoutes: Route<any, any>[] = [];
-        let stringRoutes: Route<any, any>[] = [];
-        this.routeMiddleware.routes.forEach(route => {
-            if (route.name instanceof RegExp) {
-                regexRoutes.push(route);
-            } else {
-                stringRoutes.push(route);
-            }
-        });
-
-        // Sort string Routes
-        stringRoutes.sort(sortRoutes);
-
-        // Concat all Routes
-        this.routeMiddleware.routes = regexRoutes.concat(stringRoutes);
+        await this.routeMiddleware.init();
 
         // Add RouteMiddleware if we have Routes.
         if (this.routeMiddleware.routes.length) {
             this.requestHandler.use(this.routeMiddleware.handler);
         }
+        return this.requestHandler;
     }
 
     /**
-     * Add Middleware to the Pipeline.
+     * Adds a Controller to RouteMiddleware
+     * @param controller - the Controller to add
+     */
+    addController(controller: Controller) {
+        this.routeMiddleware.addController(controller);
+    }
+
+    /**
+     * Removes a Controller from RouteMiddleware
+     * @param controller - the Controller to remove
+     */
+    removeController(controller: Controller) {
+        this.routeMiddleware.removeController(controller);
+    }
+
+    /**
+     * Adds a Middleware to the Pipeline.
      * @param middleware - the Middleware to add
      */
     use(middleware: IServerMiddleware<any, any>) {
@@ -85,7 +64,7 @@ export class Application {
     }
 
     /**
-     * Set View Middleware.  Only one is enabled at a time.
+     * Sets View Middleware.  Only one is enabled at a time.
      * @param viewMiddlware - the View Middleware
      */
     view(viewMiddlware: IViewMiddleware<any>) {
@@ -93,7 +72,7 @@ export class Application {
     }
 
     /**
-     * Set Error Middleware.  Only one is enabled at a time.
+     * Sets Error Middleware.  Only one is enabled at a time.
      * @param errorMiddleware - the Error Middleware
      */
     error(errorMiddleware: IServerMiddleware<any, any>) {
@@ -169,27 +148,4 @@ export class Application {
             });
         });
     }
-}
-
-/**
- * Compares two Routes for sorting.
- * @param routeA - the first Route
- * @param routeB - the second Route
- */
-export function sortRoutes(routeA: Route<any, any>, routeB: Route<any, any>) {
-    let a = routeA.name as string;
-    let b = routeB.name as string;
-    let aParts = a.substr(1).split('/');
-    let bParts = b.substr(1).split('/');
-    let length = Math.max(aParts.length, bParts.length);
-    let result = 0;
-    for (let index = 0; index < length; index++) {
-        let aPart = aParts[index] || '';
-        let bPart = bParts[index] || '';
-        result = ((aPart[0] === ':') as any) - ((bPart[0] === ':') as any);
-        if (result) {
-            break;
-        }
-    }
-    return result;
 }

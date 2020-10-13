@@ -1,5 +1,5 @@
 import * as timers from 'timers';
-import * as http from 'http';
+import { IncomingMessage, ServerResponse } from 'http';
 import { Socket } from 'net';
 
 export function wait(time: number) {
@@ -8,9 +8,10 @@ export function wait(time: number) {
     });
 }
 
-export function createRequest(requestInfo: Partial<http.IncomingMessage> = {}): [http.IncomingMessage, http.ServerResponse] {
+export function createRequest(requestInfo: Partial<IncomingMessage> = {}): [IncomingMessage, ServerResponse
+] {
     const socket = new Socket();
-    const request = new http.IncomingMessage(socket);
+    const request = new IncomingMessage(socket);
     Object.entries(
         Object.assign({
             method: 'get'
@@ -18,6 +19,6 @@ export function createRequest(requestInfo: Partial<http.IncomingMessage> = {}): 
         .forEach(([key, value]) => {
             (request as any)[key] = value;
         });
-    const response = new http.ServerResponse(request);
+    const response = new ServerResponse(request);
     return [request, response];
 }

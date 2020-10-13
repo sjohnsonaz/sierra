@@ -1,10 +1,12 @@
 import Context from '../../server/Context';
 import { NoRouteFoundError } from '../../server/Errors';
+import { Controller } from '../../Sierra';
 
 import Route from './Route';
 
 export default class RouteMiddleware {
     routes: Route<any, any>[] = [];
+    controllers: Controller[] = [];
     factories: Record<string, { (...args: any): any }> = {};
 
     handler = async (context: Context, value: any) => {
@@ -72,6 +74,57 @@ export default class RouteMiddleware {
         }
     }
 
+    /**
+     * Adds a Controller
+     * @param controller - the Controller to add
+     */
+    addController(controller: Controller) {
+        this.controllers.push(controller);
+    }
+
+    /**
+     * Removes a Controller
+     * @param controller - the Controller to remove
+     */
+    removeController(controller: Controller) {
+        const index = this.controllers.indexOf(controller);
+        if (index >= 0) {
+            return this.controllers.splice(index, 1);
+        } else {
+            return [];
+        }
+    }
+
+    /**
+     * Creates Routes for all Controllers
+     */
+    async init() {
+        this.controllers.forEach(controller => {
+            Controller.build(controller).forEach(route => {
+                this.routes.push(route);
+            });
+        });
+
+        // Sort Routes
+
+        // Separate string Routes
+        let regexRoutes: Route<any, any>[] = [];
+        let stringRoutes: Route<any, any>[] = [];
+        this.routes.forEach(route => {
+            if (route.name instanceof RegExp) {
+                regexRoutes.push(route);
+            } else {
+                stringRoutes.push(route);
+            }
+        });
+
+        // Sort string Routes
+        stringRoutes.sort(sortRoutes);
+
+        // Concat all Routes
+        this.routes = regexRoutes.concat(stringRoutes);
+    }
+
     addFactory<T>(constructor: { new(...args: any): T }, factory: (args: Record<string, any>) => T) {
         const name = constructor.name;
         this.factories[name] = factory;
@@ -96,4 +149,27 @@ function createParams(matches: string[], argumentNames: string[]) {
         });
     }
     return params;
+}
+
+/**
+ * Compares two Routes for sorting.
+ * @param routeA - the first Route
+ * @param routeB - the second Route
+ */
+export function sortRoutes(routeA: Route<any, any>, routeB: Route<any, any>) {
+    let a = routeA.name as string;
+    let b = routeB.name as string;
+    let aParts = a.substr(1).split('/');
+    let bParts = b.substr(1).split('/');
+    let length = Math.max(aParts.length, bParts.length);
+    let result = 0;
+    for (let index = 0; index < length; index++) {
+        let aPart = aParts[index] || '';
+        let bPart = bParts[index] || '';
+        result = ((aPart[0] === ':') as any) - ((bPart[0] === ':') as any);
+        if (result) {
+            break;
+        }
+    }
+    return result;
 }
