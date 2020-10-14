@@ -13,14 +13,21 @@ import { NeverStartedError } from './server/Errors';
  * A Sierra Application
  */
 export class Application {
+    /** The RequestHandler object */
     requestHandler: RequestHandler = new RequestHandler();
+
+    /** The RouteMiddleware object */
     routeMiddleware: RouteMiddleware = new RouteMiddleware();
+
+    /** The Server object */
     server: http.Server;
 
+    /** The logging level */
     get logging() {
         return this.requestHandler.logging;
     }
 
+    /** The logging level */
     set logging(logging: LogLevel) {
         this.requestHandler.logging = logging;
     }

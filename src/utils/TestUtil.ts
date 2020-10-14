@@ -3,13 +3,12 @@ import { IncomingMessage, ServerResponse } from 'http';
 import { Socket } from 'net';
 
 export function wait(time: number) {
-    return new Promise((resolve) => {
+    return new Promise<void>((resolve) => {
         timers.setTimeout(resolve, time);
     });
 }
 
-export function createRequest(requestInfo: Partial<IncomingMessage> = {}): [IncomingMessage, ServerResponse
-] {
+export function createRequest(requestInfo: Partial<IncomingMessage> = {}): [IncomingMessage, ServerResponse] {
     const socket = new Socket();
     const request = new IncomingMessage(socket);
     Object.entries(

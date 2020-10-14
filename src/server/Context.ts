@@ -12,20 +12,49 @@ import { Verb } from './Verb';
  * The Context object for the RequestHandler Pipeline
  */
 export class Context<T = any, U = any, V = any, X = any> {
+    /** The IncomingMessage object */
     request: IncomingMessage;
+
+    /** The ServerResponse object */
     response: ServerResponse;
+
+    /** The Session object.  Holds session data */
     session?: Session<X>;
+
+    /** The CookieRegistry object.  Holds Cookie data */
     cookies: CookieRegistry;
+
+    /** Body data */
     body?: V;
+
+    /** HTTP Verb */
     method: Verb;
+
+    /** HTTP Content-Type header */
     contentType?: string;
+
+    /** HTTP Accept Header */
     accept?: string[];
+
+    /** URL */
     url: string;
+
+    /** URL pathname */
     pathname: string;
+
+    /** Query data */
     query: T;
+
+    /** URL Params data */
     params: U;
+
+    /** View template */
     template: string;
+
+    /** HTTP Content-Type charset */
     charset?: string;
+
+    /** HTTP Content-Type boundary */
     httpBoundary?: string;
 
     /**
