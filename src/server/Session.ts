@@ -41,6 +41,7 @@ export class Session<T> {
             const id = await this.gateway.getId(this.context);
             this.id = id;
             cookie.value = id;
+            cookie.path = '/';
             // cookie.maxAge = maxAge;
         } else {
             this.id = cookie.value;
