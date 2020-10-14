@@ -1,13 +1,17 @@
-import * as http from 'http';
+import { createServer, Server } from 'http';
+import { ListenOptions } from 'net';
 
-import { IServerMiddleware } from './server/IServerMiddleware';
-import { IViewMiddleware } from './server/IViewMiddleware';
-
-import { RequestHandler } from './server/RequestHandler';
-import { RouteMiddleware } from './middleware/route/RouteMiddleware';
-import { Controller } from './middleware/route/Controller';
-import { LogLevel } from './server/LogLevel';
-import { NeverStartedError } from './server/Errors';
+import {
+    IServerMiddleware,
+    IViewMiddleware,
+    RequestHandler,
+    LogLevel,
+    NeverStartedError
+} from './server';
+import {
+    Controller,
+    RouteMiddleware
+} from './middleware/route';
 
 /**
  * A Sierra Application
@@ -20,7 +24,7 @@ export class Application {
     routeMiddleware: RouteMiddleware = new RouteMiddleware();
 
     /** The Server object */
-    server: http.Server;
+    server: Server;
 
     /** The logging level */
     get logging() {
@@ -90,14 +94,47 @@ export class Application {
      * Creates the `http.Server`.
      */
     createServer() {
-        return http.createServer(this.requestHandler.callback);
+        return createServer(this.requestHandler.callback);
     }
+
 
     /**
      * Opens the `http.Server` to listen on the specified Port.
      * @param port - the Port to open
+     * @param hostname - the Hostname
+     * @param backlog - the Backlog number
+     * @param listeningListener - a callback for the "listening" event
      */
-    listen(port: number): Promise<http.Server> {
+    listen(port?: number, hostname?: string, backlog?: number, listeningListener?: () => void): Promise<Server>;
+    listen(port?: number, hostname?: string, listeningListener?: () => void): Promise<Server>;
+    listen(port?: number, backlog?: number, listeningListener?: () => void): Promise<Server>;
+    listen(port?: number, listeningListener?: () => void): Promise<Server>;
+
+    /**
+     * Opens the `http.Server` to listen on the specified Port.
+     * @param path - the Path to open
+     * @param backlog - the Backlog number
+     * @param listeningListener - a callback for the "listening" event
+     */
+    listen(path: string, backlog?: number, listeningListener?: () => void): Promise<Server>;
+    listen(path: string, listeningListener?: () => void): Promise<Server>;
+
+    /**
+ * Opens the `http.Server` to listen on the specified Port.
+ * @param options - a options object
+ * @param listeningListener - a callback for the "listening" event
+ */
+    listen(options: ListenOptions, listeningListener?: () => void): Promise<Server>;
+
+    /**
+     * Opens the `http.Server` to listen on the specified Port.
+     * @param handle - the Handle to open
+     * @param backlog - the Backlog number
+     * @param listeningListener - a callback for the "listening" event
+     */
+    listen(handle: any, backlog?: number, listeningListener?: () => void): Promise<Server>;
+    listen(handle: any, listeningListener?: () => void): Promise<Server>;
+    listen(a: any, b?: any, c?: any, d?: any): Promise<Server> {
         if (!this.server) {
             this.server = this.createServer();
         }
@@ -119,7 +156,7 @@ export class Application {
                 cleanup()
             };
             startup();
-            this.server.listen(port);
+            this.server.listen(a, b, c, d);
         });
     }
 
