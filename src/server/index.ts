@@ -9,3 +9,4 @@ export { IViewMiddleware } from './IViewMiddleware';
 export { OutgoingMessage, send, view, json, raw, OutputType } from './OutgoingMessage';
 export { RequestHandler } from './RequestHandler';
 export { Session } from './Session';
+export { Verb, VerbLookup } from './Verb';

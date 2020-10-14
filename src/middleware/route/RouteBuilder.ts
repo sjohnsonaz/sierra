@@ -2,12 +2,11 @@ import * as path from 'path';
 import 'reflect-metadata';
 
 import { getArgumentNames, stringToRegex } from '../../utils/RouteUtil';
-import { IServerMiddleware, NoMethodError } from '../../server';
+import { IServerMiddleware, NoMethodError, Verb, VerbLookup } from '../../server';
 
 import { Controller } from './Controller';
 import { Route } from './Route';
 import { RouteDefinition, RouteMethod } from './RouteDefinition';
-import { Verb, VerbLookup } from './Verb';
 
 export class RouteBuilder {
     routeDefinitions: Record<string, RouteDefinition<IServerMiddleware<any, any>>> = {};
