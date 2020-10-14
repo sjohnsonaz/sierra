@@ -2,7 +2,7 @@ import { createServer, Server } from 'http';
 
 import * as request from 'supertest';
 
-import { RequestHandler } from '../../server/RequestHandler';
+import { RequestHandler } from '../../server';
 import { BodyMiddleware } from './BodyMiddleware';
 
 describe('BodyMiddleware', function () {

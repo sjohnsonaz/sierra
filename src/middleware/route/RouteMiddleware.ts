@@ -1,5 +1,4 @@
-import { Context } from '../../server/Context';
-import { NoRouteFoundError } from '../../server/Errors';
+import { Context, NoRouteFoundError } from '../../server';
 
 import { Controller } from './Controller';
 import { Route } from './Route';

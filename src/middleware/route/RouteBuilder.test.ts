@@ -1,7 +1,7 @@
 import * as request from 'supertest';
 
 import { Application } from '../../Application';
-import { Context } from '../../server/Context';
+import { Context } from '../../server';
 import { middleware, route } from '../../utils/Decorators';
 
 import { Controller } from './Controller';

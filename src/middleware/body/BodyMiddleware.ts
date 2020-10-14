@@ -1,4 +1,4 @@
-import { Context } from '../../server/Context';
+import { Context } from '../../server';
 import { urlStringToObject } from '../../utils/EncodeUtil';
 
 import { BufferDecoder } from './BufferDecoder';

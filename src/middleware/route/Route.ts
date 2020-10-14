@@ -1,5 +1,5 @@
 import { Verb } from './Verb';
-import { IServerMiddleware } from '../../server/IServerMiddleware';
+import { IServerMiddleware } from '../../server';
 
 export class Route<T, U> {
     verb: Verb;

@@ -1,4 +1,4 @@
-import { PipelineExit } from '../pipeline/Pipeline';
+import { PipelineExit } from '../pipeline';
 
 export type OutputType = 'auto' | 'json' | 'view' | 'text' | 'raw';
 

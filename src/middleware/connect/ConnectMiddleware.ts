@@ -1,9 +1,8 @@
 import * as http from 'http';
 
-import { IMiddleware } from '../../pipeline/IMiddleware';
-import { exit } from '../../pipeline/Pipeline';
-import { Context } from '../../server/Context';
-
+import { IMiddleware } from '../../pipeline';
+import { exit } from '../../pipeline';
+import { Context } from '../../server';
 
 export function ConnectMiddleware<T extends Context, U>(
     handleFunction: (

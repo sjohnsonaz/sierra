@@ -2,8 +2,7 @@ import * as path from 'path';
 import 'reflect-metadata';
 
 import { getArgumentNames, stringToRegex } from '../../utils/RouteUtil';
-import { IServerMiddleware } from '../../server/IServerMiddleware';
-import { NoMethodError } from '../../server/Errors';
+import { IServerMiddleware, NoMethodError } from '../../server';
 
 import { Controller } from './Controller';
 import { Route } from './Route';

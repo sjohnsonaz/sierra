@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
 import { Color } from '../utils/ConsoleUtil';
-import { Pipeline } from '../pipeline/Pipeline';
+import { Pipeline } from '../pipeline';
 
 import { IServerMiddleware } from './IServerMiddleware';
 import { IViewMiddleware } from './IViewMiddleware';

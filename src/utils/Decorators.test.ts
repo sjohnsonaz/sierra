@@ -1,4 +1,4 @@
-import { Controller } from '../middleware/route/Controller';
+import { Controller } from '../middleware/route';
 import { method, middleware, route } from './Decorators';
 
 describe('Decorators', function () {
