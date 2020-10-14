@@ -2,8 +2,8 @@ import * as request from 'supertest';
 
 import { Application } from '../../Application';
 import { Context } from '../../server';
-import { middleware, route } from '../../utils/Decorators';
 
+import { middleware, route } from './Decorators';
 import { Controller } from './Controller';
 import { RouteBuilder } from './RouteBuilder';
 import { RouteDefinition, RouteMethod } from './RouteDefinition';

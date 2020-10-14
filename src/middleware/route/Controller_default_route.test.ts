@@ -2,9 +2,9 @@ import * as request from 'supertest';
 
 import { Application } from '../../Application';
 import { Context } from '../../server';
-import { route } from '../../utils/Decorators';
 
 import { Controller } from './Controller';
+import { route } from './Decorators';
 
 describe('Default route', () => {
     let application: Application;

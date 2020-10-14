@@ -5,11 +5,13 @@ export * from './pipeline';
 export * from './server';
 
 // Middleware
-export * from './middleware';
+export * from './middleware/body';
+export * from './middleware/connect';
+export * from './middleware/route';
+export * from './middleware/session';
 
 // Util
 export { Uuid } from './utils/Uuid';
-export { route, method, middleware } from './utils/Decorators';
 
 export { Application } from './Application';
 export { Application as default } from './Application';

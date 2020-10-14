@@ -1,5 +1,6 @@
-import { Controller, RouteBuilder } from '../middleware/route';
-import { IMethod, IServerMiddleware, Verb } from '../server';
+import { IMethod, IServerMiddleware, Verb } from '../../server';
+import { Controller } from './Controller';
+import { RouteBuilder } from './RouteBuilder';
 
 /**
  * Adds a method as a route.  By default arguments are not piped from the request.

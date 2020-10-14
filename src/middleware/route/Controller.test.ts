@@ -1,8 +1,7 @@
 import * as path from 'path';
 
-import { method } from '../../utils/Decorators';
-
 import { Controller } from './Controller';
+import { method } from './Decorators';
 
 describe('Controller', function () {
     describe('getName', function () {

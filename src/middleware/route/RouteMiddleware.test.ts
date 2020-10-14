@@ -2,9 +2,9 @@ import * as request from 'supertest';
 
 import { Application } from '../../Application';
 
-import { method } from '../../utils/Decorators';
 import { BodyMiddleware } from '../body';
 
+import { method } from './Decorators';
 import { Controller } from './Controller';
 import { Route } from './Route';
 import { RouteMiddleware, sortRoutes } from './RouteMiddleware';
