@@ -1,12 +1,12 @@
 export { Context } from './Context';
 export * from './Errors';
 export { LogLevel } from './LogLevel';
-export { CookieRegistry, Cookie } from './Cookie';
+export { Cookie } from './Cookie';
 export { IMethod } from './IMethod';
 export { ISessionGateway } from './ISessionGateway';
 export { IServerMiddleware } from './IServerMiddleware';
 export { IViewMiddleware } from './IViewMiddleware';
-export { OutgoingMessage, send, view, json, raw, OutputType } from './OutgoingMessage';
+export { OutgoingMessage, send, view, json, raw } from './OutgoingMessage';
 export { RequestHandler } from './RequestHandler';
 export { Session } from './Session';
 export { Verb, VerbLookup } from './Verb';
