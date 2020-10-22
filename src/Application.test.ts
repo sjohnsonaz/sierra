@@ -49,7 +49,7 @@ describe('Application', function () {
             const application0 = new Application();
             await application0.listen(port);
             const application1 = new Application();
-            expect(async () => {
+            await expect(async () => {
                 await application1.listen(port);
             }).rejects.toThrow();
             await application0.close();
@@ -59,7 +59,7 @@ describe('Application', function () {
     describe('close', function () {
         it('should throw NeverStartedError if never started', async function () {
             const application = new Application();
-            expect(async () => {
+            await expect(async () => {
                 await application.close();
             }).rejects.toThrow(new NeverStartedError());
         });
