@@ -8,10 +8,32 @@ import { Session } from './Session';
 import { CookieRegistry } from './Cookie';
 import { Verb } from './Verb';
 
+// interface QueryHash {
+//     [index: string]: string | string[];
+// }
+
+// interface ParamsHash {
+//     [index: string]: string;
+// }
+
+// type BodyValue =
+//     number |
+//     string |
+//     Array<BodyValue> |
+//     {
+//         [index: string]: BodyValue;
+//     };
+
+// interface RequestData {
+//     query: QueryHash;
+//     params: ParamsHash;
+//     body: BodyValue;
+// }
+
 /**
  * The Context object for the RequestHandler Pipeline
  */
-export class Context<T = any, U = any, V = any, X = any> {
+export class Context<QUERY = any, PARAMS = any, BODY = any, SESSION = any> {
     /** The IncomingMessage object */
     request: IncomingMessage;
 
@@ -19,13 +41,13 @@ export class Context<T = any, U = any, V = any, X = any> {
     response: ServerResponse;
 
     /** The Session object.  Holds session data */
-    session?: Session<X>;
+    session?: Session<SESSION>;
 
     /** The CookieRegistry object.  Holds Cookie data */
     cookies: CookieRegistry;
 
     /** Body data */
-    body?: V;
+    body?: BODY;
 
     /** HTTP Verb */
     method: Verb;
@@ -43,10 +65,10 @@ export class Context<T = any, U = any, V = any, X = any> {
     pathname: string;
 
     /** Query data */
-    query: T;
+    query: QUERY;
 
     /** URL Params data */
-    params: U;
+    params: PARAMS;
 
     /** View template */
     template: string;

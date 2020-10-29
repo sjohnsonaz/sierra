@@ -7,6 +7,31 @@ export class RouteMiddleware {
     routes: Route<any, any>[] = [];
     controllers: Controller[] = [];
     factories: Record<string, { (...args: any): any }> = {};
+    castValue: (argumentType: any, value: any) => any = (argumentType, value) => {
+        let output;
+        switch (argumentType) {
+            case String:
+                output = value ?? undefined;
+                break;
+            case Number:
+                output = parseFloat(value);
+                break;
+            case Boolean:
+                output = ((value ?? '').toString() as string).toLowerCase() === 'true'
+                break;
+            case Object:
+                output = value;
+            default:
+                const factory = this.getFactory(argumentType);
+                if (factory) {
+                    return factory(value);
+                } else {
+                    output = value;
+                }
+                break;
+        }
+        return output;
+    };
 
     handler = async (context: Context, value: any) => {
         let routes = this.routes.filter(route => {
@@ -37,30 +62,8 @@ export class RouteMiddleware {
                 return await route.method.apply(route, route.argumentNames.map((name, index) => {
                     let value = contextParams[name as keyof typeof contextParams] || context.params[name] || context.query[name] || context.body[name];
                     let argumentType = route.argumentTypes[index];
-                    if (argumentType) {
-                        let output;
-                        switch (argumentType) {
-                            case String:
-                                output = value ?? undefined;
-                                break;
-                            case Number:
-                                output = parseFloat(value);
-                                break;
-                            case Boolean:
-                                output = ((value ?? '').toString() as string).toLowerCase() === 'true'
-                                break;
-                            case Object:
-                                output = value;
-                            default:
-                                const factory = this.getFactory(argumentType);
-                                if (factory) {
-                                    return factory(value);
-                                } else {
-                                    output = value;
-                                }
-                                break;
-                        }
-                        return output;
+                    if (argumentType && this.castValue) {
+                        return this.castValue(argumentType, value);
                     } else {
                         return value;
                     }
@@ -141,13 +144,13 @@ export class RouteMiddleware {
 }
 
 function createParams(matches: string[], argumentNames: string[]) {
-    let params: Record<string, string> = {};
+    const params: Record<string, string> = {};
     if (matches) {
         argumentNames.forEach((name, index) => {
             params[name] = matches[index + 1];
         });
     }
-    return params;
+    return Object.freeze(params);
 }
 
 /**
