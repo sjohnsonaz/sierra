@@ -5,7 +5,7 @@ import { getQueryString, urlStringToObject } from '../utils/EncodeUtil';
 
 import { OutgoingMessage, OutputType } from './OutgoingMessage';
 import { Session } from './Session';
-import { CookieRegistry } from './Cookie';
+import { CookieRegistry } from './cookie';
 import { Verb } from './Verb';
 
 // interface QueryHash {

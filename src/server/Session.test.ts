@@ -2,7 +2,7 @@ import { createRequest } from '../utils/TestUtil';
 
 import { Session } from './Session';
 import { Context } from './Context';
-import { Cookie } from './Cookie';
+import { Cookie } from './cookie';
 import { NoSessionGatewayError } from './Errors';
 
 describe('Session', function () {

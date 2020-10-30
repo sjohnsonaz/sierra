@@ -1,7 +1,7 @@
 export { Context } from './Context';
 export * from './Errors';
 export { LogLevel } from './LogLevel';
-export { Cookie } from './Cookie';
+export { Cookie } from './cookie';
 export { IMethod } from './IMethod';
 export { ISessionGateway } from './ISessionGateway';
 export { IServerMiddleware } from './IServerMiddleware';
