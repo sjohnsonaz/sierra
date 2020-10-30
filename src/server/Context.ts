@@ -30,54 +30,42 @@ import { Verb } from './Verb';
 //     body: BodyValue;
 // }
 
+interface ContentType {
+    mediaType?: string;
+    charset?: string;
+    boundary?: string;
+}
+
 /**
  * The Context object for the RequestHandler Pipeline
  */
 export class Context<QUERY = any, PARAMS = any, BODY = any, SESSION = any> {
     /** The IncomingMessage object */
     request: IncomingMessage;
-
     /** The ServerResponse object */
     response: ServerResponse;
-
     /** The Session object.  Holds session data */
     session?: Session<SESSION>;
-
     /** The CookieRegistry object.  Holds Cookie data */
     cookies: CookieRegistry;
-
     /** Body data */
     body?: BODY;
-
     /** HTTP Verb */
     method: Verb;
-
     /** HTTP Content-Type header */
-    contentType?: string;
-
+    contentType: ContentType;
     /** HTTP Accept Header */
     accept?: string[];
-
     /** URL */
     url: string;
-
     /** URL pathname */
     pathname: string;
-
     /** Query data */
     query: QUERY;
-
     /** URL Params data */
     params: PARAMS;
-
     /** View template */
     template: string;
-
-    /** HTTP Content-Type charset */
-    charset?: string;
-
-    /** HTTP Content-Type boundary */
-    httpBoundary?: string;
 
     /**
      * The Context constructor
@@ -91,10 +79,7 @@ export class Context<QUERY = any, PARAMS = any, BODY = any, SESSION = any> {
         this.cookies = new CookieRegistry(request);
 
         // Content Type
-        const contentType = getContentType(request);
-        this.contentType = contentType.mediaType;
-        this.charset = contentType.charset;
-        this.httpBoundary = contentType.boundary;
+        this.contentType = getContentType(request);
 
         // Accept Type
         this.accept = getAccept(request);
@@ -126,11 +111,7 @@ export class Context<QUERY = any, PARAMS = any, BODY = any, SESSION = any> {
 
 export function getContentType(request: IncomingMessage) {
     const contentTypeHeader = request.headers['content-type'];
-    const contentType: {
-        mediaType?: string;
-        charset?: string;
-        boundary?: string;
-    } = {};
+    const contentType: ContentType = {};
     if (contentTypeHeader) {
         let parts = contentTypeHeader.split('; ');
         contentType.mediaType = parts[0].trim().toLowerCase();

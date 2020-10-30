@@ -19,7 +19,7 @@ describe('Context', function () {
             expect(context.request).toBe(request);
             expect(context.response).toBe(response);
             expect(context.method).toBe(request.method.toLowerCase());
-            expect(context.contentType).toBe('application/json');
+            expect(context.contentType.mediaType).toBe('application/json');
             expect(context.accept).toStrictEqual(['application/json']);
         });
 
@@ -30,7 +30,7 @@ describe('Context', function () {
                 },
             });
             const context = new Context(request, response);
-            expect(context.httpBoundary).toBe('something');
+            expect(context.contentType.boundary).toBe('something');
         });
 
         it('should ignore improper httpBoundary', function () {
@@ -40,7 +40,7 @@ describe('Context', function () {
                 },
             });
             const context = new Context(request, response);
-            expect(context.httpBoundary).toBe(undefined);
+            expect(context.contentType.boundary).toBe(undefined);
         });
     });
 

@@ -7,7 +7,7 @@ export class BodyMiddleware {
     static async handle(context: Context) {
         let verb = context.request.method.toLowerCase();
         if (verb === 'post' || verb === 'put') {
-            switch (context.contentType) {
+            switch (context.contentType.mediaType) {
                 case 'multipart/form-data':
                     return await BodyMiddleware.handleFormData(context);
                 case 'application/x-www-form-urlencoded':
@@ -117,7 +117,7 @@ export class BodyMiddleware {
     }
 
     static async handleFormData(context: Context) {
-        let bufferDecoder = new BufferDecoder(context.httpBoundary, () => { });
+        let bufferDecoder = new BufferDecoder(context.contentType.boundary, () => { });
         return new Promise<any>((resolve, reject) => {
             try {
                 context.request.on('error', (e) => {
