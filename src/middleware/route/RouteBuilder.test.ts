@@ -167,13 +167,13 @@ describe('middleware decorator', () => {
     });
 
     it('should run in order', async () => {
-        await request(application.createServer())
+        await request(application.server)
             .get('/test')
             .expect(200, { value: true });
     });
 
     it('should run all middlewares', async () => {
-        await request(application.createServer())
+        await request(application.server)
             .post('/test')
             .expect(200, {
                 a: 1,

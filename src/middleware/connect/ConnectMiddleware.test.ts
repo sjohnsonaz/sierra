@@ -25,7 +25,7 @@ describe('ConnectMiddleware', () => {
             next();
         }));
 
-        await request(application.createServer())
+        await request(application.server)
             .get('')
             .expect(200, JSON.stringify('returned'));
     });
@@ -36,7 +36,7 @@ describe('ConnectMiddleware', () => {
         }));
         jest.advanceTimersByTime(1000);
 
-        await request(application.createServer())
+        await request(application.server)
             .get('')
             .expect(500, JSON.stringify('errored'));
     });
@@ -51,7 +51,7 @@ describe('ConnectMiddleware', () => {
 
         });
 
-        await request(application.createServer())
+        await request(application.server)
             .get('')
             .expect(200, JSON.stringify('returned'));
     });
@@ -63,7 +63,7 @@ describe('ConnectMiddleware', () => {
             done();
         }));
 
-        await request(application.createServer())
+        await request(application.server)
             .get('')
             .expect(200, JSON.stringify('returned'));
     });

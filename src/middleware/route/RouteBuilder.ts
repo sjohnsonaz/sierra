@@ -7,6 +7,7 @@ import { IServerMiddleware, NoMethodError, Verb, VerbLookup } from '../../server
 import { Controller } from './Controller';
 import { Route } from './Route';
 import { RouteDefinition, RouteMethod } from './RouteDefinition';
+import { getVerb } from '../../server/Verb';
 
 export class RouteBuilder {
     routeDefinitions: Record<string, RouteDefinition<IServerMiddleware<any, any>>> = {};
@@ -92,7 +93,7 @@ export class RouteBuilder {
 
             // Get argument names, and bind method
             let method: IServerMiddleware<unknown, unknown> = controller[definitionName as keyof typeof controller] as any;
-            let argumentNames: string[] = undefined;
+            let argumentNames: string[];
             if (method) {
                 if (pipeArgs) {
                     argumentNames = getArgumentNames(method);
@@ -100,14 +101,9 @@ export class RouteBuilder {
                 method = method.bind(controller);
             }
 
-            // Ensure index is lower case
-            const nameLowerCase = definitionName.toLowerCase();
-
             // Do we have a verb already
             if (!verb) {
-                if (VerbLookup.indexOf(nameLowerCase as any) >= 0) {
-                    verb = nameLowerCase as any;
-                }
+                verb = getVerb(definitionName);
             }
 
             let regex: RegExp;
@@ -126,6 +122,8 @@ export class RouteBuilder {
                     // If we have no name, attempt to create one
                     if (!name) {
                         // If the method isn't equal to the verb or 'index', use method in route
+                        // Ensure index is lower case
+                        const nameLowerCase = definitionName.toLowerCase();
                         if (verb !== nameLowerCase && nameLowerCase !== 'index') {
                             nameParts.push(nameLowerCase);
                         }

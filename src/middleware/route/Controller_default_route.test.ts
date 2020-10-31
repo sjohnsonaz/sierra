@@ -27,7 +27,7 @@ describe('Default route', () => {
     });
 
     it('should use default route', async function () {
-        await request(application.createServer())
+        await request(application.server)
             .get('/')
             .expect(200);
     });

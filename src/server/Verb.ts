@@ -25,7 +25,7 @@ function createEnum<T>(value: Record<string, T>) {
 }
 
 export const VerbLookup = Object.freeze([
-    VerbType.All,
+    //VerbType.All,
     VerbType.Get,
     VerbType.Post,
     VerbType.Put,
@@ -34,3 +34,17 @@ export const VerbLookup = Object.freeze([
     VerbType.Options,
     VerbType.Head
 ]);
+
+export function getVerb(value?: string) {
+    if (value) {
+        value = value.toLowerCase();
+        const index = VerbLookup.indexOf(value as any);
+        if (index >= 0) {
+            return VerbLookup[index];
+        } else {
+            return VerbType.Get;
+        }
+    } else {
+        return VerbType.Get;
+    }
+}

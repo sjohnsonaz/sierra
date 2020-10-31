@@ -14,12 +14,6 @@ export class SierraError extends Error {
     }
 }
 
-export class NeverStartedError extends SierraError {
-    constructor() {
-        super(ErrorMessage.neverStarted);
-    }
-}
-
 export class NoMethodError extends SierraError {
     method: string;
     constructor(method: string) {

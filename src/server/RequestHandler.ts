@@ -15,8 +15,8 @@ const ERROR_TEMPLATE = 'error';
 
 export class RequestHandler {
     pipeline: Pipeline<Context, any, any> = new Pipeline();
-    error: IServerMiddleware<any, any>;
-    view: IViewMiddleware<any>;
+    error?: IServerMiddleware<any, any>;
+    view?: IViewMiddleware<any>;
     logging: LogLevel = LogLevel.errors;
     defaultTemplate = DEFAULT_TEMPLATE;
 

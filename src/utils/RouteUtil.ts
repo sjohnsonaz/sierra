@@ -21,7 +21,7 @@ export function getArgumentNames(func: Function) {
     // First match everything inside the function argument parens.
     const matches = func.toString()
         .match(/function\s.*?\(([^)]*)\)\s*{|\(([^)]*)\)\s*=>\s*{|[_$a-zA-Z][_$\w\d]*\(([^)]*)\)\s*{/);
-    const args = matches[1] || matches[2] || matches[3] || '';
+    const args = matches ? matches[1] || matches[2] || matches[3] || '' : '';
 
     // Split the arguments string into an array comma delimited.
     return args.split(',')

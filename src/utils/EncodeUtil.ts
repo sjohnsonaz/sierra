@@ -34,7 +34,7 @@ export function urlStringToObject(url: string): Record<string, string | string[]
                         data[name] = [];
                     }
                 } else {
-                    return;
+                    continue;
                 }
             }
             value = decodeURIComponent(value);

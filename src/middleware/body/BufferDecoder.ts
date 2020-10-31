@@ -7,7 +7,6 @@ export class BufferDecoder {
     //boundaryEnd: string;
     boundaryLength: number;
     bufferRemainder: Buffer;
-    bufferRemainderLength: number;
     fields: Field[] = [];
     currentField: Field;
     firstChunk: boolean = true;

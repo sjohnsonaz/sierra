@@ -1,6 +1,5 @@
 import { Application } from './Application';
 import { LogLevel } from './server/LogLevel';
-import { NeverStartedError } from './server/Errors';
 import { Controller } from './middleware/route/Controller';
 
 describe('Application', function () {
@@ -35,15 +34,6 @@ describe('Application', function () {
 
     // TODO: This may have port conflicts.
     describe('listen', function () {
-        it('should create server if it does not exist', async function () {
-            const port = 3456;
-            const application = new Application();
-            expect(application.server).toBeUndefined();
-            await application.listen(port);
-            await application.close();
-            expect(application.server).toBeDefined();
-        });
-
         it('should throw if port is in use', async function () {
             const port = 3456;
             const application0 = new Application();
@@ -57,13 +47,6 @@ describe('Application', function () {
     });
 
     describe('close', function () {
-        it('should throw NeverStartedError if never started', async function () {
-            const application = new Application();
-            await expect(async () => {
-                await application.close();
-            }).rejects.toThrow(new NeverStartedError());
-        });
-
         it('should throw an error if server is not listening', async function () {
             const port = 3456;
             const application = new Application();

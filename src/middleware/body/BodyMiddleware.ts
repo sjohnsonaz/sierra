@@ -5,7 +5,7 @@ import { BufferDecoder } from './BufferDecoder';
 
 export class BodyMiddleware {
     static async handle(context: Context) {
-        let verb = context.request.method.toLowerCase();
+        let verb = context.request.method?.toLowerCase();
         if (verb === 'post' || verb === 'put') {
             switch (context.contentType.mediaType) {
                 case 'multipart/form-data':
@@ -117,7 +117,12 @@ export class BodyMiddleware {
     }
 
     static async handleFormData(context: Context) {
-        let bufferDecoder = new BufferDecoder(context.contentType.boundary, () => { });
+        const { boundary } = context.contentType;
+        if (!boundary) {
+            // TODO: Create error class
+            throw 'No boundary';
+        }
+        let bufferDecoder = new BufferDecoder(boundary, () => { });
         return new Promise<any>((resolve, reject) => {
             try {
                 context.request.on('error', (e) => {

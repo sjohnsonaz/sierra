@@ -28,7 +28,7 @@ describe('RouteMiddleware', () => {
         });
 
         it('should return "no route found" if no route is found', async () => {
-            await request(application.createServer())
+            await request(application.server)
                 .get('/notfound')
                 .expect(404, JSON.stringify('no route found'));
         });
@@ -68,20 +68,20 @@ describe('RouteMiddleware', () => {
         });
 
         it('should use query params', async () => {
-            await request(application.createServer())
+            await request(application.server)
                 .get('/testQuery')
                 .query({ id: 1 })
                 .expect(200, { id: 1 });
         });
 
         it('should use route params', async () => {
-            await request(application.createServer())
+            await request(application.server)
                 .get(`/testParams/${2}`)
                 .expect(200, { id: 2 });
         });
 
         it('should use body params', async () => {
-            await request(application.createServer())
+            await request(application.server)
                 .post('/testBody')
                 .send({ id: 3 })
                 .expect(200, { id: 3 });
@@ -109,7 +109,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast boolean query params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .get('/testBoolean')
                     .query({
                         boolean: true
@@ -120,7 +120,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast empty boolean query params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .get('/testBoolean')
                     .query({})
                     .expect(200);
@@ -150,7 +150,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast number query params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .get('/testNumber')
                     .query({
                         number: 1
@@ -162,7 +162,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast empty number query params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .get('/testNumber')
                     .query({})
                     .expect(200);
@@ -193,7 +193,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast string query params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .get('/testString')
                     .query({
                         string: 'test'
@@ -205,7 +205,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast empty string query params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .get('/testString')
                     .query({})
                     .expect(200);
@@ -235,7 +235,7 @@ describe('RouteMiddleware', () => {
 
             // TODO: Cannot cast Array items
             it('should cast query params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .get('/testArray')
                     .query({
                         'array': [1, 2, 3]
@@ -245,7 +245,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast empty query params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .get('/testArray')
                     .query({})
                     .expect(200);
@@ -276,7 +276,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast route params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .get(`/testBoolean/true`)
                     .expect(200);
                 expect(body.boolean).toBe(true);
@@ -284,7 +284,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast empty route params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .get(`/testBoolean//`)
                     .expect(200);
                 expect(body.boolean).toBe(false);
@@ -314,7 +314,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast route params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .get(`/testNumber/1`)
                     .expect(200);
                 expect(body.number).toBe(1);
@@ -323,7 +323,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast empty route params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .get(`/testNumber//`)
                     .expect(200);
                 expect(body.number).toBe(null);
@@ -354,7 +354,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast route params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .get(`/testString/test`)
                     .expect(200);
                 expect(body.string).toBe('test');
@@ -363,7 +363,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast empty route params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .get(`/testString//`)
                     .expect(200);
                 expect(body.string).toBe(undefined);
@@ -394,7 +394,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast body params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .post(`/testBoolean`)
                     .send({
                         boolean: true
@@ -405,7 +405,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast empty body params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .post(`/testBoolean`)
                     .expect(200);
                 expect(body.boolean).toBe(false);
@@ -434,7 +434,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast body params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .post(`/testNumber`)
                     .send({
                         number: 1
@@ -446,7 +446,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast empty body params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .post(`/testNumber`)
                     .expect(200);
                 expect(body.number).toBe(null);
@@ -476,7 +476,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast body params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .post(`/testString`)
                     .send({
                         string: 'test'
@@ -488,7 +488,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast empty body params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .post(`/testString`)
                     .expect(200);
                 expect(body.string).toBe(undefined);
@@ -516,7 +516,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast body params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .post(`/testArray`)
                     .send({
                         array: [1, 2, 3]
@@ -526,7 +526,7 @@ describe('RouteMiddleware', () => {
             });
 
             it('should cast empty body params', async () => {
-                const { body } = await request(application.createServer())
+                const { body } = await request(application.server)
                     .post(`/testArray`)
                     .expect(200);
                 expect(body.array).toBeUndefined();
@@ -616,7 +616,7 @@ describe('RouteMiddleware', () => {
         });
 
         it('should cast body Object params', async () => {
-            const { body } = await request(application.createServer())
+            const { body } = await request(application.server)
                 .post(`/testBodyObject`)
                 .send({
                     boolean: true,
@@ -635,7 +635,7 @@ describe('RouteMiddleware', () => {
         });
 
         it('should cast empty body Object params', async () => {
-            const { body } = await request(application.createServer())
+            const { body } = await request(application.server)
                 .post(`/testBodyObject`)
                 .expect(200);
             expect(body.boolean).toBe(undefined);
@@ -649,7 +649,7 @@ describe('RouteMiddleware', () => {
         });
 
         it('should not cast anonymous body Object params', async () => {
-            const { body } = await request(application.createServer())
+            const { body } = await request(application.server)
                 .post(`/testObject`)
                 .send({
                     boolean: true,
@@ -668,7 +668,7 @@ describe('RouteMiddleware', () => {
         });
 
         it('should not cast empty anonymous body Object params', async () => {
-            const { body } = await request(application.createServer())
+            const { body } = await request(application.server)
                 .post(`/testObject`)
                 .expect(200);
             expect(body.boolean).toBe(undefined);
@@ -682,7 +682,7 @@ describe('RouteMiddleware', () => {
         });
 
         it('should not cast unknown body Object params', async () => {
-            const { body } = await request(application.createServer())
+            const { body } = await request(application.server)
                 .post(`/testAny`)
                 .send({
                     boolean: true,
@@ -701,7 +701,7 @@ describe('RouteMiddleware', () => {
         });
 
         it('should not cast empty unknown body Object params', async () => {
-            const { body } = await request(application.createServer())
+            const { body } = await request(application.server)
                 .post(`/testAny`)
                 .expect(200);
             expect(body.boolean).toBe(undefined);

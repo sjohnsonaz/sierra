@@ -44,18 +44,10 @@ export class Context<QUERY = any, PARAMS = any, BODY = any, SESSION = any> {
     request: IncomingMessage;
     /** The ServerResponse object */
     response: ServerResponse;
-    /** The Session object.  Holds session data */
-    session?: Session<SESSION>;
-    /** The CookieRegistry object.  Holds Cookie data */
-    cookies: CookieRegistry;
-    /** Body data */
-    body?: BODY;
+
     /** HTTP Verb */
-    method: Verb;
-    /** HTTP Content-Type header */
-    contentType: ContentType;
-    /** HTTP Accept Header */
-    accept?: string[];
+    method?: Verb;
+
     /** URL */
     url: string;
     /** URL pathname */
@@ -63,9 +55,22 @@ export class Context<QUERY = any, PARAMS = any, BODY = any, SESSION = any> {
     /** Query data */
     query: QUERY;
     /** URL Params data */
-    params: PARAMS;
+    params?: PARAMS;
+
+    /** HTTP Content-Type header */
+    contentType: ContentType;
+    /** HTTP Accept Header */
+    accept?: string[];
+    /** The CookieRegistry object.  Holds Cookie data */
+    cookies: CookieRegistry;
+
+    /** The Session object.  Holds session data */
+    session?: Session<SESSION>;
+    /** Body data */
+    body?: BODY;
+
     /** View template */
-    template: string;
+    template?: string;
 
     /**
      * The Context constructor
@@ -75,7 +80,8 @@ export class Context<QUERY = any, PARAMS = any, BODY = any, SESSION = any> {
     constructor(request: IncomingMessage, response: ServerResponse) {
         this.request = request;
         this.response = response;
-        this.method = request.method.toLowerCase() as any;
+        // TODO: Fix this any
+        this.method = request.method?.toLowerCase() as any;
         this.cookies = new CookieRegistry(request);
 
         // Content Type

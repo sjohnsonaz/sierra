@@ -5,8 +5,7 @@ import {
     IServerMiddleware,
     IViewMiddleware,
     RequestHandler,
-    LogLevel,
-    NeverStartedError
+    LogLevel
 } from './server';
 import {
     Controller,
@@ -24,7 +23,7 @@ export class Application {
     routeMiddleware: RouteMiddleware = new RouteMiddleware();
 
     /** The Server object */
-    server: Server;
+    server: Server = createServer(this.requestHandler.callback);
 
     /** The logging level */
     get logging() {
@@ -91,14 +90,6 @@ export class Application {
     }
 
     /**
-     * Creates the `http.Server`.
-     */
-    createServer() {
-        return createServer(this.requestHandler.callback);
-    }
-
-
-    /**
      * Opens the `http.Server` to listen on the specified Port.
      * @param port - the Port to open
      * @param hostname - the Hostname
@@ -135,9 +126,6 @@ export class Application {
     listen(handle: any, backlog?: number, listeningListener?: () => void): Promise<Server>;
     listen(handle: any, listeningListener?: () => void): Promise<Server>;
     listen(a: any, b?: any, c?: any, d?: any): Promise<Server> {
-        if (!this.server) {
-            this.server = this.createServer();
-        }
         return new Promise((resolve, reject) => {
             const startup = () => {
                 this.server.on('error', onError);
@@ -165,17 +153,13 @@ export class Application {
      */
     close(): Promise<void> {
         return new Promise((resolve, reject) => {
-            if (!this.server) {
-                reject(new NeverStartedError());
-            } else {
-                this.server.close(error => {
-                    if (error) {
-                        reject(error);
-                    } else {
-                        resolve();
-                    }
-                });
-            }
+            this.server.close(error => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve();
+                }
+            });
         });
     }
 

@@ -1,13 +1,6 @@
-import { ErrorMessage, NeverStartedError, NoMethodError, NoRouteFoundError, NoSessionGatewayError, NotFoundError, NoViewMiddlwareError, NoViewTemplateError } from './Errors';
+import { ErrorMessage, NoMethodError, NoRouteFoundError, NoSessionGatewayError, NotFoundError, NoViewMiddlwareError, NoViewTemplateError } from './Errors';
 
 describe('Errors', function () {
-    describe('NeverStartedError', function () {
-        it('should use an ErrorMessage', function () {
-            const error = new NeverStartedError();
-            expect(error.message).toBe(ErrorMessage.neverStarted);
-        });
-    });
-
     describe('NoMethodError', function () {
         it('should use an ErrorMessage', function () {
             const error = new NoMethodError('method');
@@ -20,13 +13,6 @@ describe('Errors', function () {
         it('should use an ErrorMessage', function () {
             const error = new NoRouteFoundError();
             expect(error.message).toBe(ErrorMessage.noRouteFound);
-        });
-    });
-
-    describe('NeverStartedError', function () {
-        it('should use an ErrorMessage', function () {
-            const error = new NeverStartedError();
-            expect(error.message).toBe(ErrorMessage.neverStarted);
         });
     });
 
