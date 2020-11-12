@@ -1,4 +1,4 @@
-import { IMethod, IServerMiddleware, Verb } from '../../server';
+import { IMethod, IServerMiddleware, Verb, VerbType } from '../../server';
 import { Controller } from './Controller';
 import { RouteBuilder } from './RouteBuilder';
 
@@ -7,15 +7,16 @@ import { RouteBuilder } from './RouteBuilder';
  * @param verb 
  * @param name 
  */
-export function route<U extends IServerMiddleware<any, any>>(verb?: Verb | Verb[], name?: string | RegExp, pipeArgs: boolean = false) {
+export function route<U extends IServerMiddleware<any, any>>(verb: Verb | Verb[] = VerbType.Get, name?: string | RegExp, pipeArgs: boolean = false) {
     return function (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<U>) {
         const routeBuilder = RouteBuilder.getRouteBuilder(target);
         if (verb instanceof Array) {
             verb.forEach(verb => {
-                routeBuilder.addDefinition(propertyKey, verb, name, pipeArgs);
+                // TODO: Change to propertyKey
+                routeBuilder.addDefinition(propertyKey, verb, name as any, pipeArgs);
             });
         } else {
-            routeBuilder.addDefinition(propertyKey, verb, name, pipeArgs);
+            routeBuilder.addDefinition(propertyKey, verb, name as any, pipeArgs);
         }
     }
 }
@@ -25,15 +26,16 @@ export function route<U extends IServerMiddleware<any, any>>(verb?: Verb | Verb[
  * @param verb 
  * @param name 
  */
-export function method<U extends IMethod<any>>(verb?: Verb | Verb[], name?: string | RegExp) {
+export function method<U extends IMethod<any>>(verb: Verb | Verb[] = VerbType.Get, name?: string | RegExp) {
     return function (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<U>) {
         const routeBuilder = RouteBuilder.getRouteBuilder(target);
         if (verb instanceof Array) {
             verb.forEach(verb => {
-                routeBuilder.addDefinition(propertyKey, verb, name, true);
+                // TODO: Change to propertyKey
+                routeBuilder.addDefinition(propertyKey, verb, name as any, true);
             });
         } else {
-            routeBuilder.addDefinition(propertyKey, verb, name, true);
+            routeBuilder.addDefinition(propertyKey, verb, name as any, true);
         }
     }
 }
@@ -43,7 +45,7 @@ export function method<U extends IMethod<any>>(verb?: Verb | Verb[], name?: stri
  * @param verb 
  * @param name 
  */
-export function middleware<T extends IServerMiddleware<any, any>, U extends IServerMiddleware<any, any> | IMethod<any>>(middleware: T) {
+export function middleware<T extends IServerMiddleware<any, any>, U extends IMethod<any> | IMethod<any>>(middleware: T) {
     return function (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<U>) {
         const routeBuilder = RouteBuilder.getRouteBuilder(target);
         // Decorators are applied in reverse order, so we must add to the beginning of the Array.

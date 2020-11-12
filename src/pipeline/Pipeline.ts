@@ -21,7 +21,7 @@ export function exit() {
 export class Pipeline<T extends IPipelineContext, U, V> {
     middlewares: IMiddleware<T, any, any>[] = [];
 
-    async run(context?: T, value?: U) {
+    async run(context: T, value?: U) {
         let result: V = value as any;
         for (let index = 0, length = this.middlewares.length; index < length; index++) {
             result = await this.middlewares[index](context, result);

@@ -11,12 +11,14 @@ export class CookieRegistry {
 
     constructor(request: IncomingMessage) {
         const cookieHeader = request.headers[COOKIE];
-        const hash = CookieRegistry.stringToHash(cookieHeader);
-        Object.keys(hash).forEach(name => {
-            const value = hash[name];
-            this.incoming[name] = new Cookie(name, value);
-            this.outgoing[name] = new Cookie(name, value);
-        });
+        if (cookieHeader) {
+            const hash = CookieRegistry.stringToHash(cookieHeader);
+            Object.keys(hash).forEach(name => {
+                const value = hash[name];
+                this.incoming[name] = new Cookie(name, value);
+                this.outgoing[name] = new Cookie(name, value);
+            });
+        }
     }
 
     addCookie(
@@ -24,7 +26,7 @@ export class CookieRegistry {
         value: string,
         options?: CookieOptions): Cookie;
     addCookie(cookie: Cookie): Cookie;
-    addCookie(a: Cookie | string, value?: string, options?: CookieOptions): Cookie {
+    addCookie(a: Cookie | string, value: string = '', options?: CookieOptions): Cookie {
         if (a instanceof Cookie) {
             this.outgoing[a.name] = a;
             return a;

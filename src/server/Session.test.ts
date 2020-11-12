@@ -31,7 +31,7 @@ describe('Session', function () {
         it('should throw NoSessionGatewayError if gateway is undefined', async function () {
             const [request, response] = createRequest();
             const context = new Context(request, response);
-            const session = new Session(context, undefined);
+            const session = new Session(context, undefined as any);
             await expect(async () => {
                 await session.save();
             }).rejects.toThrow(new NoSessionGatewayError());
@@ -56,7 +56,7 @@ describe('Session', function () {
         it('should throw NoSessionGatewayError if gateway is undefined', async function () {
             const [request, response] = createRequest();
             const context = new Context(request, response);
-            const session = new Session(context, undefined);
+            const session = new Session(context, undefined as any);
             await expect(async () => {
                 await session.init();
             }).rejects.toThrow(new NoSessionGatewayError());
@@ -99,7 +99,7 @@ describe('Session', function () {
         it('should throw NoSessionGatewayError if gateway is undefined', async function () {
             const [request, response] = createRequest();
             const context = new Context(request, response);
-            const session = new Session(context, undefined);
+            const session = new Session(context, undefined as any);
             await expect(async () => {
                 await session.destroy();
             }).rejects.toThrow(new NoSessionGatewayError());
@@ -117,6 +117,7 @@ describe('Session', function () {
                 destroy: jest.fn(async () => true)
             };
             const session = new Session(context, gateway);
+            session.id = 'id';
             await session.destroy();
             expect(gateway.destroy.mock.calls.length).toBe(1);
         });
@@ -126,7 +127,7 @@ describe('Session', function () {
         it('should throw NoSessionGatewayError if gateway is undefined', async function () {
             const [request, response] = createRequest();
             const context = new Context(request, response);
-            const session = new Session(context, undefined);
+            const session = new Session(context, undefined as any);
             await expect(async () => {
                 await session.regenerate();
             }).rejects.toThrow(new NoSessionGatewayError());
@@ -136,12 +137,13 @@ describe('Session', function () {
             const [request, response] = createRequest();
             const context = new Context(request, response);
             const gateway = {
-                getId: jest.fn(async () => ''),
+                getId: jest.fn(async () => 'id'),
                 load: jest.fn(async () => ''),
                 save: async () => true,
                 destroy: jest.fn(async () => true)
             };
             const session = new Session(context, gateway);
+            session.id = 'id';
             await session.regenerate();
             expect(gateway.getId.mock.calls.length).toBe(1);
             expect(gateway.load.mock.calls.length).toBe(1);
@@ -164,7 +166,7 @@ describe('Session', function () {
             };
             const session = new Session(context, gateway);
             const updatedCookie = session.touch();
-            expect(updatedCookie.maxAge).toBeUndefined();
+            expect(updatedCookie?.maxAge).toBeUndefined();
         });
     })
 

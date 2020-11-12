@@ -7,9 +7,9 @@ import { Context } from '../../server';
 export function ConnectMiddleware<T extends Context, U>(
     handleFunction: (
         request: http.IncomingMessage,
-        response?: http.ServerResponse,
-        next?: (err?: any) => any,
-        done?: () => any
+        response: http.ServerResponse,
+        next: (err?: any) => any,
+        done: () => any
     ) => any,
     timeout = 1000
 ): IMiddleware<T, U, U> {

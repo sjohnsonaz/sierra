@@ -75,7 +75,7 @@ describe('RouteBuilder', function () {
     describe('getRouteBuilder', function () {
         it('should create a RouteBuilder on target', function () {
             class Target {
-                _routeBuilder: RouteBuilder
+                _routeBuilder?: RouteBuilder
             }
 
             const target = new Target();
@@ -133,7 +133,7 @@ describe('RouteBuilder', function () {
 
 // TODO: Move these to decorator tests
 describe('middleware decorator', () => {
-    let application: Application = undefined;
+    let application: Application | undefined = undefined;
 
     beforeAll(async () => {
         class TestController extends Controller {
@@ -167,13 +167,13 @@ describe('middleware decorator', () => {
     });
 
     it('should run in order', async () => {
-        await request(application.server)
+        await request(application?.server)
             .get('/test')
             .expect(200, { value: true });
     });
 
     it('should run all middlewares', async () => {
-        await request(application.server)
+        await request(application?.server)
             .post('/test')
             .expect(200, {
                 a: 1,

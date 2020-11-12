@@ -9,7 +9,7 @@ export type Verb =
     'options' |
     'head';
 
-const VerbType = createEnum<Verb>({
+export const VerbType = createEnum<Verb>({
     All: 'all',
     Get: 'get',
     Post: 'post',
@@ -24,7 +24,7 @@ function createEnum<T>(value: Record<string, T>) {
     return Object.freeze(value);
 }
 
-export const VerbLookup = Object.freeze([
+const VerbLookup = Object.freeze([
     //VerbType.All,
     VerbType.Get,
     VerbType.Post,

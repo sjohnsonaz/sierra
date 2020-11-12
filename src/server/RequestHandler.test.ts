@@ -23,10 +23,10 @@ describe('RequestHandler', function () {
             handler.use(async () => {
                 return 'a';
             });
-            handler.use(async (_context, value: string) => {
+            handler.use(async (_context, value?: string) => {
                 return value + 'b';
             });
-            handler.use(async (_context, value: string) => {
+            handler.use(async (_context, value?: string) => {
                 return value + 'c';
             });
             await request(server)
@@ -199,7 +199,7 @@ describe('RequestHandler', function () {
         describe('OutgoingMessage type: default', function () {
             it('should send raw', async function () {
                 handler.use(async () => {
-                    return new OutgoingMessage({ value: true }, 200, null);
+                    return new OutgoingMessage({ value: true }, 200, null as any);
                 });
 
                 await request(server)

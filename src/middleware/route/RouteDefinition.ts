@@ -2,11 +2,11 @@ import { IServerMiddleware, Verb } from '../../server';
 
 export class RouteMethod {
     verb: Verb;
-    name: string | RegExp;
+    name?: string | RegExp;
     pipeArgs: boolean;
     override: boolean;
 
-    constructor(verb: Verb, name: string | RegExp, pipeArgs: boolean, override: boolean) {
+    constructor(verb: Verb, name?: string | RegExp, pipeArgs: boolean = false, override: boolean = false) {
         this.verb = verb;
         this.name = name;
         this.pipeArgs = pipeArgs;
@@ -15,6 +15,10 @@ export class RouteMethod {
 }
 
 export class RouteDefinition<U extends IServerMiddleware<any, any>> {
-    method: RouteMethod;
+    method?: RouteMethod;
     middleware: U[] = [];
+
+    constructor(method?: RouteMethod) {
+        this.method = method;
+    }
 }

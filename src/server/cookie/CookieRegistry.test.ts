@@ -116,7 +116,9 @@ describe('CookieRegistry', function () {
             const cookieRegistry = new CookieRegistry(request);
 
             const nameCookie = cookieRegistry.getCookie('name');
-            nameCookie.value = 'value';
+            if (nameCookie) {
+                nameCookie.value = 'value';
+            }
             cookieRegistry.setCookies(response);
 
             const setCookie = response.getHeader('set-cookie') as string[];
@@ -130,12 +132,14 @@ describe('CookieRegistry', function () {
             const cookieRegistry = new CookieRegistry(request);
 
             const nameCookie = cookieRegistry.getCookie('name');
-            nameCookie.value = 'new value';
+            if (nameCookie) {
+                nameCookie.value = 'new value';
+            }
             cookieRegistry.setCookies(response);
 
             const setCookie = response.getHeader('set-cookie') as string[];
             expect(setCookie.length).toBe(1);
-            expect(setCookie[0]).toBe(nameCookie.toString());
+            expect(setCookie[0]).toBe(nameCookie?.toString());
         });
 
         it('should create Cookies', function () {

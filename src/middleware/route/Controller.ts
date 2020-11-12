@@ -4,16 +4,16 @@ import { RouteBuilder } from './RouteBuilder';
 import { Route } from './Route';
 
 export class Controller {
-    _base: string;
-    _routeBuilder: RouteBuilder;
+    _base?: string;
+    _routeBuilder?: RouteBuilder;
 
     constructor(base?: string) {
         this._base = base;
     }
 
     static build(controller: Controller): Route<any, any>[] {
-        let routeHash = controller._routeBuilder.build(controller);
-        return Object.values(routeHash);
+        let routeHash = controller._routeBuilder?.build(controller);
+        return Object.values(routeHash || {});
     }
 
     static getName(controller: Controller) {

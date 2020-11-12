@@ -7,8 +7,8 @@ export class OutgoingMessage<T> extends PipelineExit {
     data: T;
     status: number;
     type: OutputType;
-    template: string;
-    contentType: string;
+    template?: string;
+    contentType?: string;
 
     constructor(data: T, status: number = 200, type: OutputType = 'auto', template?: string, contentType?: string) {
         super();

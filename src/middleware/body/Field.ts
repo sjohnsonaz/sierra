@@ -4,14 +4,14 @@ import { IFileHandler } from './IFileHandler';
 import { IFileField } from './IFileField';
 
 export class Field {
-    header: FormDataHeader;
-    name: string;
-    fileName: string;
-    fileType: string;
+    header?: FormDataHeader;
+    name?: string;
+    fileName?: string;
+    fileType?: string;
     fileStream: Duplex;
     data: (string | Buffer)[] = [];
     firstLine: boolean = false;
-    stashedBuffer: Buffer;
+    stashedBuffer?: Buffer;
     fileHandler: IFileHandler;
 
     constructor(fileHandler: IFileHandler) {

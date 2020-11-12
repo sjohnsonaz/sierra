@@ -2,7 +2,7 @@ import * as path from 'path';
 import 'reflect-metadata';
 
 import { getArgumentNames, stringToRegex } from '../../utils/RouteUtil';
-import { IServerMiddleware, NoMethodError, Verb, VerbLookup } from '../../server';
+import { IServerMiddleware, NoMethodError, Verb } from '../../server';
 
 import { Controller } from './Controller';
 import { Route } from './Route';
@@ -11,7 +11,7 @@ import { getVerb } from '../../server/Verb';
 
 export class RouteBuilder {
     routeDefinitions: Record<string, RouteDefinition<IServerMiddleware<any, any>>> = {};
-    parent: RouteBuilder;
+    parent?: RouteBuilder;
 
     constructor(parent?: RouteBuilder) {
         this.parent = parent;
@@ -93,7 +93,7 @@ export class RouteBuilder {
 
             // Get argument names, and bind method
             let method: IServerMiddleware<unknown, unknown> = controller[definitionName as keyof typeof controller] as any;
-            let argumentNames: string[];
+            let argumentNames: string[] | undefined = undefined;
             if (method) {
                 if (pipeArgs) {
                     argumentNames = getArgumentNames(method);
@@ -152,7 +152,7 @@ export class RouteBuilder {
         });
     }
 
-    static getRouteBuilder(target: { _routeBuilder: RouteBuilder }) {
+    static getRouteBuilder(target: { _routeBuilder?: RouteBuilder }) {
         if (target._routeBuilder) {
             if (!target.hasOwnProperty('_routeBuilder')) {
                 target._routeBuilder = new RouteBuilder(target._routeBuilder);

@@ -69,7 +69,7 @@ export class RequestHandler {
         context.response.end();
     }
 
-    sendRaw<T>(context: Context, data: T, status: number = 200, contentType: string) {
+    sendRaw<T>(context: Context, data: T, status: number = 200, contentType?: string) {
         this.log(context, data, status);
         context.response.statusCode = status;
         if (typeof data === 'string') {
@@ -85,7 +85,7 @@ export class RequestHandler {
         context.response.end();
     }
 
-    async sendView<T>(context: Context, data: T, status: number = 200, template: string) {
+    async sendView<T>(context: Context, data: T, status: number = 200, template?: string) {
         try {
             if (!this.view) {
                 throw new NoViewMiddlwareError();
@@ -118,9 +118,9 @@ export class RequestHandler {
         let accept = context.accept;
         switch (type) {
             case 'auto':
-                if (this.view && accept.indexOf('text/html') > -1) {
+                if (this.view && accept && accept.indexOf('text/html') > -1) {
                     this.sendView(context, data, status, template);
-                } else if (accept.indexOf('application/json')) {
+                } else if (accept && accept.indexOf('application/json')) {
                     this.sendJson(context, data, status);
                 } else {
                     this.sendRaw(context, data, status, contentType);

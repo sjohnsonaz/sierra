@@ -40,7 +40,8 @@ export class RouteMiddleware {
         if (routes.length) {
             let route = routes[0];
             context.template = route.template;
-            context.params = createParams(context.pathname.match(route.regex), route.argumentNames);
+            const match = context.pathname.match(route.regex);
+            context.params = match ? createParams(match, route.argumentNames) : {};
             context.body = context.body || {};
             let result = value;
             for (let index = 0, length = route.middlewares.length; index < length; index++) {
@@ -67,7 +68,8 @@ export class RouteMiddleware {
                     } else {
                         return value;
                     }
-                }));
+                    // TODO: Fix this any
+                }) as any);
             } else {
                 return await route.method(context, result);
             }
@@ -127,7 +129,8 @@ export class RouteMiddleware {
         this.routes = regexRoutes.concat(stringRoutes);
     }
 
-    addFactory<T>(constructor: { new(...args: any): T }, factory: (args: Record<string, any>) => T) {
+    // TODO: Match args type
+    addFactory<T, U>(constructor: { new(...args: any): T }, factory: (...args: any) => T) {
         const name = constructor.name;
         this.factories[name] = factory;
     }
@@ -137,7 +140,8 @@ export class RouteMiddleware {
         delete this.factories[name];
     }
 
-    getFactory<T>(constructor: { new(...args: any): T }): (args: Record<string, any>) => T {
+    // TODO: Match args type
+    getFactory<T>(constructor: { new(...args: any): T }): (...args: any) => T {
         const name = constructor.name;
         return this.factories[name];
     }

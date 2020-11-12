@@ -1,3 +1,4 @@
+import { Context } from '../../server';
 import { Controller } from './Controller';
 import { method, middleware, route } from './Decorators';
 
@@ -5,47 +6,48 @@ describe('Decorators', function () {
     describe('route', function () {
         it('should generate get routes', async function () {
             class TestController extends Controller {
-                @route('get')
-                async get() {
+                @
+                    route('get')
+                async get(_context: Context) {
                     return { value: true };
                 }
             }
 
             const testController = new TestController()
-            const definitions = testController._routeBuilder.getRouteDefinitions();
-            const { get } = definitions;
+            const definitions = testController._routeBuilder?.getRouteDefinitions();
+            const get = definitions?.get;
             expect(get).toBeDefined();
-            expect(get.method.verb).toBe('get');
+            expect(get?.method?.verb).toBe('get');
         });
 
         it.skip('should generate routes for multiple verbs', async function () {
             class TestController extends Controller {
                 @route(['get', 'post'])
-                async get() {
+                async get(_context: Context) {
                     return { value: true };
                 }
             }
 
             const testController = new TestController()
-            const definitions = testController._routeBuilder.getRouteDefinitions();
-            const { get } = definitions;
+            const definitions = testController._routeBuilder?.getRouteDefinitions();
+            const get = definitions?.get;
             expect(get).toBeDefined();
-            expect(get.method.verb).toBe('get');
+            expect(get?.method?.verb).toBe('get');
         });
 
         it.skip('should generate routes for all verbs', async function () {
             class TestController extends Controller {
                 @route('all')
-                async get() {
+                async get(_context: Context) {
                     return { value: true };
                 }
             }
 
             const testController = new TestController()
-            const definitions = testController._routeBuilder.getRouteDefinitions();
-            const { get } = definitions;
+            const definitions = testController._routeBuilder?.getRouteDefinitions();
+            const get = definitions?.get;
             expect(get).toBeDefined();
-            expect(get.method.verb).toBe('get');
+            expect(get?.method?.verb).toBe('get');
         });
     });
 
@@ -59,10 +61,10 @@ describe('Decorators', function () {
             }
 
             const testController = new TestController()
-            const definitions = testController._routeBuilder.getRouteDefinitions();
-            const { get } = definitions;
+            const definitions = testController._routeBuilder?.getRouteDefinitions();
+            const get = definitions?.get;
             expect(get).toBeDefined();
-            expect(get.method.verb).toBe('get');
+            expect(get?.method?.verb).toBe('get');
         });
 
         it.skip('should generate routes for multiple verbs', async function () {
@@ -74,10 +76,10 @@ describe('Decorators', function () {
             }
 
             const testController = new TestController()
-            const definitions = testController._routeBuilder.getRouteDefinitions();
-            const { get } = definitions;
+            const definitions = testController._routeBuilder?.getRouteDefinitions();
+            const get = definitions?.get;
             expect(get).toBeDefined();
-            expect(get.method.verb).toBe('get');
+            expect(get?.method?.verb).toBe('get');
         });
 
         it.skip('should generate routes for all verbs', async function () {
@@ -89,10 +91,10 @@ describe('Decorators', function () {
             }
 
             const testController = new TestController()
-            const definitions = testController._routeBuilder.getRouteDefinitions();
-            const { get } = definitions;
+            const definitions = testController._routeBuilder?.getRouteDefinitions();
+            const get = definitions?.get;
             expect(get).toBeDefined();
-            expect(get.method.verb).toBe('get');
+            expect(get?.method?.verb).toBe('get');
         });
     });
 
@@ -106,11 +108,11 @@ describe('Decorators', function () {
                 }
             }
             const testController = new TestController()
-            const definitions = testController._routeBuilder.getRouteDefinitions();
-            const { get } = definitions;
+            const definitions = testController._routeBuilder?.getRouteDefinitions();
+            const get = definitions?.get;
             expect(get).toBeDefined();
-            expect(get.middleware.length).toBe(1);
-            expect(get.middleware[0].name).toBe('middlewareA');
+            expect(get?.middleware.length).toBe(1);
+            expect(get?.middleware[0].name).toBe('middlewareA');
         });
 
         it('should add functions in order', function () {
@@ -123,12 +125,12 @@ describe('Decorators', function () {
                 }
             }
             const testController = new TestController()
-            const definitions = testController._routeBuilder.getRouteDefinitions();
-            const { get } = definitions;
+            const definitions = testController._routeBuilder?.getRouteDefinitions();
+            const get = definitions?.get;
             expect(get).toBeDefined();
-            expect(get.middleware.length).toBe(2);
-            expect(get.middleware[0].name).toBe('middlewareA');
-            expect(get.middleware[1].name).toBe('middlewareB');
+            expect(get?.middleware.length).toBe(2);
+            expect(get?.middleware[0].name).toBe('middlewareA');
+            expect(get?.middleware[1].name).toBe('middlewareB');
         });
     });
 });

@@ -12,11 +12,11 @@ const SIERRA_ID = 'sierra_id';
 
 export class Session<T> {
     context: Context;
-    id: string;
+    id?: string;
     gateway: ISessionGateway<T>;
-    data: T;
-    expires: Date;
-    maxAge: number;
+    data?: T;
+    expires?: Date;
+    maxAge?: number;
     cookieIdentifier: string;
 
     constructor(context: Context, gateway: ISessionGateway<T>, cookieIdentifier: string = SIERRA_ID) {
@@ -29,7 +29,11 @@ export class Session<T> {
         if (!this.gateway) {
             throw new NoSessionGatewayError();
         }
-        return await this.gateway.save(this.context, this.id, this.data);
+        if (!this.id) {
+            await this.init();
+        }
+        // TODO: Verify this any
+        return await this.gateway.save(this.context, this.id as any, this.data || {} as any);
     }
 
     async init(maxAge: number = 60) {
@@ -65,7 +69,11 @@ export class Session<T> {
 
         const id = this.id;
         this.id = undefined;
-        return await this.gateway.destroy(this.context, id);
+        if (id) {
+            return await this.gateway.destroy(this.context, id);
+        } else {
+            return true;
+        }
     }
 
     async regenerate(maxAge = 60) {

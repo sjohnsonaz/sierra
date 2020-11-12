@@ -8,7 +8,7 @@ export class BufferDecoder {
     boundaryLength: number;
     bufferRemainder: Buffer;
     fields: Field[] = [];
-    currentField: Field;
+    currentField?: Field;
     firstChunk: boolean = true;
     fileHandler: IFileHandler;
 
@@ -37,7 +37,7 @@ export class BufferDecoder {
             }
         } else {
             // We do have boundaries
-            let previousBoundary: Boundary = undefined;
+            let previousBoundary: Boundary | undefined = undefined;
             for (let index = 0, length = boundaries.length - 1; index <= length; index++) {
                 let boundary = boundaries[index];
 

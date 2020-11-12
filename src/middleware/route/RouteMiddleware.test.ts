@@ -596,7 +596,7 @@ describe('RouteMiddleware', () => {
                 }
 
                 @method('post')
-                async testAny($body: never) {
+                async testAny($body: any) {
                     const { boolean, number, string } = $body;
                     return {
                         boolean,
@@ -827,7 +827,7 @@ describe('RouteMiddleware', () => {
             ];
 
             routes.map(route => {
-                return new Route('get', route, undefined, undefined, undefined, undefined, undefined, undefined);
+                return new Route('get', route, undefined as any, undefined as any, undefined as any, undefined as any, undefined as any, undefined as any);
             }).sort(sortRoutes);
 
             expect(true).toBe(true);

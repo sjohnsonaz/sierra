@@ -18,7 +18,7 @@ describe('Context', function () {
             const context = new Context(request, response);
             expect(context.request).toBe(request);
             expect(context.response).toBe(response);
-            expect(context.method).toBe(request.method.toLowerCase());
+            expect(context.method).toBe(request.method?.toLowerCase());
             expect(context.contentType.mediaType).toBe('application/json');
             expect(context.accept).toStrictEqual(['application/json']);
         });

@@ -23,7 +23,7 @@ describe('Default route', () => {
 
         application = new Application();
         application.addController(new TestController());
-        application.init();
+        await application.init();
     });
 
     it('should use default route', async function () {

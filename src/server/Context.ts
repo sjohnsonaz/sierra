@@ -49,7 +49,7 @@ export class Context<QUERY = any, PARAMS = any, BODY = any, SESSION = any> {
     method?: Verb;
 
     /** URL */
-    url: string;
+    url?: string;
     /** URL pathname */
     pathname: string;
     /** Query data */
@@ -92,14 +92,14 @@ export class Context<QUERY = any, PARAMS = any, BODY = any, SESSION = any> {
 
         this.url = request.url;
 
-        let url = new URL(request.url, 'http://' + request.headers.host + '/');
+        let url = new URL(request.url || '', `http://${request.headers.host}`);
         // Remove ending '/' from pathname, unless only single '/'.
         let pathname = url.pathname;
         if (pathname !== '/' && pathname.endsWith('/')) {
             pathname = pathname.slice(0, -1);
         }
         this.pathname = pathname;
-        this.query = urlStringToObject(getQueryString(request.url)) as any;
+        this.query = urlStringToObject(getQueryString(url.search)) as any;
     }
 
     /**
