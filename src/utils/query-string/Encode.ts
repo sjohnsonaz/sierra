@@ -1,35 +1,55 @@
 export function encode(obj: Record<string, any>) {
-    //const entries = createEntries(obj);
+    const entries: Entry[] = [];
+    for (let name in obj) {
+        if (obj.hasOwnProperty(name)) {
+            const value = obj[name];
+            const key = encodeURIComponent(name);
+            createEntries(key, value, entries);
+        }
+    }
+    return entries.join('&');
 }
 
-export function createEntry<T extends number | string>(key: string, value: T) {
-    return {
-        key,
-        value
-    };
+class Entry<T extends boolean | number | string | null = boolean | number | string | null> {
+    key: string;
+    value: T;
+
+    constructor(key: string, value: T) {
+        this.key = key;
+        this.value = value;
+    }
+
+    toString() {
+        const value = this.value === null ? 'null' : this.value.toString();
+        return `${this.key}=${encodeURIComponent(value)}`;
+    }
 }
 
-export function createEntries<T>(name: string, value: T, output: ReturnType<typeof createEntry>[] = [], prefix?: string) {
+function createEntries<T>(name: string, value: T, output: Entry[]) {
     switch (typeof value) {
+        case 'boolean':
         case 'number':
         case 'string':
-            const key = prefix ? `${prefix}[${name}]` : name;
-            output.push(createEntry(key, value));
+            createPrimitiveEntry(name, value, output);
             break;
         case 'object':
-            if (value instanceof Array) {
-                const key = prefix ? `${prefix}[${name}]` : name;
-                createArrayEntries(key, value, output);
+            if (value === null) {
+                createPrimitiveEntry(name, value as any, output);
+            } else if (value instanceof Array) {
+                createArrayEntries(name, value, output);
             } else {
-                const key = prefix ? `${prefix}[${name}]` : name;
-                createObjectEntries(key, value, output);
+                createObjectEntries(name, value, output);
             }
             break;
     }
     return output;
 }
 
-function createArrayEntries<T>(name: string, array: T[], output: ReturnType<typeof createEntry>[] = []) {
+function createPrimitiveEntry<T extends boolean | number | string | null>(name: string, value: T, output: Entry[]) {
+    output.push(new Entry(name, value));
+}
+
+function createArrayEntries<T>(name: string, array: T[], output: Entry[]) {
     const key = `${name}[]`;
     for (let item of array) {
         createEntries(key, item, output);
@@ -37,11 +57,11 @@ function createArrayEntries<T>(name: string, array: T[], output: ReturnType<type
     return output;
 }
 
-function createObjectEntries(name: string, obj: Record<string, any>, output: ReturnType<typeof createEntry>[] = []) {
+function createObjectEntries(name: string, obj: Record<string, any>, output: Entry[]) {
     for (let property in obj) {
         if (obj.hasOwnProperty(property)) {
             const value = obj[property];
-            const key = `${name}[${property}]`;
+            const key = `${name}[${encodeURIComponent(property)}]`;
             createEntries(key, value, output);
         }
     }
