@@ -1,11 +1,39 @@
 import { encode } from "./Encode";
 
 describe('encode', function () {
-    it('should create a query string for primitives', function () {
+    it('should not create a query string for undefined', function () {
+        const result = encode({
+            key: undefined
+        });
+        expect(result).toBe('');
+    });
+
+    it('should create a query string for true', function () {
+        const result = encode({
+            key: true
+        });
+        expect(result).toBe('key=true');
+    });
+
+    it('should create a query string for number', function () {
+        const result = encode({
+            key: 1
+        });
+        expect(result).toBe('key=1');
+    });
+
+    it('should create a query string for string', function () {
         const result = encode({
             key: 'value'
         });
         expect(result).toBe('key=value');
+    });
+
+    it('should create a query string for null', function () {
+        const result = encode({
+            key: null
+        });
+        expect(result).toBe('key=null');
     });
 
     it('should create a query string for multiple primitives', function () {
