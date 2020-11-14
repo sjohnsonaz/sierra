@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { URL } from 'url';
 
-import { getQueryString, urlStringToObject } from '../utils/EncodeUtil';
+import { getQueryString, urlStringToObject } from '../utils/query-string';
 
 import { OutgoingMessage, OutputType } from './OutgoingMessage';
 import { Session } from './Session';

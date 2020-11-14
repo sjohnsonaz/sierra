@@ -1,5 +1,5 @@
 import { Context } from '../../server';
-import { urlStringToObject } from '../../utils/EncodeUtil';
+import { urlStringToObject } from '../../utils/query-string';
 
 import { BufferDecoder } from './BufferDecoder';
 
