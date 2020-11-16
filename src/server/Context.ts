@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { URL } from 'url';
 
-import { getQueryString, urlStringToObject } from '../utils/query-string';
+import { getQueryString, decode } from '../utils/query-string';
 
 import { OutgoingMessage, OutputType } from './OutgoingMessage';
 import { Session } from './Session';
@@ -99,7 +99,7 @@ export class Context<QUERY = any, PARAMS = any, BODY = any, SESSION = any> {
             pathname = pathname.slice(0, -1);
         }
         this.pathname = pathname;
-        this.query = urlStringToObject(getQueryString(url.search)) as any;
+        this.query = decode(getQueryString(url.search)) as any;
     }
 
     /**

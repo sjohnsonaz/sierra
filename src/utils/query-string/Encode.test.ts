@@ -29,6 +29,14 @@ describe('encode', function () {
         expect(result).toBe('key=value');
     });
 
+    it('should create an encoded query string for strings', function () {
+        const input = {
+            a: 'first last'
+        };
+        const output = encode(input);
+        expect(output).toBe('a=first%20last');
+    });
+
     it('should create a query string for null', function () {
         const result = encode({
             key: null

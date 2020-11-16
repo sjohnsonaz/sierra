@@ -1,5 +1,5 @@
 import { Context } from '../../server';
-import { urlStringToObject } from '../../utils/query-string';
+import { decode } from '../../utils/query-string';
 
 import { BufferDecoder } from './BufferDecoder';
 
@@ -69,7 +69,7 @@ export class BodyMiddleware {
                     try {
                         let bufferedData = Buffer.concat(body).toString().trim();
                         if (bufferedData) {
-                            const data = urlStringToObject(bufferedData);
+                            const data = decode(bufferedData);
                             context.body = data;
                         } else {
                             context.body = null;
