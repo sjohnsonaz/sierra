@@ -8,7 +8,7 @@ type DecodeValue = string | DecodeValue[] | DecodedQuery;
 export function decode(queryString: string) {
     const graphEntries = createEntries(queryString);
     const graphNode = createNodes(graphEntries);
-    return graphNode.createOutput();
+    return graphNode.decode();
 }
 
 function createEntries(query: string) {
@@ -86,6 +86,11 @@ class GraphNode {
         } else {
             node.addEntry(graphEntry, index);
         }
+    }
+
+    decode() {
+        const output: DecodedQuery = this.createOutput() as any;
+        return output;
     }
 
     createOutput() {
