@@ -1,9 +1,9 @@
-// interface DecodedQuery {
-//     [index: string]: DecodeValue;
-//     [index: number]: DecodeValue;
-// }
+interface DecodedQuery {
+    [index: string]: DecodeValue;
+    [index: number]: DecodeValue;
+}
 
-// type DecodeValue = string | DecodeValue[] | DecodedQuery;
+type DecodeValue = string | DecodeValue[] | DecodedQuery;
 
 export function decode(queryString: string) {
     const graphEntries = createEntries(queryString);
@@ -90,8 +90,8 @@ class GraphNode {
 
     createOutput() {
         const keys = Object.keys(this.children);
-        const outputObject: Record<string, any> = {};
-        const outputArray: any[] = [];
+        const outputObject: DecodedQuery = {};
+        const outputArray: DecodeValue[] = [];
         keys.forEach(key => {
             const entry = this.children[key];
             if (key === '') {
