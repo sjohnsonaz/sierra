@@ -1,4 +1,14 @@
-import { IMiddleware } from './IMiddleware';
+/**
+ * An interface for Middleware functions.
+ * 
+ * @param context - This is the Context object.
+ * @param value - This is the return value of the previous Pipeline stage.
+ * @returns - This must return a Promise.  The return value will be passed as the value parameter into the next stage of the Pipeline.
+ * 
+ */
+export type Middleware<CONTEXT, VALUE, RESULT> =
+    (context?: CONTEXT, value?: VALUE) => Promise<RESULT>;
+
 
 /**
  * The PipelineExit class, when returned from a Middleware function, signals that the Pipeline should exit.
@@ -18,7 +28,7 @@ export function exit() {
  * The Pipeline class runs a series of Middleware async functions.
  */
 export class Pipeline<T, U, V> {
-    middlewares: IMiddleware<T, any, any>[] = [];
+    middlewares: Middleware<T, any, any>[] = [];
 
     async run(context: T, value?: U) {
         let result: V = value as any;
@@ -33,17 +43,17 @@ export class Pipeline<T, U, V> {
 
     /**
      * Adds a Middleware function to the Pipeline
-     * @param middlware - a Middleware function to add
+     * @param middleware - a Middleware function to add
      */
-    use(middlware: IMiddleware<T, any, any>) {
-        this.middlewares.push(middlware);
+    use(middleware: Middleware<T, any, any>) {
+        this.middlewares.push(middleware);
     }
 
     /**
      * Removes a Middleware function from the Pipeline
      * @param middleware - a Middleware function to remove
      */
-    remove(middleware: IMiddleware<T, any, any>) {
+    remove(middleware: Middleware<T, any, any>) {
         let index = this.middlewares.indexOf(middleware);
         if (index >= 0) {
             return this.middlewares.splice(index, 1);
@@ -52,3 +62,4 @@ export class Pipeline<T, U, V> {
         }
     }
 }
+
