@@ -1,5 +1,6 @@
-import { Context, ISessionGateway } from '../../server';
+import { Context } from '../../server';
 import { Uuid } from '../../utils/Uuid';
+import { ISessionGateway } from './ISessionGateway';
 
 export class MemorySessionGateway<T extends { _id: string }> implements ISessionGateway<T> {
     data: Record<string, T> = {};

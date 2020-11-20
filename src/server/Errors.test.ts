@@ -1,4 +1,4 @@
-import { ErrorMessage, NoMethodError, NoRouteFoundError, NoSessionGatewayError, NotFoundError, NoViewMiddlwareError, NoViewTemplateError } from './Errors';
+import { ErrorMessage, NoMethodError, NonStringViewError, NoRouteFoundError, NoSessionGatewayError, NotFoundError, NoViewTemplateError } from './Errors';
 
 describe('Errors', function () {
     describe('NoMethodError', function () {
@@ -30,18 +30,19 @@ describe('Errors', function () {
         });
     });
 
-    describe('NoViewMiddlwareError', function () {
-        it('should use an ErrorMessage', function () {
-            const error = new NoViewMiddlwareError();
-            expect(error.message).toBe(ErrorMessage.noViewMiddleware);
-        });
-    });
-
     describe('NoViewTemplateError', function () {
         it('should use an ErrorMessage', function () {
             const error = new NoViewTemplateError('template');
             expect(error.message).toBe(ErrorMessage.noViewTemplate);
             expect(error.template).toBe('template');
+        });
+    });
+
+    describe('NonStringViewError', function () {
+        it('should use an ErrorMessage', function () {
+            const error = new NonStringViewError('output');
+            expect(error.message).toBe(ErrorMessage.nonStringView);
+            expect(error.output).toBe('output');
         });
     });
 });

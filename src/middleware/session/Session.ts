@@ -1,6 +1,6 @@
 
-import { Context } from './Context';
-import { NoSessionGatewayError } from './Errors';
+import { Context, NoSessionGatewayError } from '../../server';
+
 import { ISessionGateway } from './ISessionGateway';
 
 //const MILLISECONDS = 1;
@@ -101,7 +101,7 @@ export class Session<T> {
         // Create session object for this
         const session = new Session(context, gateway, cookieIdentifier);
         await session.init(maxAge);
-        context.session = session;
+        context.data.session = session;
         // TODO: Set only sierra_id cookie
         // context.cookies.setCookies(context.response);
 

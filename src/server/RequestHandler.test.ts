@@ -6,7 +6,7 @@ import { Color } from '../utils/ConsoleUtil';
 
 import { RequestHandler, errorTemplate, colorStatus } from './RequestHandler';
 import { OutgoingMessage, json, raw, view } from './OutgoingMessage';
-import { NotFoundError, NoRouteFoundError, NoViewTemplateError, NoViewMiddlwareError } from './Errors';
+import { NotFoundError, NoRouteFoundError, NoViewTemplateError, NonStringViewError } from './Errors';
 import { LogLevel } from './LogLevel';
 
 describe('RequestHandler', function () {
@@ -89,22 +89,22 @@ describe('RequestHandler', function () {
         beforeEach(async function () {
             handler = new RequestHandler();
 
-            handler.error = async function (_context, error) {
+            handler.useError(async function (_context, error) {
                 return error;
-            };
+            });
 
-            handler.view = async function (_context, data, template) {
+            handler.useView(async function (context, data) {
                 const templates: Record<string, Function> = {
                     index: function (data: { value: boolean }) {
                         return `index: value = ${data.value}`;
                     }
                 }
-                const templateFunction = templates[template];
+                const templateFunction = templates[context.template || ''];
                 if (!templateFunction) {
-                    throw new NoViewTemplateError(template);
+                    throw new NoViewTemplateError(context.template || '');
                 }
                 return templateFunction(data);
-            };
+            });
 
             server = createServer(handler.callback);
         });
@@ -265,7 +265,7 @@ describe('RequestHandler', function () {
     });
 
     describe('sendView', function () {
-        describe('NoViewMiddlewareError', function () {
+        describe('no middleware', function () {
             let server: Server;
             let handler: RequestHandler;
 
@@ -273,21 +273,22 @@ describe('RequestHandler', function () {
                 handler = new RequestHandler();
                 handler.logging = LogLevel.none;
 
-                handler.error = async function (_context, error) {
+                handler.useError(async function (_context, error) {
                     return error;
-                };
+                });
 
                 server = createServer(handler.callback);
             });
 
-            it('should throw NoViewTemplateError when no template is found', async function () {
+            it('should return JSON', async function () {
                 handler.use(async function () {
                     return view({ value: true });
                 });
 
-                await request(server)
+                const { text } = await request(server)
                     .get('/')
-                    .expect(500, errorTemplate(new NoViewMiddlwareError()));
+                    .expect(500);
+                expect(text).toBe(errorTemplate(new NonStringViewError({ value: true })));
             });
         });
 
@@ -299,11 +300,11 @@ describe('RequestHandler', function () {
                 handler = new RequestHandler();
                 handler.logging = LogLevel.none;
 
-                handler.error = async function (_context, error) {
+                handler.useError(async function (_context, error) {
                     return error;
-                };
+                });
 
-                handler.view = async function (_context, data, template) {
+                handler.useView(async function (context, data) {
                     const templates: Record<string, Function> = {
                         index: function (data: { value: boolean }) {
                             return `index: value = ${data.value}`;
@@ -311,13 +312,13 @@ describe('RequestHandler', function () {
                         test: function (data: { value: boolean }) {
                             return `test: value = ${data.value}`;
                         }
-                    }
-                    const templateFunction = templates[template];
+                    };
+                    const templateFunction = templates[context.template || ''];
                     if (!templateFunction) {
-                        throw new NoViewTemplateError(template);
+                        throw new NoViewTemplateError(context.template || '');
                     }
                     return templateFunction(data);
-                };
+                });
 
                 server = createServer(handler.callback);
             });
@@ -341,14 +342,15 @@ describe('RequestHandler', function () {
                     .expect(200, 'test: value = true');
             });
 
-            it('should send unknown view as JSON', async function () {
+            it('should throw NoViewTemplateError when no template is found', async function () {
                 handler.use(async function () {
                     return view({ value: true }, 'other');
                 });
 
-                await request(server)
+                const { text } = await request(server)
                     .get('/')
-                    .expect(200, { value: true });
+                    .expect(500);
+                expect(text).toBe(errorTemplate(new NoViewTemplateError('index')));
             });
         });
     });
@@ -402,7 +404,7 @@ describe('RequestHandler', function () {
             handler = new RequestHandler();
             handler.logging = LogLevel.none;
 
-            handler.view = async function (_context, data, template) {
+            handler.useView(async function (context, data) {
                 const templates: Record<string, Function> = {
                     index: function (data: string) {
                         return `index: error = ${data}`;
@@ -411,12 +413,12 @@ describe('RequestHandler', function () {
                         return `error: error = ${data}`;
                     }
                 }
-                const templateFunction = templates[template];
+                const templateFunction = templates[context.template || ''];
                 if (!templateFunction) {
-                    throw new NoViewTemplateError(template);
+                    throw new NoViewTemplateError(context.template || '');
                 }
                 return templateFunction(data);
-            };
+            });
 
             server = createServer(handler.callback);
         });
@@ -424,7 +426,7 @@ describe('RequestHandler', function () {
             const errorHandler = jest.fn(async function (_context, error) {
                 return error;
             });
-            handler.error = errorHandler;
+            handler.useError(errorHandler);
 
             handler.use(async function () {
                 return true;
@@ -440,7 +442,7 @@ describe('RequestHandler', function () {
             const errorHandler = jest.fn(async function (_context, error) {
                 return error;
             });
-            handler.error = errorHandler;
+            handler.useError(errorHandler);
 
             handler.use(async function () {
                 throw 'error thrown';
@@ -456,7 +458,7 @@ describe('RequestHandler', function () {
             const errorHandler = jest.fn(async function (_context, error) {
                 return new OutgoingMessage(error, 404);
             });
-            handler.error = errorHandler;
+            handler.useError(errorHandler);
 
             handler.use(async function () {
                 throw 'error thrown';
@@ -472,7 +474,7 @@ describe('RequestHandler', function () {
             const errorHandler = jest.fn(async function (_context, error) {
                 return view(error);
             });
-            handler.error = errorHandler;
+            handler.useError(errorHandler);
 
             handler.use(async function () {
                 throw 'error thrown';
@@ -488,7 +490,7 @@ describe('RequestHandler', function () {
             const errorHandler = jest.fn(async function (_context, error) {
                 return error;
             });
-            handler.error = errorHandler;
+            handler.useError(errorHandler);
 
             handler.use(async function () {
                 throw 'error thrown';
@@ -506,7 +508,7 @@ describe('RequestHandler', function () {
             const errorHandler = jest.fn(async function (_context, error) {
                 throw 'inner error thrown';
             });
-            handler.error = errorHandler;
+            handler.useError(errorHandler);
 
             handler.use(async function () {
                 throw 'error thrown';

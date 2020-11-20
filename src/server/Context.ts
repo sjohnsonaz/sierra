@@ -1,73 +1,33 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { URL } from 'url';
 
-import { getQueryString, decode } from '../utils/query-string';
-
-import { OutgoingMessage, OutputType } from './OutgoingMessage';
-import { Session } from './Session';
+import { ContentType } from './ContentType';
 import { CookieRegistry } from './cookie';
-import { Verb } from './Verb';
-
-// interface QueryHash {
-//     [index: string]: string | string[];
-// }
-
-// interface ParamsHash {
-//     [index: string]: string;
-// }
-
-// type BodyValue =
-//     number |
-//     string |
-//     Array<BodyValue> |
-//     {
-//         [index: string]: BodyValue;
-//     };
-
-// interface RequestData {
-//     query: QueryHash;
-//     params: ParamsHash;
-//     body: BodyValue;
-// }
-
-interface ContentType {
-    mediaType?: string;
-    charset?: string;
-    boundary?: string;
-}
+import { OutgoingMessage, OutputType } from './OutgoingMessage';
+import { getVerb, Verb } from './Verb';
 
 /**
  * The Context object for the RequestHandler Pipeline
  */
-export class Context<QUERY = any, PARAMS = any, BODY = any, SESSION = any> {
+export class Context {
     /** The IncomingMessage object */
     request: IncomingMessage;
     /** The ServerResponse object */
     response: ServerResponse;
 
     /** HTTP Verb */
-    method?: Verb;
-
+    method: Verb;
     /** URL */
-    url?: string;
-    /** URL pathname */
-    pathname: string;
-    /** Query data */
-    query: QUERY;
-    /** URL Params data */
-    params?: PARAMS;
-
+    url: URL;
     /** HTTP Content-Type header */
     contentType: ContentType;
     /** HTTP Accept Header */
-    accept?: string[];
+    accept: string[];
+
+    data: Record<string, any> = {};
+
     /** The CookieRegistry object.  Holds Cookie data */
     cookies: CookieRegistry;
-
-    /** The Session object.  Holds session data */
-    session?: Session<SESSION>;
-    /** Body data */
-    body?: BODY;
 
     /** View template */
     template?: string;
@@ -80,9 +40,12 @@ export class Context<QUERY = any, PARAMS = any, BODY = any, SESSION = any> {
     constructor(request: IncomingMessage, response: ServerResponse) {
         this.request = request;
         this.response = response;
-        // TODO: Fix this any
-        this.method = request.method?.toLowerCase() as any;
-        this.cookies = new CookieRegistry(request);
+
+        // Method
+        this.method = getMethod(request);
+
+        // Url
+        this.url = getUrl(request);
 
         // Content Type
         this.contentType = getContentType(request);
@@ -90,16 +53,12 @@ export class Context<QUERY = any, PARAMS = any, BODY = any, SESSION = any> {
         // Accept Type
         this.accept = getAccept(request);
 
-        this.url = request.url;
-
-        let url = new URL(request.url || '', `http://${request.headers.host}`);
-        // Remove ending '/' from pathname, unless only single '/'.
-        let pathname = url.pathname;
-        if (pathname !== '/' && pathname.endsWith('/')) {
-            pathname = pathname.slice(0, -1);
-        }
-        this.pathname = pathname;
-        this.query = decode(getQueryString(url.search)) as any;
+        // // Remove ending '/' from pathname, unless only single '/'.
+        // let pathname = url.pathname;
+        // if (pathname !== '/' && pathname.endsWith('/')) {
+        //     pathname = pathname.slice(0, -1);
+        // }
+        this.cookies = new CookieRegistry(request);
     }
 
     /**
@@ -113,6 +72,14 @@ export class Context<QUERY = any, PARAMS = any, BODY = any, SESSION = any> {
     send<U>(data: U, status?: number, type?: OutputType, template?: string, contentType?: string) {
         return new OutgoingMessage(data, status, type, template, contentType);
     }
+}
+
+export function getUrl(request: IncomingMessage) {
+    return new URL(request.url || '', `http://${request.headers.host}`);
+}
+
+export function getMethod(request: IncomingMessage) {
+    return getVerb(request.method);
 }
 
 export function getContentType(request: IncomingMessage) {

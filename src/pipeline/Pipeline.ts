@@ -7,7 +7,7 @@
  * 
  */
 export type Middleware<CONTEXT, VALUE, RESULT> =
-    (context?: CONTEXT, value?: VALUE) => Promise<RESULT>;
+    (context: CONTEXT, value?: VALUE) => Promise<RESULT>;
 
 
 /**
@@ -27,11 +27,11 @@ export function exit() {
 /**
  * The Pipeline class runs a series of Middleware async functions.
  */
-export class Pipeline<T, U, V> {
-    middlewares: Middleware<T, any, any>[] = [];
+export class Pipeline<CONTEXT, VALUE, RESULT> {
+    middlewares: Middleware<CONTEXT, any, any>[] = [];
 
-    async run(context: T, value?: U) {
-        let result: V = value as any;
+    async run(context: CONTEXT, value?: VALUE) {
+        let result: RESULT = value as any;
         for (let index = 0, length = this.middlewares.length; index < length; index++) {
             result = await this.middlewares[index](context, result);
             if (result instanceof PipelineExit) {
@@ -45,7 +45,7 @@ export class Pipeline<T, U, V> {
      * Adds a Middleware function to the Pipeline
      * @param middleware - a Middleware function to add
      */
-    use(middleware: Middleware<T, any, any>) {
+    use(middleware: Middleware<CONTEXT, any, any>) {
         this.middlewares.push(middleware);
     }
 
@@ -53,7 +53,7 @@ export class Pipeline<T, U, V> {
      * Removes a Middleware function from the Pipeline
      * @param middleware - a Middleware function to remove
      */
-    remove(middleware: Middleware<T, any, any>) {
+    remove(middleware: Middleware<CONTEXT, any, any>) {
         let index = this.middlewares.indexOf(middleware);
         if (index >= 0) {
             return this.middlewares.splice(index, 1);

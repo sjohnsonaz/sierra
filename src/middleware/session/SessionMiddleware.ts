@@ -1,5 +1,7 @@
+import { Context } from '../../server';
 
-import { Context, Session, ISessionGateway } from '../../server';
+import { ISessionGateway } from './ISessionGateway';
+import { Session } from './Session';
 
 export class SessionMiddleware<T> {
     gateway: ISessionGateway<any>;

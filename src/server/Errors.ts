@@ -5,7 +5,8 @@ export enum ErrorMessage {
     notFound = 'not found',
     noSessionGateway = 'no session gateway',
     noViewMiddleware = 'No view middleware',
-    noViewTemplate = 'no view template'
+    noViewTemplate = 'no view template',
+    nonStringView = 'non string view'
 }
 
 export class SierraError extends Error {
@@ -40,16 +41,18 @@ export class NoSessionGatewayError extends SierraError {
     }
 }
 
-export class NoViewMiddlwareError extends SierraError {
-    constructor() {
-        super(ErrorMessage.noViewMiddleware);
-    }
-}
-
 export class NoViewTemplateError extends SierraError {
     template: string;
     constructor(template: string) {
         super(ErrorMessage.noViewTemplate);
         this.template = template;
+    }
+}
+
+export class NonStringViewError extends SierraError {
+    output: any;
+    constructor(output: any) {
+        super(ErrorMessage.nonStringView);
+        this.output = output;
     }
 }

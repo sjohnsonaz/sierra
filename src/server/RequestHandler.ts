@@ -1,22 +1,20 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
 import { Color } from '../utils/ConsoleUtil';
-import { Pipeline } from '../pipeline';
+import { Middleware, Pipeline } from '../pipeline';
 
-import { IServerMiddleware } from './IServerMiddleware';
-import { IViewMiddleware } from './IViewMiddleware';
 import { Context } from './Context';
 import { OutgoingMessage, OutputType } from './OutgoingMessage';
 import { LogLevel } from './LogLevel';
-import { ErrorMessage, NoViewMiddlwareError, NoViewTemplateError, SierraError } from './Errors';
+import { ErrorMessage, NonStringViewError, NoViewTemplateError, SierraError } from './Errors';
 
 const DEFAULT_TEMPLATE = 'index';
 const ERROR_TEMPLATE = 'error';
 
 export class RequestHandler {
     pipeline: Pipeline<Context, any, any> = new Pipeline();
-    error?: IServerMiddleware<any, any>;
-    view?: IViewMiddleware<any>;
+    errorPipeline: Pipeline<Context, any, any> = new Pipeline();
+    viewPipeline: Pipeline<Context, any, any> = new Pipeline();
     logging: LogLevel = LogLevel.errors;
     defaultTemplate = DEFAULT_TEMPLATE;
 
@@ -43,19 +41,15 @@ export class RequestHandler {
                         break;
                 }
             }
-            if (this.error) {
-                try {
-                    let result = await this.error(context, e);
-                    if (result instanceof OutgoingMessage) {
-                        this.send(context, result.data, result.status, result.type, result.template, result.contentType);
-                    } else {
-                        this.send(context, result, errorStatus, 'auto', ERROR_TEMPLATE);
-                    }
+            try {
+                let result = await this.errorPipeline.run(context, e);
+                if (result instanceof OutgoingMessage) {
+                    this.send(context, result.data, result.status, result.type, result.template, result.contentType);
+                } else {
+                    this.send(context, result, errorStatus, 'auto', ERROR_TEMPLATE);
                 }
-                catch (e) {
-                    this.sendError(context, e, errorStatus);
-                }
-            } else {
+            }
+            catch (e) {
                 this.sendError(context, e, errorStatus);
             }
         }
@@ -87,10 +81,12 @@ export class RequestHandler {
 
     async sendView<T>(context: Context, data: T, status: number = 200, template?: string) {
         try {
-            if (!this.view) {
-                throw new NoViewMiddlwareError();
+            context.template = context.template ?? template ?? this.defaultTemplate;
+            let output = await this.viewPipeline.run(context, data);
+            // Ensure output is a string
+            if (typeof output !== 'string') {
+                throw new NonStringViewError(output);
             }
-            let output = await this.view(context, data, template ?? context.template ?? this.defaultTemplate);
             this.log(context, data, status);
             context.response.statusCode = status;
             context.response.setHeader('Content-Type', 'text/html');
@@ -98,15 +94,11 @@ export class RequestHandler {
             context.response.end();
         }
         catch (e) {
-            if (e instanceof NoViewTemplateError) {
-                this.sendJson(context, data, status);
-            } else {
-                this.log(context, data, 500);
-                context.response.statusCode = 500;
-                context.response.setHeader('Content-Type', 'text/html');
-                context.response.write(errorTemplate(e));
-                context.response.end();
-            }
+            this.log(context, data, 500);
+            context.response.statusCode = 500;
+            context.response.setHeader('Content-Type', 'text/html');
+            context.response.write(errorTemplate(e));
+            context.response.end();
             if (this.logging >= LogLevel.errors) {
                 console.error(e);
             }
@@ -118,7 +110,7 @@ export class RequestHandler {
         let accept = context.accept;
         switch (type) {
             case 'auto':
-                if (this.view && accept && accept.indexOf('text/html') > -1) {
+                if (this.viewPipeline.middlewares.length && accept && accept.indexOf('text/html') > -1) {
                     this.sendView(context, data, status, template);
                 } else if (accept && accept.indexOf('application/json')) {
                     this.sendJson(context, data, status);
@@ -155,10 +147,10 @@ export class RequestHandler {
             }
         }
         try {
-            if (this.view && accept && accept.indexOf('text/html') > -1) {
+            if (this.viewPipeline.middlewares.length && accept && accept.indexOf('text/html') > -1) {
                 await this.sendView(context, data, status, ERROR_TEMPLATE);
             } else {
-                await this.sendJson(context, data.message ?? data.name, status);
+                this.sendJson(context, data.message ?? data.name, status);
             }
         }
         catch (e) {
@@ -175,8 +167,16 @@ export class RequestHandler {
         }
     }
 
-    use<T, U>(middlware: IServerMiddleware<T, U>) {
+    use<T, U>(middlware: Middleware<Context, T, U>) {
         this.pipeline.use(middlware);
+    }
+
+    useError<T, U>(middlware: Middleware<Context, T, U>) {
+        this.errorPipeline.use(middlware);
+    }
+
+    useView<T, U>(middlware: Middleware<Context, T, U>) {
+        this.viewPipeline.use(middlware);
     }
 }
 

@@ -1,4 +1,4 @@
-interface DecodedQuery {
+export interface DecodedQuery {
     [index: string]: DecodeValue;
     [index: number]: DecodeValue;
 }
