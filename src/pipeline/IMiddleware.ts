@@ -1,5 +1,3 @@
-import { IPipelineContext } from './IPipelineContext';
-
 /**
  * An interface for Middleware functions.
  * 
@@ -8,7 +6,6 @@ import { IPipelineContext } from './IPipelineContext';
  * @returns - This must return a Promise.  The return value will be passed as the value parameter into the next stage of the Pipeline.
  * 
  */
-export interface IMiddleware<T, U, V extends IPipelineContext> {
-    (context: T, value?: U): Promise<V>;
+export interface IMiddleware<T, U, V> {
+    (context?: T, value?: U): Promise<V>;
 }
-// TODO: Change context to optional

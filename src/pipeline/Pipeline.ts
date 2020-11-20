@@ -1,5 +1,4 @@
 import { IMiddleware } from './IMiddleware';
-import { IPipelineContext } from './IPipelineContext';
 
 /**
  * The PipelineExit class, when returned from a Middleware function, signals that the Pipeline should exit.
@@ -18,7 +17,7 @@ export function exit() {
 /**
  * The Pipeline class runs a series of Middleware async functions.
  */
-export class Pipeline<T extends IPipelineContext, U, V> {
+export class Pipeline<T, U, V> {
     middlewares: IMiddleware<T, any, any>[] = [];
 
     async run(context: T, value?: U) {

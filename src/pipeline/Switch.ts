@@ -1,7 +1,6 @@
-import { IPipelineContext } from "./IPipelineContext";
 import { Pipeline } from "./Pipeline";
 
-export abstract class Switch<T extends IPipelineContext, U, V> {
+export abstract class Switch<T, U, V> {
     pipelines: Record<string, Pipeline<T, U, V>> = {};
 
     async run(context: T, value: U): Promise<V> {
