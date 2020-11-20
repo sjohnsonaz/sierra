@@ -18,7 +18,7 @@ describe('BodyMiddleware', function () {
         it('should read "application/json" data', async function () {
             handler.use(BodyMiddleware.handle);
             handler.use((context) => {
-                return context.body;
+                return context.data.body;
             });
 
             await request(server)
@@ -34,7 +34,7 @@ describe('BodyMiddleware', function () {
         it('should handle badly formed "application/json" data', async function () {
             handler.use(BodyMiddleware.handle);
             handler.use((context) => {
-                return context.body;
+                return context.data.body;
             });
 
             const { text } = await request(server)
@@ -58,7 +58,7 @@ describe('BodyMiddleware', function () {
         it('should read "multipart/form-data" data', async function () {
             handler.use(BodyMiddleware.handle);
             handler.use((context) => {
-                return context.body;
+                return context.data.body;
             });
 
             await request(server)
@@ -72,7 +72,7 @@ describe('BodyMiddleware', function () {
         it.skip('should handle badly formed "multipart/form-data" data', async function () {
             handler.use(BodyMiddleware.handle);
             handler.use((context) => {
-                return context.body;
+                return context.data.body;
             });
 
             const { text } = await request(server)
@@ -98,7 +98,7 @@ describe('BodyMiddleware', function () {
         it('should read "application/x-www-form-urlencoded" data', async function () {
             handler.use(BodyMiddleware.handle);
             handler.use((context) => {
-                return context.body;
+                return context.data.body;
             });
 
             await request(server)

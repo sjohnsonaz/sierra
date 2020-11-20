@@ -1,7 +1,6 @@
 import * as http from 'http';
 
-import { IMiddleware } from '../../pipeline';
-import { exit } from '../../pipeline';
+import { exit, Middleware } from '../../pipeline';
 import { Context } from '../../server';
 
 export function ConnectMiddleware<T extends Context, U>(
@@ -12,7 +11,7 @@ export function ConnectMiddleware<T extends Context, U>(
         done: () => any
     ) => any,
     timeout = 1000
-): IMiddleware<T, U, U> {
+): Middleware<T, U, U> {
     return function (context: T, value?: U): Promise<U> {
         return new Promise<U>((resolve, reject) => {
             let interval = setInterval(() => {

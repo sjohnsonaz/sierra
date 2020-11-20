@@ -39,8 +39,8 @@ export class BodyMiddleware {
                     .on('end', () => {
                         try {
                             let bufferedData = Buffer.concat(body).toString().trim();
-                            context.body = bufferedData ? JSON.parse(bufferedData) : null;
-                            resolve(context.body);
+                            context.data.body = bufferedData ? JSON.parse(bufferedData) : null;
+                            resolve(context.data.body);
                         }
                         catch (e) {
                             reject(e);
@@ -70,11 +70,11 @@ export class BodyMiddleware {
                         let bufferedData = Buffer.concat(body).toString().trim();
                         if (bufferedData) {
                             const data = decode(bufferedData);
-                            context.body = data;
+                            context.data.body = data;
                         } else {
-                            context.body = null;
+                            context.data.body = null;
                         }
-                        resolve(context.body);
+                        resolve(context.data.body);
                     }
                     catch (e) {
                         reject(e);
@@ -102,8 +102,8 @@ export class BodyMiddleware {
                 }).on('end', () => {
                     try {
                         let bufferedData = Buffer.concat(body).toString().trim();
-                        context.body = bufferedData;
-                        resolve(context.body);
+                        context.data.body = bufferedData;
+                        resolve(context.data.body);
                     }
                     catch (e) {
                         reject(e);
@@ -135,8 +135,8 @@ export class BodyMiddleware {
                     }
                 }).on('end', () => {
                     try {
-                        context.body = bufferDecoder.decode();
-                        resolve(context.body);
+                        context.data.body = bufferDecoder.decode();
+                        resolve(context.data.body);
                     }
                     catch (e) {
                         reject(e);
