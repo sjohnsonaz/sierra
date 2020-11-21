@@ -1,4 +1,4 @@
-import { Controller, middleware, Context, method, json } from '../src';
+import { Controller, Context, json, method, middleware } from '../src';
 
 async function SimpleMiddleware() {
     return true;
