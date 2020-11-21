@@ -1,5 +1,12 @@
 import * as path from 'path';
 
+import * as request from 'supertest';
+
+import { Application } from '../../../Application';
+import { Context } from '../../../server';
+import { BodyMiddleware } from '../../body';
+import { QueryStringMiddleware } from '../../query-string';
+
 import { Controller } from './Controller';
 import { method } from './Decorators';
 
@@ -102,6 +109,113 @@ describe('Controller', function () {
             }
             const template = Controller.getTemplate(new IndexController(), 'getData');
             expect(template).toBe(path.join('index', 'getData'));
+        });
+    });
+
+    // TODO: Enable default route
+    describe.skip('Default route', () => {
+        let application: Application;
+
+        beforeAll(async function () {
+            class TestController extends Controller {
+                constructor() {
+                    super('/');
+                }
+
+                @method('get')
+                async get(context: Context, value: any) {
+                    return { value: true };
+                }
+            }
+
+            application = new Application();
+            application.addController(new TestController());
+            await application.init();
+        });
+
+        it('should use default route', async function () {
+            await request(application.server)
+                .get('/')
+                .expect(200);
+        });
+    });
+
+    describe('route matching', function () {
+        let application: Application;
+
+        beforeAll(async () => {
+            application = new Application();
+
+            class IndexController extends Controller {
+                @method('get')
+                async get() {
+                    return true;
+                }
+            }
+
+            application.addController(new IndexController());
+            await application.init();
+        });
+
+        it('should return "no route found" if no route is found', async () => {
+            await request(application.server)
+                .get('/notfound')
+                .expect(404, JSON.stringify('no route found'));
+        });
+    });
+
+    describe.skip('argument mapping', () => {
+        let application: Application;
+
+        beforeAll(async () => {
+            application = new Application();
+
+            class IndexController extends Controller {
+                @method('get')
+                async testQuery(id: number) {
+                    return {
+                        id
+                    };
+                }
+
+                @method('get', '/testParams/:id')
+                async testParams(id: number) {
+                    return {
+                        id
+                    };
+                }
+
+                @method('post')
+                async testBody(id: number) {
+                    return {
+                        id
+                    };
+                }
+            }
+            application.use(QueryStringMiddleware);
+            application.use(BodyMiddleware);
+            application.addController(new IndexController());
+            await application.init();
+        });
+
+        it('should use query params', async () => {
+            await request(application.server)
+                .get('/testQuery')
+                .query({ id: 1 })
+                .expect(200, { id: 1 });
+        });
+
+        it('should use route params', async () => {
+            await request(application.server)
+                .get(`/testParams/${2}`)
+                .expect(200, { id: 2 });
+        });
+
+        it('should use body params', async () => {
+            await request(application.server)
+                .post('/testBody')
+                .send({ id: 3 })
+                .expect(200, { id: 3 });
         });
     });
 });

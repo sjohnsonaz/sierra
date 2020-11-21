@@ -1,9 +1,9 @@
 import { Middleware } from '../../../pipeline';
 import { Context, Verb } from '../../../server';
 import { Controller } from './Controller';
-import { IMethod } from './IMethod';
 import { RouteBuilder } from './RouteBuilder';
 
+type Method<T> = (...args: any[]) => Promise<T>;
 type VerbString = 'all' | 'get' | 'post' | 'put' | 'delete' | 'patch' | 'options' | 'head';
 type VerbType = Verb | VerbString;
 
@@ -12,7 +12,7 @@ type VerbType = Verb | VerbString;
  * @param verb 
  * @param name 
  */
-export function method<U extends IMethod<any>>(verbs: VerbType | VerbType[] = Verb.Get, name?: string | RegExp, template?: string) {
+export function method<U extends Method<any>>(verbs: VerbType | VerbType[] = Verb.Get, name?: string | RegExp, template?: string) {
     const _verbs: Verb[] = verbs instanceof Array ? verbs as any : [verbs];
     return function (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<U>) {
         let key = name || propertyKey;
@@ -26,7 +26,7 @@ export function method<U extends IMethod<any>>(verbs: VerbType | VerbType[] = Ve
  * @param verb 
  * @param name 
  */
-export function middleware<T extends Middleware<Context, any, any>, U extends IMethod<any> | IMethod<any>>(middleware: T) {
+export function middleware<T extends Middleware<Context, any, any>, U extends Method<any>>(middleware: T) {
     return function (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<U>) {
         const routeBuilder = RouteBuilder.getRouteBuilder(target);
         // Decorators are applied in reverse order, so we must add to the beginning of the Array.

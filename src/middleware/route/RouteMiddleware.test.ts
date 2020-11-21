@@ -1,6 +1,7 @@
 import { Context, Verb } from "../../server";
 
 import { createRequest } from '../../utils/TestUtil';
+import { Controller } from "./controller";
 
 import { Route } from "./Route";
 import { RouteMiddleware, sortRoutes } from "./RouteMiddleware";
@@ -73,6 +74,47 @@ describe('RouteMiddleware', function () {
 
             const result = await routerMiddleware.handle(context);
             expect(result).toBe('1');
+        });
+    });
+
+    describe('Controller', function () {
+        describe.skip('init', function () {
+            it('should build Routes from Controllers', function () {
+
+            });
+
+            it('should sort Routes from Controllers', function () {
+
+            });
+        });
+
+        describe('addController', function () {
+            it('should add a Controller', function () {
+                const routeMiddleware = new RouteMiddleware();
+                expect(routeMiddleware.controllers.length).toBe(0);
+                const controller = new Controller();
+                routeMiddleware.addController(controller);
+                expect(routeMiddleware.controllers.length).toBe(1);
+                expect(routeMiddleware.controllers[0]).toBe(controller);
+            });
+        });
+
+        describe('removeController', function () {
+            it('should remove a Controller', function () {
+                const routeMiddleware = new RouteMiddleware();
+                const controller = new Controller();
+                routeMiddleware.addController(controller);
+                expect(routeMiddleware.controllers.length).toBe(1);
+                routeMiddleware.removeController(controller);
+                expect(routeMiddleware.controllers.length).toBe(0);
+            });
+
+            it('should not remove a Controller that is not present', function () {
+                const routeMiddleware = new RouteMiddleware();
+                const controller = new Controller();
+                routeMiddleware.removeController(controller);
+                expect(routeMiddleware.controllers.length).toBe(0);
+            });
         });
     });
 });

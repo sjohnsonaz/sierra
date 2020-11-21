@@ -81,10 +81,6 @@ export class RouteBuilder {
         return Object.keys(routeDefinitions).map(definitionName => {
             const methodName: keyof T = definitionName as any;
             const routeDefinition = routeDefinitions[definitionName];
-            const { method: definitionMethod, middleware: definitionMiddleware } = routeDefinition;
-            if (!definitionMethod) {
-                throw new NoMethodError(definitionName);
-            }
 
             // Get method
             let method: Middleware<Context, unknown, unknown> = controller[definitionName as keyof typeof controller] as any;
@@ -98,27 +94,7 @@ export class RouteBuilder {
             const template = Controller.getTemplate(controller, methodName);
 
             // Create Route
-            const route = new Route(definitionMethod.verbs, definitionMethod.name || definitionName, method, definitionMethod.template || template);
-
-            // Add Middleware
-            for (let middleware of definitionMiddleware) {
-                route.pipeline.use(middleware);
-            }
-
-            // let argumentTypes;
-            // if (Reflect.getMetadata) {
-            //     argumentTypes = Reflect.getMetadata("design:paramtypes", controller, definitionName);
-            // }
-
-            // Get argument names, and bind method
-            // let method: Middleware<Context, unknown, unknown> = controller[definitionName as keyof typeof controller] as any;
-            // let argumentNames: string[] | undefined = undefined;
-            // if (method) {
-            //     if (pipeArgs) {
-            //         argumentNames = getArgumentNames(method);
-            //     }
-            //     method = method.bind(controller);
-            // }
+            const route = routeDefinition.createRoute(definitionName, method, template);
 
             return route;
         });
