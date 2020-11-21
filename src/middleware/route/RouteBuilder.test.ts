@@ -1,7 +1,7 @@
 import * as request from 'supertest';
 
 import { Application } from '../../Application';
-import { Context } from '../../server';
+import { Context, Verb } from '../../server';
 
 import { middleware, route } from './Decorators';
 import { Controller } from './Controller';
@@ -60,14 +60,14 @@ describe('RouteBuilder', function () {
         it('should create a new RouteDefinition', function () {
             const routeBuilder = new RouteBuilder();
             expect(Object.keys(routeBuilder.routeDefinitions).length).toBe(0);
-            routeBuilder.addDefinition('get', 'get', 'get', false, false);
+            routeBuilder.addDefinition('get', Verb.Get, 'get', false, false);
             expect(Object.keys(routeBuilder.routeDefinitions).length).toBe(1);
             expect(routeBuilder.routeDefinitions['get']).toBeInstanceOf(RouteDefinition);
         });
 
         it('should create a new RouteMethod', function () {
             const routeBuilder = new RouteBuilder();
-            routeBuilder.addDefinition('get', 'get', 'get', false, false);
+            routeBuilder.addDefinition('get', Verb.Get, 'get', false, false);
             expect(routeBuilder.routeDefinitions['get'].method).toBeInstanceOf(RouteMethod);
         });
     });

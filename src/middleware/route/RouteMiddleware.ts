@@ -34,15 +34,22 @@ export class RouteMiddleware {
     };
 
     handler = async (context: Context, value: any) => {
+        // Remove ending '/' from pathname, unless only single '/'.
+        let pathname = context.url.pathname;
+        if (pathname !== '/' && pathname.endsWith('/')) {
+            pathname = pathname.slice(0, -1);
+        }
+
         let routes = this.routes.filter(route => {
-            return (context.method === route.verb || route.verb === 'all') && !!context.pathname.match(route.regex);
+            return (context.method === route.verb || route.verb === 'all') && !!pathname.match(route.regex);
         });
         if (routes.length) {
             let route = routes[0];
             context.template = route.template;
-            const match = context.pathname.match(route.regex);
-            context.params = match ? createParams(match, route.argumentNames) : {};
-            context.body = context.body || {};
+            const match = pathname.match(route.regex);
+            context.data.query = context.data.query || {};
+            context.data.params = match ? createParams(match, route.argumentNames) : {};
+            context.data.body = context.data.body || {};
             let result = value;
             for (let index = 0, length = route.middlewares.length; index < length; index++) {
                 result = await route.middlewares[index](context, result);
@@ -52,16 +59,16 @@ export class RouteMiddleware {
                     $context: context,
                     $request: context.request,
                     $response: context.response,
-                    $body: context.body,
-                    $session: context.session,
-                    $query: context.query,
-                    $params: context.params,
+                    $body: context.data.body,
+                    $session: context.data.session,
+                    $query: context.data.query,
+                    $params: context.data.params,
                     $accept: context.accept,
                     $contentType: context.contentType,
                     $result: result
                 };
                 return await route.method.apply(route, route.argumentNames.map((name, index) => {
-                    let value = contextParams[name as keyof typeof contextParams] || context.params[name] || context.query[name] || context.body[name];
+                    let value = contextParams[name as keyof typeof contextParams] || contextParams.$params[name] || contextParams.$query[name] || contextParams.$body[name];
                     let argumentType = route.argumentTypes[index];
                     if (argumentType && this.castValue) {
                         return this.castValue(argumentType, value);

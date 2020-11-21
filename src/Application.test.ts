@@ -19,7 +19,7 @@ describe('Application', function () {
             const application = new Application();
             const middleware = async () => '';
             application.view(middleware);
-            expect(application.requestHandler.viewPipeline.middlewares[0]).toBe(middleware);
+            expect(application.requestHandler.viewPipeline.middlewares).toContain(middleware);
         });
     });
 
@@ -28,7 +28,7 @@ describe('Application', function () {
             const application = new Application();
             const middleware = async () => { };
             application.error(middleware);
-            expect(application.requestHandler.viewPipeline.middlewares[0]).toBe(middleware);
+            expect(application.requestHandler.errorPipeline.middlewares).toContain(middleware);
         });
     });
 

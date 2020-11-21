@@ -8,6 +8,8 @@ import { method } from './Decorators';
 import { Controller } from './Controller';
 import { Route } from './Route';
 import { RouteMiddleware, sortRoutes } from './RouteMiddleware';
+import { Verb } from '../../server';
+import { QueryStringMiddleware } from '../query-string';
 
 describe('RouteMiddleware', () => {
     describe('route matching', function () {
@@ -62,6 +64,7 @@ describe('RouteMiddleware', () => {
                     };
                 }
             }
+            application.use(QueryStringMiddleware);
             application.use(BodyMiddleware.handle);
             application.addController(new IndexController());
             await application.init();
@@ -94,6 +97,7 @@ describe('RouteMiddleware', () => {
 
             beforeAll(async () => {
                 application = new Application();
+                application.use(QueryStringMiddleware);
 
                 class IndexController extends Controller {
                     @method('get')
@@ -134,6 +138,7 @@ describe('RouteMiddleware', () => {
 
             beforeAll(async () => {
                 application = new Application();
+                application.use(QueryStringMiddleware);
 
                 class IndexController extends Controller {
                     @method('get')
@@ -177,6 +182,7 @@ describe('RouteMiddleware', () => {
 
             beforeAll(async () => {
                 application = new Application();
+                application.use(QueryStringMiddleware);
 
                 class IndexController extends Controller {
                     @method('get')
@@ -220,6 +226,7 @@ describe('RouteMiddleware', () => {
 
             beforeAll(async () => {
                 application = new Application();
+                application.use(QueryStringMiddleware);
 
                 class IndexController extends Controller {
                     @method('get')
@@ -260,6 +267,7 @@ describe('RouteMiddleware', () => {
 
             beforeAll(async () => {
                 application = new Application();
+                application.use(QueryStringMiddleware);
 
                 class IndexController extends Controller {
                     @method('get', '/testBoolean/:boolean')
@@ -827,7 +835,7 @@ describe('RouteMiddleware', () => {
             ];
 
             routes.map(route => {
-                return new Route('get', route, undefined as any, undefined as any, undefined as any, undefined as any, undefined as any, undefined as any);
+                return new Route(Verb.Get, route, undefined as any, undefined as any, undefined as any, undefined as any, undefined as any, undefined as any);
             }).sort(sortRoutes);
 
             expect(true).toBe(true);

@@ -2,29 +2,29 @@ import * as path from 'path';
 import 'reflect-metadata';
 
 import { getArgumentNames, stringToRegex } from '../../utils/RouteUtil';
-import { IServerMiddleware, NoMethodError, Verb } from '../../server';
+import { Context, NoMethodError, Verb, getVerb } from '../../server';
+import { Middleware } from '../../pipeline';
 
 import { Controller } from './Controller';
 import { Route } from './Route';
 import { RouteDefinition, RouteMethod } from './RouteDefinition';
-import { getVerb } from '../../server/Verb';
 
 export class RouteBuilder {
-    routeDefinitions: Record<string, RouteDefinition<IServerMiddleware<any, any>>> = {};
+    routeDefinitions: Record<string, RouteDefinition<Middleware<Context, any, any>>> = {};
     parent?: RouteBuilder;
 
     constructor(parent?: RouteBuilder) {
         this.parent = parent;
     }
 
-    addMiddleware(methodName: string, middleware: IServerMiddleware<any, any>) {
+    addMiddleware(methodName: string, middleware: Middleware<Context, any, any>) {
         if (!this.routeDefinitions[methodName]) {
             this.routeDefinitions[methodName] = new RouteDefinition();
         }
         this.routeDefinitions[methodName].middleware.push(middleware);
     }
 
-    unshiftMiddleware(methodName: string, middleware: IServerMiddleware<any, any>) {
+    unshiftMiddleware(methodName: string, middleware: Middleware<Context, any, any>) {
         if (!this.routeDefinitions[methodName]) {
             this.routeDefinitions[methodName] = new RouteDefinition();
         }
@@ -42,10 +42,10 @@ export class RouteBuilder {
         if (this.parent) {
             // Merge with existing RouteDefinitions
             let routeDefinitions = this.routeDefinitions;
-            let parentRouteDefinitions: Record<string, RouteDefinition<IServerMiddleware<any, any>>> = this.parent.getRouteDefinitions();
+            let parentRouteDefinitions: Record<string, RouteDefinition<Middleware<Context, any, any>>> = this.parent.getRouteDefinitions();
 
             // Create merged object with values from this RouteBuilder
-            let mergedRouteDefinitions: Record<string, RouteDefinition<IServerMiddleware<any, any>>> = {};
+            let mergedRouteDefinitions: Record<string, RouteDefinition<Middleware<Context, any, any>>> = {};
             let keys: string[] = RouteBuilder.getKeys(parentRouteDefinitions, routeDefinitions);
             keys.forEach(index => {
                 let routeDefinition = routeDefinitions[index];
@@ -92,7 +92,7 @@ export class RouteBuilder {
             }
 
             // Get argument names, and bind method
-            let method: IServerMiddleware<unknown, unknown> = controller[definitionName as keyof typeof controller] as any;
+            let method: Middleware<Context, unknown, unknown> = controller[definitionName as keyof typeof controller] as any;
             let argumentNames: string[] | undefined = undefined;
             if (method) {
                 if (pipeArgs) {

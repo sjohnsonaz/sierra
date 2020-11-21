@@ -1,11 +1,12 @@
-import { IServerMiddleware, Verb } from '../../server';
+import { Middleware } from '../../pipeline';
+import { Context, Verb } from '../../server';
 
 export class Route<T, U> {
     verb: Verb;
     name: string | RegExp;
     regex: RegExp;
-    middlewares: IServerMiddleware<any, any>[];
-    method: IServerMiddleware<T, U>;
+    middlewares: Middleware<Context, any, any>[];
+    method: Middleware<Context, T, U>;
     pipeArgs: boolean;
     argumentNames: string[];
     template: string;
@@ -15,8 +16,8 @@ export class Route<T, U> {
         verb: Verb,
         name: string | RegExp,
         regex: RegExp,
-        middlewares: IServerMiddleware<any, any>[],
-        method: IServerMiddleware<T, U>,
+        middlewares: Middleware<Context, any, any>[],
+        method: Middleware<Context, T, U>,
         pipeArgs: boolean = false,
         argumentNames: string[] = [],
         template: string,

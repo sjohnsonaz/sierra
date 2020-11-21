@@ -41,15 +41,19 @@ export class RequestHandler {
                         break;
                 }
             }
-            try {
-                let result = await this.errorPipeline.run(context, e);
-                if (result instanceof OutgoingMessage) {
-                    this.send(context, result.data, result.status, result.type, result.template, result.contentType);
-                } else {
-                    this.send(context, result, errorStatus, 'auto', ERROR_TEMPLATE);
+            if (this.errorPipeline.middlewares.length) {
+                try {
+                    let result = await this.errorPipeline.run(context, e);
+                    if (result instanceof OutgoingMessage) {
+                        this.send(context, result.data, result.status, result.type, result.template, result.contentType);
+                    } else {
+                        this.send(context, result, errorStatus, 'auto', ERROR_TEMPLATE);
+                    }
                 }
-            }
-            catch (e) {
+                catch (e) {
+                    this.sendError(context, e, errorStatus);
+                }
+            } else {
                 this.sendError(context, e, errorStatus);
             }
         }

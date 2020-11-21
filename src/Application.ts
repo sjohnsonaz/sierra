@@ -2,15 +2,15 @@ import { createServer, Server } from 'http';
 import { ListenOptions } from 'net';
 
 import {
-    IServerMiddleware,
-    IViewMiddleware,
     RequestHandler,
-    LogLevel
+    LogLevel,
+    Context
 } from './server';
 import {
     Controller,
     RouteMiddleware
 } from './middleware/route';
+import { Middleware } from './pipeline';
 
 /**
  * A Sierra Application
@@ -69,7 +69,7 @@ export class Application {
      * Adds a Middleware to the Pipeline.
      * @param middleware - the Middleware to add
      */
-    use(middleware: IServerMiddleware<any, any>) {
+    use(middleware: Middleware<Context, any, any>) {
         this.requestHandler.use(middleware);
     }
 
@@ -77,16 +77,16 @@ export class Application {
      * Sets View Middleware.  Only one is enabled at a time.
      * @param viewMiddlware - the View Middleware
      */
-    view(viewMiddlware: IViewMiddleware<any>) {
-        this.requestHandler.view = viewMiddlware;
+    view(viewMiddlware: Middleware<Context, any, any>) {
+        this.requestHandler.useView(viewMiddlware);
     }
 
     /**
      * Sets Error Middleware.  Only one is enabled at a time.
      * @param errorMiddleware - the Error Middleware
      */
-    error(errorMiddleware: IServerMiddleware<any, any>) {
-        this.requestHandler.error = errorMiddleware;
+    error(errorMiddleware: Middleware<Context, any, any>) {
+        this.requestHandler.useError(errorMiddleware);
     }
 
     /**

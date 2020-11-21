@@ -1,4 +1,5 @@
-import { IServerMiddleware, Verb } from '../../server';
+import { Middleware } from '../../pipeline';
+import { Context, Verb } from '../../server';
 
 export class RouteMethod {
     verb: Verb;
@@ -14,7 +15,7 @@ export class RouteMethod {
     }
 }
 
-export class RouteDefinition<U extends IServerMiddleware<any, any>> {
+export class RouteDefinition<U extends Middleware<Context, any, any>> {
     method?: RouteMethod;
     middleware: U[] = [];
 

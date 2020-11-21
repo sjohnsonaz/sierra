@@ -53,11 +53,6 @@ export class Context {
         // Accept Type
         this.accept = getAccept(request);
 
-        // // Remove ending '/' from pathname, unless only single '/'.
-        // let pathname = url.pathname;
-        // if (pathname !== '/' && pathname.endsWith('/')) {
-        //     pathname = pathname.slice(0, -1);
-        // }
         this.cookies = new CookieRegistry(request);
     }
 

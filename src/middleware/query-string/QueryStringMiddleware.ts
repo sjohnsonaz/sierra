@@ -1,13 +1,9 @@
 import { Context } from '../../server';
-import { decode, DecodedQuery, getQueryString } from '../../utils/query-string';
+import { decode, getQueryString } from '../../utils/query-string';
 
-export async function QueryStringMiddleware<T extends Context>(context: T) {
-    type QueryContext = T & {
-        query: DecodedQuery;
-    };
+export async function QueryStringMiddleware(context: Context) {
     const queryString = getQueryString(context.request.url || '');
     const query = decode(queryString);
-    const queryContext: QueryContext = context as any;
-    queryContext.query = query;
+    context.data.query = query;
     return query;
 }
