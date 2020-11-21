@@ -1,12 +1,21 @@
 import { Context, NoRouteFoundError } from "../../server";
+import { Controller } from "./controller";
 import { Route } from "./Route";
 import { RouteGroup } from "./RouteGroup";
 
 export class RouteMiddleware extends RouteGroup {
     allRoutes: Route<any, any>[] = [];
+    controllers: Controller[] = [];
 
     init() {
         const allRoutes = super.init();
+        for (let controller of this.controllers) {
+            const routeGroups = Controller.build(controller);
+            const controllerRoutes = routeGroups.init();
+            for (let controllerRoute of controllerRoutes) {
+                allRoutes.push(controllerRoute);
+            }
+        }
         this.allRoutes = allRoutes;
         this.allRoutes.sort(sortRoutes);
         return allRoutes;
@@ -29,6 +38,27 @@ export class RouteMiddleware extends RouteGroup {
             return route.run(context, value, match);
         } else {
             throw new NoRouteFoundError();
+        }
+    }
+
+    /**
+     * Adds a Controller to RouteMiddleware
+     * @param controller - the Controller to add
+     */
+    addController(controller: Controller) {
+        return this.controllers.push(controller);
+    }
+
+    /**
+     * Removes a Controller from RouteMiddleware
+     * @param controller - the Controller to remove
+     */
+    removeController(controller: Controller) {
+        const index = this.controllers.indexOf(controller);
+        if (index >= 0) {
+            return !!this.controllers.splice(index).length;
+        } else {
+            return false;
         }
     }
 }

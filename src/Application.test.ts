@@ -73,11 +73,11 @@ describe('Application', function () {
     describe('addController', function () {
         it('should add a Controller', function () {
             const application = new Application();
-            expect(application.controllers.length).toBe(0);
+            expect(application.routeMiddleware.controllers.length).toBe(0);
             const controller = new Controller();
             application.addController(controller);
-            expect(application.controllers.length).toBe(1);
-            expect(application.controllers).toContain(controller);
+            expect(application.routeMiddleware.controllers.length).toBe(1);
+            expect(application.routeMiddleware.controllers).toContain(controller);
         });
     });
 
@@ -86,16 +86,16 @@ describe('Application', function () {
             const application = new Application();
             const controller = new Controller();
             application.addController(controller);
-            expect(application.controllers.length).toBe(1);
+            expect(application.routeMiddleware.controllers.length).toBe(1);
             application.removeController(controller);
-            expect(application.controllers.length).toBe(0);
+            expect(application.routeMiddleware.controllers.length).toBe(0);
         });
 
         it('should not remove a Controller that is not present', function () {
             const application = new Application();
             const controller = new Controller();
             application.removeController(controller);
-            expect(application.controllers.length).toBe(0);
+            expect(application.routeMiddleware.controllers.length).toBe(0);
         });
     });
 });

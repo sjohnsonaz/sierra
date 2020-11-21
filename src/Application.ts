@@ -19,8 +19,6 @@ export class Application {
     /** The RouteMiddleware object */
     routeMiddleware: RouteMiddleware = new RouteMiddleware();
 
-    controllers: Controller[] = [];
-
     /** The Server object */
     server: Server = createServer(this.requestHandler.callback);
 
@@ -39,16 +37,13 @@ export class Application {
      * @returns Promise<void>
      */
     async init() {
-        for (let controller of this.controllers) {
-            const routeGroup = Controller.build(controller);
-            this.routeMiddleware.addGroup(routeGroup);
-        }
         const routes = this.routeMiddleware.init();
 
         // Add RouteMiddleware if we have Routes.
         if (routes.length) {
             this.requestHandler.use(this.routeMiddleware.handle);
         }
+
         return this.requestHandler;
     }
 
@@ -57,7 +52,7 @@ export class Application {
      * @param controller - the Controller to add
      */
     addController(controller: Controller) {
-        this.controllers.push(controller);
+        return this.routeMiddleware.addController(controller);
     }
 
     /**
@@ -65,12 +60,7 @@ export class Application {
      * @param controller - the Controller to remove
      */
     removeController(controller: Controller) {
-        const index = this.controllers.indexOf(controller);
-        if (index >= 0) {
-            return !!this.controllers.splice(index).length;
-        } else {
-            return false;
-        }
+        return this.routeMiddleware.removeController(controller);
     }
 
     /**
