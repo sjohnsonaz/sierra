@@ -1,4 +1,5 @@
-import { Context, ISessionGateway, Uuid } from '../src';
+import { Context, Uuid } from '../src';
+import { ISessionGateway } from '../src/middleware/session/ISessionGateway';
 
 export default class SessionGateway implements ISessionGateway<any> {
     async getId(context: Context): Promise<string> {

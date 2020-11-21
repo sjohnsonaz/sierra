@@ -1,4 +1,4 @@
-import { Controller, middleware, route, Context, method, json } from '../src';
+import { Controller, middleware, Context, method, json } from '../src';
 
 async function SimpleMiddleware() {
     return true;
@@ -9,7 +9,7 @@ export default class HomeController extends Controller {
         super('/');
     }
 
-    @route('get')
+    @method('get')
     @middleware(SimpleMiddleware)
     @middleware(async (context) => {
         return { value: true };
@@ -50,7 +50,7 @@ export default class HomeController extends Controller {
         };
     }
 
-    @route('get')
+    @method('get')
     async getJson(context: Context, value: any) {
         return json({ value: true });
     }
