@@ -6,9 +6,8 @@ import {
     LogLevel,
     Context
 } from './server';
-import { Controller } from './middleware/controller';
+import { Controller, RouteMiddleware } from './middleware/route';
 import { Middleware } from './pipeline';
-import { RouteMiddleware } from './middleware/route';
 
 /**
  * A Sierra Application

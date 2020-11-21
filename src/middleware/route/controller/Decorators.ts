@@ -1,5 +1,5 @@
-import { Middleware } from '../../pipeline';
-import { Context, Verb } from '../../server';
+import { Middleware } from '../../../pipeline';
+import { Context, Verb } from '../../../server';
 import { Controller } from './Controller';
 import { IMethod } from './IMethod';
 import { RouteBuilder } from './RouteBuilder';

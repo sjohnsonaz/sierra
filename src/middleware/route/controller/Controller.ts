@@ -1,7 +1,8 @@
 import * as path from 'path';
 
+import { RouteGroup } from '../RouteGroup';
+
 import { RouteBuilder } from './RouteBuilder';
-import { RouteGroup } from '../route';
 
 export class Controller {
     _base?: string;

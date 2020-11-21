@@ -1,4 +1,5 @@
-import { Context, Verb } from '../../server';
+import { Verb } from '../../../server';
+
 import { Controller } from './Controller';
 import { method, middleware } from './Decorators';
 

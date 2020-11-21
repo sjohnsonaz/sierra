@@ -1,5 +1,5 @@
-import { Middleware } from '../../pipeline';
-import { Context, Verb } from '../../server';
+import { Middleware } from '../../../pipeline';
+import { Context, Verb } from '../../../server';
 
 export class RouteMethod {
     verbs: Verb[];

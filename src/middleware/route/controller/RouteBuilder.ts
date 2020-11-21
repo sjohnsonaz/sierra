@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 
-import { Context, NoMethodError, Verb } from '../../server';
-import { Middleware } from '../../pipeline';
+import { Context, NoMethodError, Verb } from '../../../server';
+import { Middleware } from '../../../pipeline';
 
-import { Route } from '../route/Route';
+import { Route } from '../Route';
 
 import { Controller } from './Controller';
 import { RouteDefinition, RouteMethod } from './RouteDefinition';

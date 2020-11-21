@@ -7,7 +7,7 @@ export * from './server';
 // Middleware
 export * from './middleware/body';
 export * from './middleware/connect';
-export * from './middleware/controller';
+export * from './middleware/route';
 export * from './middleware/session';
 export * from './middleware/query-string';
 
