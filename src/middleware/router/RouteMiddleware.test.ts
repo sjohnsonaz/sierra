@@ -6,25 +6,6 @@ import { Route } from "./Route";
 import { RouterMiddleware, sortRoutes } from "./RouterMiddleware";
 
 describe('RouteMiddleware', function () {
-    describe('add', function () {
-        it('should add a Route', function () {
-            const routerMiddleware = new RouterMiddleware();
-            const route = new Route(Verb.Get, 'test', async () => { });
-            routerMiddleware.add(route);
-            expect(routerMiddleware.routes).toContain(route);
-        });
-    });
-
-    describe('remove', function () {
-        it('should remove a Route', function () {
-            const routerMiddleware = new RouterMiddleware();
-            const route = new Route(Verb.Get, 'test', async () => { });
-            routerMiddleware.add(route);
-            routerMiddleware.remove(route);
-            expect(routerMiddleware.routes).not.toContain(route);
-        });
-    });
-
     describe('init', function () {
         it('should sort Routes', function () {
             const routerMiddleware = new RouterMiddleware();
