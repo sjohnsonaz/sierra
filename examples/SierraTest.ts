@@ -1,4 +1,4 @@
-import Sierra, { BodyMiddleware, LogLevel, SessionMiddleware } from '../src';
+import Sierra, { BodyMiddleware, LogLevel, QueryStringMiddleware, SessionMiddleware } from '../src';
 
 import HandlebarsView from './HandlebarsView';
 import HomeController from './HomeController';
@@ -11,7 +11,8 @@ HandlebarsView.viewRoot = './examples/views/';
 testApplication.view(HandlebarsView.handle);
 
 // Body
-testApplication.use(BodyMiddleware.handle);
+testApplication.use(QueryStringMiddleware);
+testApplication.use(BodyMiddleware);
 
 // Session
 let sessionMiddleware = new SessionMiddleware(new SessionGateway());

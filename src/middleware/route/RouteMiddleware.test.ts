@@ -65,7 +65,7 @@ describe('RouteMiddleware', () => {
                 }
             }
             application.use(QueryStringMiddleware);
-            application.use(BodyMiddleware.handle);
+            application.use(BodyMiddleware);
             application.addController(new IndexController());
             await application.init();
         });
@@ -278,7 +278,7 @@ describe('RouteMiddleware', () => {
                         };
                     }
                 }
-                application.use(BodyMiddleware.handle);
+                application.use(BodyMiddleware);
                 application.addController(new IndexController());
                 await application.init();
             });
@@ -316,7 +316,7 @@ describe('RouteMiddleware', () => {
                         };
                     }
                 }
-                application.use(BodyMiddleware.handle);
+                application.use(BodyMiddleware);
                 application.addController(new IndexController());
                 await application.init();
             });
@@ -356,7 +356,7 @@ describe('RouteMiddleware', () => {
                         };
                     }
                 }
-                application.use(BodyMiddleware.handle);
+                application.use(BodyMiddleware);
                 application.addController(new IndexController());
                 await application.init();
             });
@@ -396,7 +396,7 @@ describe('RouteMiddleware', () => {
                         };
                     }
                 }
-                application.use(BodyMiddleware.handle);
+                application.use(BodyMiddleware);
                 application.addController(new IndexController());
                 await application.init();
             });
@@ -436,7 +436,7 @@ describe('RouteMiddleware', () => {
                         };
                     }
                 }
-                application.use(BodyMiddleware.handle);
+                application.use(BodyMiddleware);
                 application.addController(new IndexController());
                 await application.init();
             });
@@ -478,7 +478,7 @@ describe('RouteMiddleware', () => {
                         };
                     }
                 }
-                application.use(BodyMiddleware.handle);
+                application.use(BodyMiddleware);
                 application.addController(new IndexController());
                 await application.init();
             });
@@ -518,7 +518,7 @@ describe('RouteMiddleware', () => {
                         };
                     }
                 }
-                application.use(BodyMiddleware.handle);
+                application.use(BodyMiddleware);
                 application.addController(new IndexController());
                 await application.init();
             });
@@ -618,7 +618,7 @@ describe('RouteMiddleware', () => {
                     };
                 }
             }
-            application.use(BodyMiddleware.handle);
+            application.use(BodyMiddleware);
             application.addController(new IndexController());
             await application.init();
         });
