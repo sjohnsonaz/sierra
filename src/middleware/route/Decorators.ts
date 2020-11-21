@@ -1,6 +1,7 @@
 import { Middleware } from '../../pipeline';
-import { Context, IMethod, Verb } from '../../server';
+import { Context, Verb } from '../../server';
 import { Controller } from './Controller';
+import { IMethod } from './IMethod';
 import { RouteBuilder } from './RouteBuilder';
 
 type VerbType = Verb | Verb[keyof Verb];
