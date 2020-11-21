@@ -1,7 +1,7 @@
 import * as path from 'path';
 
 import { RouteBuilder } from './RouteBuilder';
-import { Route } from './Route';
+import { RouteGroup } from '../route';
 
 export class Controller {
     _base?: string;
@@ -11,9 +11,13 @@ export class Controller {
         this._base = base;
     }
 
-    static build(controller: Controller): Route<any, any>[] {
-        let routeHash = controller._routeBuilder?.build(controller);
-        return Object.values(routeHash || {});
+    static build(controller: Controller) {
+        const routes = controller._routeBuilder?.build(controller);
+        const routeGroup = new RouteGroup(controller._base || Controller.getName(controller));
+        routes?.forEach(route => {
+            routeGroup.add(route);
+        });
+        return routeGroup;
     }
 
     static getName(controller: Controller) {

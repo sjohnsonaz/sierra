@@ -4,46 +4,21 @@ import { Controller } from './Controller';
 import { IMethod } from './IMethod';
 import { RouteBuilder } from './RouteBuilder';
 
-type VerbType = Verb | Verb[keyof Verb];
-
-/**
- * Adds a method as a route.  By default arguments are not piped from the request.
- * @param verb 
- * @param name 
- */
-export function route<U extends Middleware<Context, any, any>>(verb: VerbType | VerbType[] = Verb.Get, name?: string | RegExp, pipeArgs: boolean = false) {
-    const _verb: Verb | Verb[] = verb as any;
-    return function (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<U>) {
-        const routeBuilder = RouteBuilder.getRouteBuilder(target);
-        if (_verb instanceof Array) {
-            _verb.forEach(verb => {
-                // TODO: Change to propertyKey
-                routeBuilder.addDefinition(propertyKey, verb, name as any, pipeArgs);
-            });
-        } else {
-            routeBuilder.addDefinition(propertyKey, _verb, name as any, pipeArgs);
-        }
-    }
-}
+type VerbString = 'all' | 'get' | 'post' | 'put' | 'delete' | 'patch' | 'options' | 'head';
+type VerbType = Verb | VerbString;
 
 /**
  * Adds a method as a route.
  * @param verb 
  * @param name 
  */
-export function method<U extends IMethod<any>>(verb: VerbType | VerbType[] = Verb.Get, name?: string | RegExp) {
-    const _verb: Verb | Verb[] = verb as any;
+export function method<U extends IMethod<any>>(verbs: VerbType | VerbType[] = Verb.Get, name?: string | RegExp, template?: string) {
+    const _verbs: Verb[] = verbs instanceof Array ? verbs as any : [verbs];
     return function (target: Controller, propertyKey: string, descriptor: TypedPropertyDescriptor<U>) {
+        let key = name || propertyKey;
         const routeBuilder = RouteBuilder.getRouteBuilder(target);
-        if (_verb instanceof Array) {
-            _verb.forEach(verb => {
-                // TODO: Change to propertyKey
-                routeBuilder.addDefinition(propertyKey, verb, name as any, true);
-            });
-        } else {
-            routeBuilder.addDefinition(propertyKey, _verb, name as any, true);
-        }
-    }
+        routeBuilder.addRoute(propertyKey, _verbs, key, template);
+    };
 }
 
 /**

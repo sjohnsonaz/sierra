@@ -9,7 +9,8 @@ export class Route<VALUE, RESULT> {
     readonly name: string | RegExp;
     readonly method: Middleware<Context, any, any>;
     // TODO: Should template be on Route?
-    readonly template?: string;
+    // TODO: Should this be readonly?
+    template?: string;
 
     config?: {
         readonly regex: RegExp;
@@ -39,7 +40,7 @@ export class Route<VALUE, RESULT> {
             this.config = {
                 regex: this.name,
                 parameters: [],
-                firstParamIndex: -1
+                firstParamIndex: -2
             };
         } else {
             const name = getName(base, this.name);
@@ -50,11 +51,11 @@ export class Route<VALUE, RESULT> {
                 .map(directory => directory.startsWith(':') ? '([\^\/]*)' : directory);
             const index = directories
                 .findIndex(part => part.startsWith(':'));
-            const regex = new RegExp(`^${parts.join('\\/')}$`, 'i');
+            const regex = new RegExp(`^\\/${parts.join('\\/')}$`, 'i');
             const parameters = directories
                 .filter(directory => directory.startsWith(':'))
                 .map(directory => directory.substr(1));
-            const firstParamIndex = index >= 0 ? index : 0;
+            const firstParamIndex = index;
             this.config = {
                 regex,
                 parameters,
@@ -82,20 +83,38 @@ export class Route<VALUE, RESULT> {
         return Object.freeze(params);
     }
 
-    run(context: Context, value: VALUE, match: null | RegExpMatchArray) {
+    async run(context: Context, value: VALUE, match: null | RegExpMatchArray) {
         context.template = context.template || this.template;
         context.data.params = this.getParams(match);
-        const result = this.pipeline.run(context, value);
+        const result = await this.pipeline.run(context, value);
         return this.method(context, result);
     }
 }
 
+/**
+ * If `name` starts with `"~"`, do nothing.
+ * 
+ * Otherwise, join `base` and `name`.
+ * 
+ * Result must not end in `"/"`.
+ * 
+ * @param base 
+ * @param name 
+ */
 function getName(base: string = '', name: string) {
+    let result: string;
     if (name.startsWith('~')) {
         name = name.substr(1);
-        return path.posix.join('/', name);
+        result = path.posix.join(name);
     } else {
         base = base.replace('\\', '/');
-        return path.posix.join('/', base, name);
+        result = path.posix.join(base, name);
     }
+    if (result.startsWith('/')) {
+        result = result.substr(1);
+    }
+    if (result.endsWith('/')) {
+        result = result.substr(0, result.length - 1);
+    }
+    return result;
 }

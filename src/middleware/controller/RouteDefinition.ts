@@ -2,16 +2,18 @@ import { Middleware } from '../../pipeline';
 import { Context, Verb } from '../../server';
 
 export class RouteMethod {
-    verb: Verb;
-    name?: string | RegExp;
-    pipeArgs: boolean;
-    override: boolean;
+    verbs: Verb[];
+    name: string | RegExp;
+    template?: string;
 
-    constructor(verb: Verb, name?: string | RegExp, pipeArgs: boolean = false, override: boolean = false) {
-        this.verb = verb;
+    constructor(
+        verbs: Verb[],
+        name: string | RegExp,
+        template?: string,
+    ) {
+        this.verbs = verbs;
         this.name = name;
-        this.pipeArgs = pipeArgs;
-        this.override = override;
+        this.template = template;
     }
 }
 
@@ -19,7 +21,7 @@ export class RouteDefinition<U extends Middleware<Context, any, any>> {
     method?: RouteMethod;
     middleware: U[] = [];
 
-    constructor(method?: RouteMethod) {
-        this.method = method;
+    constructor(definitionMethod?: RouteMethod) {
+        this.method = definitionMethod;
     }
 }

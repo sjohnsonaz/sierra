@@ -3,12 +3,12 @@ import { Context, Verb } from "../../server";
 import { createRequest } from '../../utils/TestUtil';
 
 import { Route } from "./Route";
-import { RouterMiddleware, sortRoutes } from "./RouterMiddleware";
+import { RouteMiddleware, sortRoutes } from "./RouteMiddleware";
 
 describe('RouteMiddleware', function () {
     describe('init', function () {
         it('should sort Routes', function () {
-            const routerMiddleware = new RouterMiddleware();
+            const routerMiddleware = new RouteMiddleware();
             const routeA = new Route(Verb.Get, 'a', async () => { });
             const routeB = new Route(Verb.Get, 'a/:b', async () => { });
             const routeRegex = new Route(Verb.Get, /regex/, async () => { });
@@ -20,15 +20,15 @@ describe('RouteMiddleware', function () {
             expect(routerMiddleware.routes[2]).toBe(routeRegex);
 
             routerMiddleware.init();
-            expect(routerMiddleware.routes[0]).toBe(routeRegex);
-            expect(routerMiddleware.routes[1]).toBe(routeA);
-            expect(routerMiddleware.routes[2]).toBe(routeB);
+            expect(routerMiddleware.allRoutes[0]).toBe(routeRegex);
+            expect(routerMiddleware.allRoutes[1]).toBe(routeA);
+            expect(routerMiddleware.allRoutes[2]).toBe(routeB);
         });
     });
 
     describe('handle', function () {
         it('should match routes', async function () {
-            const routerMiddleware = new RouterMiddleware();
+            const routerMiddleware = new RouteMiddleware();
             const route = new Route(Verb.Get, 'test', async () => {
                 return true
             });
@@ -50,7 +50,7 @@ describe('RouteMiddleware', function () {
         });
 
         it('should match parameterized routes', async function () {
-            const routerMiddleware = new RouterMiddleware();
+            const routerMiddleware = new RouteMiddleware();
             const testRoute = new Route(Verb.Get, 'test', async () => {
                 return true
             });

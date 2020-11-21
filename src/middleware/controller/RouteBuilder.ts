@@ -1,12 +1,11 @@
-import * as path from 'path';
 import 'reflect-metadata';
 
-import { getArgumentNames, stringToRegex } from '../../utils/RouteUtil';
-import { Context, NoMethodError, Verb, getVerb } from '../../server';
+import { Context, NoMethodError, Verb } from '../../server';
 import { Middleware } from '../../pipeline';
 
+import { Route } from '../route/Route';
+
 import { Controller } from './Controller';
-import { Route } from './Route';
 import { RouteDefinition, RouteMethod } from './RouteDefinition';
 
 export class RouteBuilder {
@@ -31,11 +30,16 @@ export class RouteBuilder {
         this.routeDefinitions[methodName].middleware.unshift(middleware);
     }
 
-    addDefinition(methodName: string, verb: Verb, name: string | RegExp, pipeArgs?: boolean, override?: boolean) {
+    addRoute(
+        methodName: string,
+        verbs: Verb[],
+        name: string | RegExp,
+        template?: string,
+    ) {
         if (!this.routeDefinitions[methodName]) {
             this.routeDefinitions[methodName] = new RouteDefinition();
         }
-        this.routeDefinitions[methodName].method = new RouteMethod(verb, name, pipeArgs, override);;
+        this.routeDefinitions[methodName].method = new RouteMethod(verbs, name, template);
     }
 
     getRouteDefinitions() {
@@ -77,78 +81,46 @@ export class RouteBuilder {
         return Object.keys(routeDefinitions).map(definitionName => {
             const methodName: keyof T = definitionName as any;
             const routeDefinition = routeDefinitions[definitionName];
-            const middleware = routeDefinition.middleware;
-            const routeMethod = routeDefinition.method;
-            if (!routeMethod) {
+            const { method: definitionMethod, middleware: definitionMiddleware } = routeDefinition;
+            if (!definitionMethod) {
                 throw new NoMethodError(definitionName);
             }
-            let name = routeMethod.name || '';
-            let verb = routeMethod.verb;
-            const pipeArgs = routeMethod.pipeArgs;
 
-            let argumentTypes;
-            if (Reflect.getMetadata) {
-                argumentTypes = Reflect.getMetadata("design:paramtypes", controller, definitionName);
-            }
-
-            // Get argument names, and bind method
+            // Get method
             let method: Middleware<Context, unknown, unknown> = controller[definitionName as keyof typeof controller] as any;
-            let argumentNames: string[] | undefined = undefined;
-            if (method) {
-                if (pipeArgs) {
-                    argumentNames = getArgumentNames(method);
-                }
+            if (!method) {
+                throw new NoMethodError(definitionName);
+            } else {
                 method = method.bind(controller);
             }
 
-            // Do we have a verb already
-            if (!verb) {
-                verb = getVerb(definitionName);
+            // Get template
+            const template = Controller.getTemplate(controller, methodName);
+
+            // Create Route
+            const route = new Route(definitionMethod.verbs, definitionMethod.name || definitionName, method, definitionMethod.template || template);
+
+            // Add Middleware
+            for (let middleware of definitionMiddleware) {
+                route.pipeline.use(middleware);
             }
 
-            let regex: RegExp;
-            // If name is a RegExp, we are done
-            if (!(name instanceof RegExp)) {
-                // If name starts with ~/, we must only remove the ~, and we are done
-                if (name.startsWith('~/')) {
-                    name = name.substr(1);
-                } else {
-                    // Else, assemble string
-                    let nameParts = [];
+            // let argumentTypes;
+            // if (Reflect.getMetadata) {
+            //     argumentTypes = Reflect.getMetadata("design:paramtypes", controller, definitionName);
+            // }
 
-                    // Use controller base
-                    nameParts.push(Controller.getBase(controller));
+            // Get argument names, and bind method
+            // let method: Middleware<Context, unknown, unknown> = controller[definitionName as keyof typeof controller] as any;
+            // let argumentNames: string[] | undefined = undefined;
+            // if (method) {
+            //     if (pipeArgs) {
+            //         argumentNames = getArgumentNames(method);
+            //     }
+            //     method = method.bind(controller);
+            // }
 
-                    // If we have no name, attempt to create one
-                    if (!name) {
-                        // If the method isn't equal to the verb or 'index', use method in route
-                        // Ensure index is lower case
-                        const nameLowerCase = definitionName.toLowerCase();
-                        if (verb !== nameLowerCase && nameLowerCase !== 'index') {
-                            nameParts.push(nameLowerCase);
-                        }
-                    } else {
-                        // Use the name we have
-                        nameParts.push(name);
-                    }
-
-                    // Build name
-                    name = path.posix.join(...nameParts);
-
-                    // Ensure preceeding '/'
-                    if (!name.startsWith('/')) {
-                        name = '/' + name;
-                    }
-                }
-                name = path.posix.normalize(name);
-                regex = stringToRegex(name);
-            } else {
-                regex = name;
-            }
-
-            let template = Controller.getTemplate(controller, methodName);
-
-            return new Route(verb, name, regex, middleware, method, pipeArgs, argumentNames, template, argumentTypes);
+            return route;
         });
     }
 

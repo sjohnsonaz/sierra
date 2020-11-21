@@ -6,11 +6,9 @@ import {
     LogLevel,
     Context
 } from './server';
-import {
-    Controller,
-    RouteMiddleware
-} from './middleware/controller';
+import { Controller } from './middleware/controller';
 import { Middleware } from './pipeline';
+import { RouteMiddleware } from './middleware/route';
 
 /**
  * A Sierra Application
@@ -21,6 +19,8 @@ export class Application {
 
     /** The RouteMiddleware object */
     routeMiddleware: RouteMiddleware = new RouteMiddleware();
+
+    controllers: Controller[] = [];
 
     /** The Server object */
     server: Server = createServer(this.requestHandler.callback);
@@ -40,11 +40,15 @@ export class Application {
      * @returns Promise<void>
      */
     async init() {
-        await this.routeMiddleware.init();
+        for (let controller of this.controllers) {
+            const routeGroup = Controller.build(controller);
+            this.routeMiddleware.addGroup(routeGroup);
+        }
+        const routes = this.routeMiddleware.init();
 
         // Add RouteMiddleware if we have Routes.
-        if (this.routeMiddleware.routes.length) {
-            this.requestHandler.use(this.routeMiddleware.handler);
+        if (routes.length) {
+            this.requestHandler.use(this.routeMiddleware.handle);
         }
         return this.requestHandler;
     }
@@ -54,7 +58,7 @@ export class Application {
      * @param controller - the Controller to add
      */
     addController(controller: Controller) {
-        this.routeMiddleware.addController(controller);
+        this.controllers.push(controller);
     }
 
     /**
@@ -62,7 +66,12 @@ export class Application {
      * @param controller - the Controller to remove
      */
     removeController(controller: Controller) {
-        this.routeMiddleware.removeController(controller);
+        const index = this.controllers.indexOf(controller);
+        if (index >= 0) {
+            return !!this.controllers.splice(index).length;
+        } else {
+            return false;
+        }
     }
 
     /**

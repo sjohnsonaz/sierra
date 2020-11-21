@@ -2,12 +2,14 @@ import { Context, NoRouteFoundError } from "../../server";
 import { Route } from "./Route";
 import { RouteGroup } from "./RouteGroup";
 
-export class RouterMiddleware extends RouteGroup {
+export class RouteMiddleware extends RouteGroup {
+    allRoutes: Route<any, any>[] = [];
 
     init() {
-        const routes = super.init();
-        this.routes.sort(sortRoutes);
-        return routes;
+        const allRoutes = super.init();
+        this.allRoutes = allRoutes;
+        this.allRoutes.sort(sortRoutes);
+        return allRoutes;
     }
 
     handle = async (context: Context, value?: any) => {
@@ -16,7 +18,7 @@ export class RouterMiddleware extends RouteGroup {
         let route: Route<any, any> | undefined = undefined;
         // Store match array
         let match: null | RegExpMatchArray = null;
-        for (let _route of this.routes) {
+        for (let _route of this.allRoutes) {
             match = _route.match(context.method, pathname);
             if (match) {
                 route = _route;

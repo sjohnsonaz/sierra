@@ -3,7 +3,7 @@ import * as request from 'supertest';
 import { Application } from '../../Application';
 import { Context, Verb } from '../../server';
 
-import { middleware, route } from './Decorators';
+import { method, middleware } from './Decorators';
 import { Controller } from './Controller';
 import { RouteBuilder } from './RouteBuilder';
 import { RouteDefinition, RouteMethod } from './RouteDefinition';
@@ -60,15 +60,15 @@ describe('RouteBuilder', function () {
         it('should create a new RouteDefinition', function () {
             const routeBuilder = new RouteBuilder();
             expect(Object.keys(routeBuilder.routeDefinitions).length).toBe(0);
-            routeBuilder.addDefinition('get', Verb.Get, 'get', false, false);
+            routeBuilder.addRoute('getMethod', [Verb.Get], 'get');
             expect(Object.keys(routeBuilder.routeDefinitions).length).toBe(1);
-            expect(routeBuilder.routeDefinitions['get']).toBeInstanceOf(RouteDefinition);
+            expect(routeBuilder.routeDefinitions['getMethod']).toBeInstanceOf(RouteDefinition);
         });
 
         it('should create a new RouteMethod', function () {
             const routeBuilder = new RouteBuilder();
-            routeBuilder.addDefinition('get', Verb.Get, 'get', false, false);
-            expect(routeBuilder.routeDefinitions['get'].method).toBeInstanceOf(RouteMethod);
+            routeBuilder.addRoute('getMethod', [Verb.Get], 'get');
+            expect(routeBuilder.routeDefinitions['getMethod'].method).toBeInstanceOf(RouteMethod);
         });
     });
 
@@ -143,7 +143,7 @@ describe('middleware decorator', () => {
             @middleware(async (_context) => {
                 return true;
             })
-            @route('get')
+            @method('get', '/')
             async get(_context: Context, value: boolean) {
                 return { value: value };
             }
@@ -155,7 +155,7 @@ describe('middleware decorator', () => {
                 value.b = 2;
                 return value;
             })
-            @route('post')
+            @method('post', '/')
             async post(_context: Context, value: any) {
                 return value;
             }
@@ -167,17 +167,21 @@ describe('middleware decorator', () => {
     });
 
     it('should run in order', async () => {
-        await request(application?.server)
+        const { body } = await request(application?.server)
             .get('/test')
-            .expect(200, { value: true });
+            .expect(200);
+        expect(body).toStrictEqual({
+            value: true
+        });
     });
 
     it('should run all middlewares', async () => {
-        await request(application?.server)
+        const { body } = await request(application?.server)
             .post('/test')
-            .expect(200, {
-                a: 1,
-                b: 2
-            });
+            .expect(200);
+        expect(body).toStrictEqual({
+            a: 1,
+            b: 2
+        });
     });
 });

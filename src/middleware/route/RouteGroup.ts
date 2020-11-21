@@ -14,7 +14,8 @@ export class RouteGroup {
         this.base = base;
     }
 
-    route(verbs: Verb | Verb[],
+    route(
+        verbs: Verb | Verb[],
         name: string | RegExp,
         method: Middleware<Context, any, any>,
         template?: string,
@@ -58,11 +59,19 @@ export class RouteGroup {
         }
     }
 
-    init(parentBase: string = '') {
+    init(parentBase: string = '/') {
         const base = path.posix.join(parentBase, this.base);
+        const routes: Route<any, any>[] = [];
         for (let route of this.routes) {
             route.init(base);
+            routes.push(route);
         }
-        return this.routes;
+        for (let routeGroup of this.routeGroups) {
+            const groupRoutes = routeGroup.init(base);
+            for (let groupRoute of groupRoutes) {
+                routes.push(groupRoute);
+            }
+        }
+        return routes;
     }
 }
