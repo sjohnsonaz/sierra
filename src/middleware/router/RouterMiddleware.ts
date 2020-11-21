@@ -1,24 +1,13 @@
 import { Context, NoRouteFoundError } from "../../server";
 import { Route } from "./Route";
+import { RouteGroup } from "./RouteGroup";
 
-export class RouterMiddleware {
-    routes: Route<any, any>[] = [];
-
-    add(route: Route<any, any>) {
-        this.routes.push(route);
-    }
-
-    remove(route: Route<any, any>) {
-        const index = this.routes.indexOf(route);
-        if (index >= 0) {
-            return !!this.routes.splice(index, 1).length;
-        } else {
-            return false;
-        }
-    }
+export class RouterMiddleware extends RouteGroup {
 
     init() {
+        const routes = super.init();
         this.routes.sort(sortRoutes);
+        return routes;
     }
 
     handle = async (context: Context, value?: any) => {
@@ -48,7 +37,7 @@ export class RouterMiddleware {
  * @param routeB - the second Route
  */
 export function sortRoutes(routeA: Route<any, any>, routeB: Route<any, any>) {
-    return routeA.firstParamIndex - routeB.firstParamIndex;
+    return (routeA.config?.firstParamIndex || 0) - (routeB.config?.firstParamIndex || 0);
 }
 
 function getPathname(context: Context) {

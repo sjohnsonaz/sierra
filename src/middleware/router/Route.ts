@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import { Middleware, Pipeline } from '../../pipeline';
 import { Context, Verb } from '../../server';
 
@@ -5,17 +7,20 @@ export class Route<VALUE, RESULT> {
     pipeline: Pipeline<Context, VALUE, RESULT> = new Pipeline();
     readonly verbs: Verb[];
     readonly name: string | RegExp;
-    readonly regex: RegExp;
     readonly method: Middleware<Context, any, any>;
-    readonly parameters: string[];
     // TODO: Should template be on Route?
     readonly template?: string;
-    /**
-      * If `name` is a RegExp, `firstParamIndex` is -1
-      * 
-      * Otherwise, `firstParamIndex` is the index of the first parameter in `name`
-      */
-    readonly firstParamIndex: number = 0;
+
+    config?: {
+        readonly regex: RegExp;
+        readonly parameters: string[];
+        /**
+          * If `name` is a RegExp, `firstParamIndex` is -1
+          * 
+          * Otherwise, `firstParamIndex` is the index of the first parameter in `name`
+          */
+        readonly firstParamIndex: number;
+    }
 
     constructor(
         verbs: Verb | Verb[],
@@ -25,11 +30,19 @@ export class Route<VALUE, RESULT> {
     ) {
         this.verbs = verbs instanceof Array ? verbs : [verbs];
         this.name = name;
-        if (name instanceof RegExp) {
-            this.regex = name;
-            this.parameters = [];
-            this.firstParamIndex = -1;
+        this.method = method;
+        this.template = template;
+    }
+
+    init(base?: string) {
+        if (this.name instanceof RegExp) {
+            this.config = {
+                regex: this.name,
+                parameters: [],
+                firstParamIndex: -1
+            };
         } else {
+            const name = getName(base, this.name);
             const directories = name
                 .replace('\\', '/')
                 .split('/');
@@ -37,19 +50,23 @@ export class Route<VALUE, RESULT> {
                 .map(directory => directory.startsWith(':') ? '([\^\/]*)' : directory);
             const index = directories
                 .findIndex(part => part.startsWith(':'));
-            this.regex = new RegExp(`^\\/${parts.join('\\/')}$`, 'i');
-            this.parameters = directories
+            const regex = new RegExp(`^${parts.join('\\/')}$`, 'i');
+            const parameters = directories
                 .filter(directory => directory.startsWith(':'))
                 .map(directory => directory.substr(1));
-            this.firstParamIndex = index >= 0 ? index : 0;
+            const firstParamIndex = index >= 0 ? index : 0;
+            this.config = {
+                regex,
+                parameters,
+                firstParamIndex
+            };
         }
-        this.method = method;
-        this.template = template;
     }
 
     match(verb: Verb, pathname: string) {
-        if (this.verbs.indexOf(verb) >= 0) {
-            return pathname.match(this.regex);
+        // TODO: Remove this.config undefined check
+        if (this.verbs.indexOf(verb) >= 0 && this.config) {
+            return pathname.match(this.config.regex);
         } else {
             return null;
         }
@@ -58,7 +75,7 @@ export class Route<VALUE, RESULT> {
     getParams(match: null | RegExpMatchArray) {
         const params: Record<string, string> = {};
         if (match) {
-            this.parameters.forEach((name, index) => {
+            this.config?.parameters.forEach((name, index) => {
                 params[name] = match[index + 1];
             });
         }
@@ -70,5 +87,15 @@ export class Route<VALUE, RESULT> {
         context.data.params = this.getParams(match);
         const result = this.pipeline.run(context, value);
         return this.method(context, result);
+    }
+}
+
+function getName(base: string = '', name: string) {
+    if (name.startsWith('~')) {
+        name = name.substr(1);
+        return path.posix.join('/', name);
+    } else {
+        base = base.replace('\\', '/');
+        return path.posix.join('/', base, name);
     }
 }
