@@ -1,6 +1,6 @@
 import { Application } from './Application';
 import { LogLevel } from './server/LogLevel';
-import { Controller } from './middleware/route/Controller';
+import { Controller } from './middleware/controller/Controller';
 
 describe('Application', function () {
     describe('use', function () {

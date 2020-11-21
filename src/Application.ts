@@ -9,7 +9,7 @@ import {
 import {
     Controller,
     RouteMiddleware
-} from './middleware/route';
+} from './middleware/controller';
 import { Middleware } from './pipeline';
 
 /**
