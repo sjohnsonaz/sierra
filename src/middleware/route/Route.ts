@@ -23,16 +23,46 @@ export class Route<VALUE, RESULT> {
         readonly firstParamIndex: number;
     }
 
+    // TODO: Change to non-overload
     constructor(
         verbs: Verb | Verb[],
         name: string | RegExp,
         method: Middleware<Context, any, any>,
         template?: string,
+    );
+    constructor(
+        verbs: Verb | Verb[],
+        name: string | RegExp,
+        middleware: Middleware<Context, any, any>[],
+        method: Middleware<Context, any, any>,
+        template?: string,
+    );
+    constructor(
+        verbs: Verb | Verb[],
+        name: string | RegExp,
+        a: any,
+        b?: any,
+        c?: any
     ) {
         this.verbs = verbs instanceof Array ? verbs : [verbs];
         this.name = name;
-        this.method = method;
-        this.template = template;
+        switch (typeof a) {
+            case 'function':
+                this.method = a;
+                this.template = b;
+                break;
+            case 'object':
+                if (a instanceof Array) {
+                    for (let _middleware of a) {
+                        this.pipeline.use(_middleware);
+                    }
+                }
+                this.method = b;
+                this.template = c;
+                break;
+            default:
+                this.method = undefined as any;
+        }
     }
 
     init(base?: string) {

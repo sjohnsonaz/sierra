@@ -17,8 +17,8 @@ export class RouteMethod {
         this.template = template;
     }
 
-    createRoute(definitionName: string, method: Middleware<Context, any, any>, template: string) {
-        return new Route(this.verbs, this.name || definitionName, method, this.template || template);
+    createRoute(definitionName: string, method: Middleware<Context, any, any>, middleware: Middleware<Context, any, any>[], template: string) {
+        return new Route(this.verbs, this.name || definitionName, middleware, method, this.template || template);
     }
 }
 
@@ -34,10 +34,6 @@ export class RouteDefinition<U extends Middleware<Context, any, any>> {
         if (!this.method) {
             throw new NoMethodError(name);
         }
-        const route = this.method.createRoute(name, method, template);
-        for (let middleware of this.middleware) {
-            route.pipeline.use(middleware);
-        }
-        return route;
+        return this.method.createRoute(name, method, this.middleware, template);
     }
 }

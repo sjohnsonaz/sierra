@@ -14,14 +14,27 @@ export class RouteGroup {
         this.base = base;
     }
 
+    // TODO: Change to non-overload
     route(
         verbs: Verb | Verb[],
         name: string | RegExp,
+        method: Middleware<Context, any, any>
+    ): Route<any, any>;
+    route(
+        verbs: Verb | Verb[],
+        name: string | RegExp,
+        middleware: Middleware<Context, any, any>[],
         method: Middleware<Context, any, any>,
-        template?: string,
+    ): Route<any, any>;
+    route(
+        verbs: Verb | Verb[],
+        name: string | RegExp,
+        a: any,
+        b?: any
     ) {
-        const route = new Route(verbs, name, method, template);
+        let route = new Route(verbs, name, a, b);
         this.routes.push(route);
+        return route;
     }
 
     add(route: Route<any, any>) {
