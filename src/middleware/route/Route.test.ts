@@ -24,7 +24,7 @@ describe('Route', function () {
             expect(route.config?.parameters).toStrictEqual([]);
         });
 
-        it('should hadle parameterized routes', function () {
+        it('should handle parameterized routes', function () {
             const method = async function test(context: Context) { }
             const route = new Route(Verb.Get, 'test/:id', method, 'template');
             route.init();
