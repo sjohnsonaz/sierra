@@ -30,12 +30,12 @@ export function ConnectMiddleware<T extends Context, U>(
                     if (err) {
                         reject(err);
                     } else {
-                        resolve(value);
+                        resolve(value as any);
                     }
                 },
                 function () {
                     clearInterval(interval);
-                    resolve(value);
+                    resolve(value as any);
                 }
             );
         });

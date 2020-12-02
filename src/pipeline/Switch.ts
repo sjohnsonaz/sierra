@@ -12,5 +12,5 @@ export abstract class Switch<T, U, V> {
         return pipeline.run(context, value);
     }
 
-    abstract async handle(context: T, value: U): Promise<string>;
+    abstract handle(context: T, value: U): Promise<string>;
 }
