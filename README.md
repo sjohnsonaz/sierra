@@ -1,3 +1,5 @@
+[![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/sjohnsonaz/sierra)
+
 # Sierra
 
 ![Node.js CI](https://github.com/sjohnsonaz/sierra/workflows/Node.js%20CI/badge.svg) [![npm version](https://badge.fury.io/js/sierra.svg)](https://badge.fury.io/js/sierra)
