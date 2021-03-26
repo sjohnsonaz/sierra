@@ -66,7 +66,7 @@ export function createRoute(route: any, parser: any = defaultParseFunction) {
   return new Route(route, parser);
 }
 
-function defaultParseFunction<T extends RouteFunction>(
+export function defaultParseFunction<T extends RouteFunction>(
   ...args: MatchParameters<T>
 ) {
   return [...args];
