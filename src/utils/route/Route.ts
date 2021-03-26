@@ -1,76 +1,46 @@
-import { stringToRegex } from '../RouteUtil';
+import { stringToRegex, getParameterNames } from '../RouteUtil';
 
 interface RouteFunction {
   (...args: (string | number)[]): string;
 }
 
-const STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/gm;
+type MatchArray<T> = {
+  [Property in keyof T]?: string;
+};
 
-export function getParameterNames<T extends () => any>(
-  functionHandle: T
-): string[] {
-  let definition = functionHandle.toString().replace(STRIP_COMMENTS, '');
-  if (definition.startsWith('function')) {
-    // We have a standard function
-    return (
-      definition
-        .slice(definition.indexOf('(') + 1, definition.indexOf(')'))
-        .match(/([^\s,]+)/g) || []
-    );
-  } else {
-    // We have an arrow function
-    let arrowIndex = definition.indexOf('=>');
-    let parenthesisIndex = definition.indexOf('(');
-    if (parenthesisIndex > -1 && parenthesisIndex < arrowIndex) {
-      return (
-        definition
-          .slice(parenthesisIndex + 1, definition.indexOf(')'))
-          .match(/([^\s,]+)/g) || []
-      );
-    } else {
-      return definition.slice(0, arrowIndex).match(/([^\s,]+)/g) || [];
-    }
-  }
+type MatchParameters<T extends (...args: any) => any> = T extends (
+  ...args: infer P
+) => any
+  ? MatchArray<P>
+  : never;
+
+interface ParseFunction<T extends RouteFunction, U> {
+  (...args: MatchParameters<T>): U;
 }
 
-export class Route<T extends RouteFunction> {
+export class Route<T extends RouteFunction, U extends ParseFunction<T, any>> {
   readonly route: T;
   readonly names: string[];
   readonly definition: string;
   readonly regExp: RegExp;
+  readonly parser: U;
 
-  constructor(route: T) {
+  constructor(route: T, parser: U) {
     this.route = route;
     this.names = getParameterNames(route);
     this.definition = route(...this.names.map((name) => `:${name}`));
     this.regExp = stringToRegex(this.definition);
+    this.parser = parser;
   }
 
   run(...args: Parameters<T>) {
     return this.route(...args);
   }
 
-  match(pathname: string) {
+  match(pathname: string): ReturnType<U> | undefined {
     const matches = pathname.match(this.regExp);
     if (matches) {
-      return matches.splice(1);
-    } else {
-      return undefined;
-    }
-  }
-
-  matchObject(pathname: string) {
-    const matches = pathname.match(this.regExp);
-    if (matches) {
-      const values = matches.splice(1);
-      const { names } = this;
-      const output: Record<string, string> = {};
-      values.reduce((output, value, index) => {
-        const name = names[index];
-        output[name] = value;
-        return output;
-      }, output);
-      return output;
+      return this.parser(...(matches.splice(1) as any));
     } else {
       return undefined;
     }
@@ -83,4 +53,21 @@ export class Route<T extends RouteFunction> {
   toRegExp() {
     return this.regExp;
   }
+}
+
+export function createRoute<T extends RouteFunction>(
+  route: T
+): Route<T, (...args: MatchParameters<T>) => MatchParameters<T>>;
+export function createRoute<
+  T extends RouteFunction,
+  U extends ParseFunction<T, any>
+>(route: T, parser: U): Route<T, U>;
+export function createRoute(route: any, parser: any = defaultParseFunction) {
+  return new Route(route, parser);
+}
+
+function defaultParseFunction<T extends RouteFunction>(
+  ...args: MatchParameters<T>
+) {
+  return [...args];
 }
