@@ -2,7 +2,7 @@ import { ResponseDirective, ResponseDirectiveOptions } from './ResponseDirective
 import { ResponseDirectiveType } from './ResponseDirectiveType';
 
 export class JsonDirective<T> extends ResponseDirective<T> {
-    constructor(value: T, options?: ResponseDirectiveOptions) {
+    constructor(value: T, options?: Partial<ResponseDirectiveOptions>) {
         super(ResponseDirectiveType.Json, value, options);
     }
 }
@@ -10,6 +10,6 @@ export class JsonDirective<T> extends ResponseDirective<T> {
 /**
  * Returns a `JsonDirective` object
  */
-export function json<T>(value: T, options?: ResponseDirectiveOptions) {
+export function json<T>(value: T, options?: Partial<ResponseDirectiveOptions>) {
     return new JsonDirective(value, options);
 }
