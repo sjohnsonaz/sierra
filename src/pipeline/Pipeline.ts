@@ -4,10 +4,10 @@ import { Middleware } from './Middleware';
 /**
  * The `Pipeline` class runs a series of `Middleware` async functions.
  */
-export class Pipeline<CONTEXT, RESULT> {
+export class Pipeline<CONTEXT, RESULT, DIRECTIVE extends Directive<RESULT> = Directive<RESULT>> {
     middlewares: Middleware<any, any>[] = [];
 
-    async run(context: CONTEXT): Promise<Directive<RESULT>> {
+    async run(context: CONTEXT): Promise<DIRECTIVE> {
         const captures: CaptureDirective[] = [];
         let result: any;
         for (let index = 0, length = this.middlewares.length; index < length; index++) {
