@@ -12,16 +12,16 @@ const DEFAULT_TEMPLATE = 'index';
 const ERROR_TEMPLATE = 'error';
 
 export class RequestHandler {
-    pipeline: Pipeline<Context, any, any> = new Pipeline();
-    errorPipeline: Pipeline<Context, any, any> = new Pipeline();
-    viewPipeline: Pipeline<Context, any, any> = new Pipeline();
+    pipeline: Pipeline<Context, any> = new Pipeline();
+    errorPipeline: Pipeline<Context, any> = new Pipeline();
+    viewPipeline: Pipeline<Context, any> = new Pipeline();
     logging: LogLevel = LogLevel.errors;
     defaultTemplate = DEFAULT_TEMPLATE;
 
     callback = async (request: IncomingMessage, response: ServerResponse) => {
         let context = new Context(request, response);
         try {
-            let result = await this.pipeline.run(context, undefined);
+            let result = await this.pipeline.run(context);
             // If Headers have already sent, we cannot send.
             if (!context.response.headersSent && !context.response.writableEnded) {
                 if (result instanceof OutgoingMessage) {
@@ -30,8 +30,7 @@ export class RequestHandler {
                     this.send(context, result);
                 }
             }
-        }
-        catch (e) {
+        } catch (e) {
             let errorStatus = 500;
             if (e instanceof SierraError) {
                 switch (e.message) {
@@ -45,12 +44,18 @@ export class RequestHandler {
                 try {
                     let result = await this.errorPipeline.run(context, e);
                     if (result instanceof OutgoingMessage) {
-                        this.send(context, result.data, result.status, result.type, result.template, result.contentType);
+                        this.send(
+                            context,
+                            result.data,
+                            result.status,
+                            result.type,
+                            result.template,
+                            result.contentType
+                        );
                     } else {
                         this.send(context, result, errorStatus, 'auto', ERROR_TEMPLATE);
                     }
-                }
-                catch (e) {
+                } catch (e) {
                     this.sendError(context, e, errorStatus);
                 }
             } else {
@@ -96,8 +101,7 @@ export class RequestHandler {
             context.response.setHeader('Content-Type', 'text/html');
             context.response.write(output);
             context.response.end();
-        }
-        catch (e) {
+        } catch (e) {
             this.log(context, data, 500);
             context.response.statusCode = 500;
             context.response.setHeader('Content-Type', 'text/html');
@@ -109,7 +113,14 @@ export class RequestHandler {
         }
     }
 
-    send<T>(context: Context, data: T, status: number = 200, type: OutputType = 'auto', template?: string, contentType?: string) {
+    send<T>(
+        context: Context,
+        data: T,
+        status: number = 200,
+        type: OutputType = 'auto',
+        template?: string,
+        contentType?: string
+    ) {
         context.cookies.setCookies(context.response);
         let accept = context.accept;
         switch (type) {
@@ -156,8 +167,7 @@ export class RequestHandler {
             } else {
                 this.sendJson(context, data.message ?? data.name, status);
             }
-        }
-        catch (e) {
+        } catch (e) {
             if (this.logging >= LogLevel.errors) {
                 console.error(e);
             }
@@ -185,8 +195,7 @@ export class RequestHandler {
 }
 
 export function errorTemplate(error: any) {
-    return (
-        `<!DOCTYPE html>
+    return `<!DOCTYPE html>
 <html>
     <head>
         <title>Sierra Error</title>
@@ -195,8 +204,7 @@ export function errorTemplate(error: any) {
         <h1>Sierra Error</h1>
         <pre><code>${error}</code></pre>
     </body>
-</html>`
-    );
+</html>`;
 }
 
 export function colorStatus(status: number) {

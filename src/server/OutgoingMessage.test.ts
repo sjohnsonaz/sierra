@@ -12,7 +12,7 @@ describe('OutgoingMessage', function () {
         });
 
         it('should initialize all properties', function () {
-            const outgoingMessage = new OutgoingMessage('data', 500, 'json', 'template', 'application/json');;
+            const outgoingMessage = new OutgoingMessage('data', 500, 'json', 'template', 'application/json');
             expect(outgoingMessage.data).toBe('data');
             expect(outgoingMessage.status).toBe(500);
             expect(outgoingMessage.type).toBe('json');

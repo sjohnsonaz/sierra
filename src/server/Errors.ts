@@ -6,7 +6,7 @@ export enum ErrorMessage {
     noSessionGateway = 'no session gateway',
     noViewMiddleware = 'No view middleware',
     noViewTemplate = 'no view template',
-    nonStringView = 'non string view'
+    nonStringView = 'non string view',
 }
 
 export class SierraError extends Error {

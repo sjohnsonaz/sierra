@@ -1,4 +1,3 @@
-
 import { createRequest } from '../utils/TestUtil';
 
 import { Context } from './Context';
@@ -11,8 +10,8 @@ describe('Context', function () {
                 method: 'get',
                 url: 'http://localhost/test',
                 headers: {
-                    'accept': 'application/json',
-                    'content-type': 'application/json'
+                    accept: 'application/json',
+                    'content-type': 'application/json',
                 },
             });
             const context = new Context(request, response);
@@ -26,7 +25,7 @@ describe('Context', function () {
         it('should initialize httpBoundary', function () {
             const [request, response] = createRequest({
                 headers: {
-                    'content-type': 'multipart/form-data; boundary=something'
+                    'content-type': 'multipart/form-data; boundary=something',
                 },
             });
             const context = new Context(request, response);
@@ -36,7 +35,7 @@ describe('Context', function () {
         it('should ignore improper httpBoundary', function () {
             const [request, response] = createRequest({
                 headers: {
-                    'content-type': 'multipart/form-data; boundary'
+                    'content-type': 'multipart/form-data; boundary',
                 },
             });
             const context = new Context(request, response);
@@ -68,34 +67,20 @@ describe('Context', function () {
     });
 
     describe.skip('getContentType', function () {
-        it('should handle falsey', function () {
+        it('should handle falsey', function () {});
 
-        });
+        it('should handle media-type', function () {});
 
-        it('should handle media-type', function () {
+        it('should handle charset', function () {});
 
-        });
-
-        it('should handle charset', function () {
-
-        });
-
-        it('should handle boundary', function () {
-
-        });
+        it('should handle boundary', function () {});
     });
 
     describe.skip('getAccept', function () {
-        it('should handle falsey', function () {
+        it('should handle falsey', function () {});
 
-        });
+        it('should handle one', function () {});
 
-        it('should handle one', function () {
-
-        });
-
-        it('should handle multiple', function () {
-
-        });
+        it('should handle multiple', function () {});
     });
 });

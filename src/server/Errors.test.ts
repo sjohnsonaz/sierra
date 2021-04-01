@@ -1,4 +1,12 @@
-import { ErrorMessage, NoMethodError, NonStringViewError, NoRouteFoundError, NoSessionGatewayError, NotFoundError, NoViewTemplateError } from './Errors';
+import {
+    ErrorMessage,
+    NoMethodError,
+    NonStringViewError,
+    NoRouteFoundError,
+    NoSessionGatewayError,
+    NotFoundError,
+    NoViewTemplateError,
+} from './Errors';
 
 describe('Errors', function () {
     describe('NoMethodError', function () {

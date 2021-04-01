@@ -103,7 +103,7 @@ export function getAccept(request: IncomingMessage) {
     const accept = request.headers['accept'];
     if (accept) {
         let types = accept.split(',');
-        return types.map(type => {
+        return types.map((type) => {
             let parts = type.split(';');
             return parts[0];
         });

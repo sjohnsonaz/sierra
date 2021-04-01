@@ -20,7 +20,13 @@ export class OutgoingMessage<T> extends PipelineExit {
     }
 }
 
-export function send<T>(data: T, status: number = 200, type: OutputType = 'auto', template?: string, contentType?: string) {
+export function send<T>(
+    data: T,
+    status: number = 200,
+    type: OutputType = 'auto',
+    template?: string,
+    contentType?: string
+) {
     return new OutgoingMessage(data, status, type, template);
 }
 
