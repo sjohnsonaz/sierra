@@ -1,4 +1,9 @@
-export function decode<T>(queryString: string): T {
+export function decode<
+    T = {
+        [index: string]: string;
+        [index: number]: string;
+    }
+>(queryString: string): T {
     const graphEntries = createEntries(queryString);
     const graphNode = createNodes(graphEntries);
     return graphNode.decode();

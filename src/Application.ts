@@ -1,11 +1,7 @@
 import { createServer, Server } from 'http';
 import { ListenOptions } from 'net';
 
-import {
-    RequestHandler,
-    LogLevel,
-    Context
-} from './server';
+import { RequestHandler, LogLevel, Context } from './server';
 import { Controller, RouteMiddleware } from './middleware/route';
 import { Middleware } from './pipeline';
 
@@ -67,7 +63,7 @@ export class Application {
      * Adds a Middleware to the Pipeline.
      * @param middleware - the Middleware to add
      */
-    use(middleware: Middleware<Context, any, any>) {
+    use(middleware: Middleware<Context, any>) {
         this.requestHandler.use(middleware);
     }
 
@@ -75,7 +71,7 @@ export class Application {
      * Sets View Middleware.  Only one is enabled at a time.
      * @param viewMiddlware - the View Middleware
      */
-    view(viewMiddlware: Middleware<Context, any, any>) {
+    view(viewMiddlware: Middleware<Context, any>) {
         this.requestHandler.useView(viewMiddlware);
     }
 
@@ -83,7 +79,7 @@ export class Application {
      * Sets Error Middleware.  Only one is enabled at a time.
      * @param errorMiddleware - the Error Middleware
      */
-    error(errorMiddleware: Middleware<Context, any, any>) {
+    error(errorMiddleware: Middleware<Context, any>) {
         this.requestHandler.useError(errorMiddleware);
     }
 
@@ -109,10 +105,10 @@ export class Application {
     listen(path: string, listeningListener?: () => void): Promise<Server>;
 
     /**
- * Opens the `http.Server` to listen on the specified Port.
- * @param options - a options object
- * @param listeningListener - a callback for the "listening" event
- */
+     * Opens the `http.Server` to listen on the specified Port.
+     * @param options - a options object
+     * @param listeningListener - a callback for the "listening" event
+     */
     listen(options: ListenOptions, listeningListener?: () => void): Promise<Server>;
 
     /**
@@ -127,7 +123,7 @@ export class Application {
         return new Promise((resolve, reject) => {
             const startup = () => {
                 this.server.on('error', onError);
-                this.server.on('listening', onListening)
+                this.server.on('listening', onListening);
             };
             const cleanup = () => {
                 this.server.off('error', onError);
@@ -139,7 +135,7 @@ export class Application {
             };
             const onListening = () => {
                 resolve(this.server);
-                cleanup()
+                cleanup();
             };
             startup();
             this.server.listen(a, b, c, d);
@@ -151,7 +147,7 @@ export class Application {
      */
     close(): Promise<void> {
         return new Promise((resolve, reject) => {
-            this.server.close(error => {
+            this.server.close((error) => {
                 if (error) {
                     reject(error);
                 } else {
@@ -165,7 +161,7 @@ export class Application {
      * Waits for `SIGINT` or `SIGTERM` signals on the `Process` object.
      */
     async wait() {
-        return new Promise<void>(resolve => {
+        return new Promise<void>((resolve) => {
             process.on('SIGINT', () => {
                 resolve();
             });

@@ -36,7 +36,7 @@ export class Context<DATA extends Object = {}> {
      * @param request - an incoming request
      * @param response - an outgoing response
      */
-    constructor(request: IncomingMessage, response: ServerResponse, initialData: DATA) {
+    constructor(request: IncomingMessage, response: ServerResponse, initialData: DATA = {} as any) {
         this.request = request;
         this.response = response;
         this.data = initialData;
