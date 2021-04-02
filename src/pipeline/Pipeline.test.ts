@@ -1,3 +1,4 @@
+import { Middleware, MiddlewareReturn } from './Middleware';
 import { pipeline, Pipeline } from './Pipeline';
 
 describe('Pipeline', function () {
@@ -15,7 +16,7 @@ describe('Pipeline', function () {
                 .use(async (context: { value: string }) => {
                     context.value += 'b';
                 })
-                .use(async (context: { value: string }) => {
+                .use(async (context) => {
                     return context.value + 'c';
                 });
             let result = await testPipeline.run({ value: 'a' });
@@ -63,3 +64,26 @@ describe('Pipeline', function () {
         });
     });
 });
+
+const testPipeiline = new Pipeline();
+const newTest = testPipeiline
+    .use<{ value: string }, boolean>(async (context) => {
+        return true;
+    })
+    .use(async (context: { test: string }) => {})
+    .use<{ name: string }>(async (context) => {})
+    .use(async (context) => {
+        context.test;
+        return true;
+    });
+
+const middleware = async () => true;
+
+type middlewareReturn = MiddlewareReturn<typeof middleware>;
+
+function use<T extends Middleware<any, any>>(middleware: T) {
+    const value: MiddlewareReturn<typeof middleware> = undefined as any;
+    return value;
+}
+
+const value = use(middleware);

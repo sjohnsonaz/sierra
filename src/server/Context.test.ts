@@ -1,7 +1,7 @@
 import { createRequest } from '../utils/TestUtil';
 
 import { Context } from './Context';
-import { OutgoingMessage } from './OutgoingMessage';
+import { ResponseDirective } from './response-directive';
 
 describe('Context', function () {
     describe('constructor', function () {
@@ -40,29 +40,6 @@ describe('Context', function () {
             });
             const context = new Context(request, response);
             expect(context.contentType.boundary).toBe(undefined);
-        });
-    });
-
-    describe('send', function () {
-        it('should create an OutgoingMessage with default parameters', function () {
-            const [request, response] = createRequest();
-            const context = new Context(request, response);
-            const data = { value: true };
-            const result = context.send(data);
-            expect(result).toBeInstanceOf(OutgoingMessage);
-            expect(result.data).toBe(data);
-            expect(result.status).toBe(200);
-        });
-
-        it('should create an OutgoingMessage', function () {
-            const [request, response] = createRequest();
-            const context = new Context(request, response);
-            const data = { value: true };
-            const status = 201;
-            const result = context.send(data, status);
-            expect(result).toBeInstanceOf(OutgoingMessage);
-            expect(result.data).toBe(data);
-            expect(result.status).toBe(status);
         });
     });
 

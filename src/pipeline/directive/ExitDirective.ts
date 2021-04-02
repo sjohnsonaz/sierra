@@ -10,6 +10,8 @@ export class ExitDirective<T> extends Directive<T> {
 /**
  * Returns a `ExitDirective` object
  */
-export function exit<T>(value: T) {
+export function exit(): ExitDirective<void>;
+export function exit<T>(value: T): ExitDirective<T>;
+export function exit<T>(value?: T) {
     return new ExitDirective(value);
 }

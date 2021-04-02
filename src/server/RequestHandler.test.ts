@@ -5,7 +5,7 @@ import * as request from 'supertest';
 import { Color } from '../utils/ConsoleUtil';
 
 import { RequestHandler, errorTemplate, colorStatus } from './RequestHandler';
-import { OutgoingMessage, json, raw, view } from './OutgoingMessage';
+import { auto, error, json, raw, text, view } from './response-directive';
 import { NotFoundError, NoRouteFoundError, NoViewTemplateError, NonStringViewError } from './Errors';
 import { LogLevel } from './LogLevel';
 
@@ -20,18 +20,17 @@ describe('RequestHandler', function () {
         });
 
         it('should run requests through a Pipeline', async function () {
-            handler.use(async () => {
-                return 'a';
-            });
-            handler.use(async (_context, value?: string) => {
-                return value + 'b';
-            });
-            handler.use(async (_context, value?: string) => {
-                return value + 'c';
-            });
-            await request(server)
-                .get('/')
-                .expect(200, JSON.stringify('abc'));
+            handler
+                .use<{ value: string }>(async ({ data }) => {
+                    data.value = 'a';
+                })
+                .use<{ value: string }>(async ({ data }) => {
+                    data.value += 'b';
+                })
+                .use(async ({ data }) => {
+                    return data.value + 'c';
+                });
+            await request(server).get('/').expect(200, JSON.stringify('abc'));
         });
     });
 
@@ -49,36 +48,28 @@ describe('RequestHandler', function () {
             handler.use(async () => {
                 return true;
             });
-            await request(server)
-                .get('/')
-                .expect(200);
+            await request(server).get('/').expect(200);
         });
 
         it('should send 404 on not found', async function () {
             handler.use(async () => {
                 throw new NotFoundError();
             });
-            await request(server)
-                .get('/')
-                .expect(404);
+            await request(server).get('/').expect(404);
         });
 
         it('should send 404 on no route found', async function () {
             handler.use(async () => {
                 throw new NoRouteFoundError();
             });
-            await request(server)
-                .get('/')
-                .expect(404);
+            await request(server).get('/').expect(404);
         });
 
         it('should send 500 on error', async function () {
             handler.use(async () => {
                 throw 'error';
             });
-            await request(server)
-                .get('/')
-                .expect(500);
+            await request(server).get('/').expect(500);
         });
     });
 
@@ -89,48 +80,43 @@ describe('RequestHandler', function () {
         beforeEach(async function () {
             handler = new RequestHandler();
 
-            handler.useError(async function (_context, error) {
-                return error;
-            });
+            // handler.useError(async function (_context) {
+            //     return error;
+            // });
 
-            handler.useView(async function (context, data) {
-                const templates: Record<string, Function> = {
+            handler.useView(async function (context) {
+                const { view } = context;
+                const templates: Record<string, (...args: any) => string> = {
                     index: function (data: { value: boolean }) {
                         return `index: value = ${data.value}`;
-                    }
-                }
+                    },
+                };
                 const templateFunction = templates[context.template || ''];
                 if (!templateFunction) {
                     throw new NoViewTemplateError(context.template || '');
                 }
-                return templateFunction(data);
+                return templateFunction(view.value);
             });
 
             server = createServer(handler.callback);
         });
 
-        describe('OutgoingMessage type: "auto"', function () {
+        describe('ResponseDirective type: "auto"', function () {
             describe('accept', function () {
-                it('should detect accept "text/html"', async function () {
+                it('should detect accept text/html', async function () {
                     handler.use(async () => {
                         return { value: true };
                     });
 
-                    await request(server)
-                        .get('/')
-                        .set('Accept', 'text/html')
-                        .expect(200, 'index: value = true');
+                    await request(server).get('/').set('Accept', 'text/html').expect(200, 'index: value = true');
                 });
 
-                it('should detect accept "application/json"', async function () {
+                it('should detect accept application/json', async function () {
                     handler.use(async () => {
                         return { value: true };
                     });
 
-                    await request(server)
-                        .get('/')
-                        .set('Accept', 'application/json')
-                        .expect(200, { value: true });
+                    await request(server).get('/').set('Accept', 'application/json').expect(200, { value: true });
                 });
 
                 it('should send raw on default', async function () {
@@ -138,73 +124,63 @@ describe('RequestHandler', function () {
                         return { value: true };
                     });
 
-                    await request(server)
-                        .get('/')
-                        .expect(200, { value: true });
+                    await request(server).get('/').expect(200, { value: true });
                 });
             });
         });
 
-        describe('OutgoingMessage type: "json"', function () {
+        describe('ResponseDirective type: "json"', function () {
             it('should send JSON', async function () {
                 handler.use(async () => {
                     return json({ value: true });
                 });
 
-                await request(server)
-                    .get('/')
-                    .expect(200, { value: true });
+                await request(server).get('/').expect(200, { value: true });
             });
         });
 
-        describe('OutgoingMessage type: "raw"', function () {
+        describe('ResponseDirective type: "raw"', function () {
             it('should detect outgoing type', async function () {
                 handler.use(async () => {
                     return raw({ value: true });
                 });
 
-                await request(server)
-                    .get('/')
-                    .expect(200, { value: true });
+                await request(server).get('/').expect(200, { value: true });
             });
         });
 
-        describe('OutgoingMessage type: "text"', function () {
+        describe('ResponseDirective type: "text"', function () {
             it('should detect outgoing type, but set "Content-Type" to "text/plain"', async function () {
                 handler.use(async () => {
-                    return new OutgoingMessage({ value: true }, 200, 'text');
+                    return text({ value: true });
                 });
 
-                const { text } = await request(server)
+                const { text: _text } = await request(server)
                     .get('/')
                     .expect('Content-Type', 'text/plain')
                     .type('text/plain')
-                    .expect(200);//, { value: true });
-                expect(text).toBe(JSON.stringify({ value: true }));
+                    .expect(200); //, { value: true });
+                expect(_text).toBe(JSON.stringify({ value: true }));
             });
         });
 
-        describe('OutgoingMessage type: "view"', function () {
+        describe('ResponseDirective type: "view"', function () {
             it('should send a View', async function () {
                 handler.use(async () => {
                     return view({ value: true });
                 });
 
-                await request(server)
-                    .get('/')
-                    .expect(200, 'index: value = true');
+                await request(server).get('/').expect(200, 'index: value = true');
             });
         });
 
-        describe('OutgoingMessage type: default', function () {
+        describe('ResponseDirective type: default', function () {
             it('should send raw', async function () {
                 handler.use(async () => {
-                    return new OutgoingMessage({ value: true }, 200, null as any);
+                    return { value: true };
                 });
 
-                await request(server)
-                    .get('/')
-                    .expect(200, { value: true });
+                await request(server).get('/').expect(200, { value: true });
             });
         });
     });
@@ -222,45 +198,35 @@ describe('RequestHandler', function () {
             handler.use(async function (context) {
                 return true;
             });
-            await request(server)
-                .get('/')
-                .expect(200, 'true');
+            await request(server).get('/').expect(200, 'true');
         });
 
         it('should send false responses', async function () {
             handler.use(async function (context) {
                 return false;
             });
-            await request(server)
-                .get('/')
-                .expect(200, 'false');
+            await request(server).get('/').expect(200, 'false');
         });
 
         it('should send null responses', async function () {
             handler.use(async function (context) {
                 return null;
             });
-            await request(server)
-                .get('/')
-                .expect(200, 'null');
+            await request(server).get('/').expect(200, 'null');
         });
 
         it('should cast undefined responses to null', async function () {
             handler.use(async function (context) {
                 return undefined;
             });
-            await request(server)
-                .get('/')
-                .expect(200, null);
+            await request(server).get('/').expect(200, null);
         });
 
         it('should send object responses', async function () {
             handler.use(async function () {
                 return { value: 'test' };
             });
-            await request(server)
-                .get('/')
-                .expect(200, { value: 'test' });
+            await request(server).get('/').expect(200, { value: 'test' });
         });
     });
 
@@ -273,9 +239,9 @@ describe('RequestHandler', function () {
                 handler = new RequestHandler();
                 handler.logging = LogLevel.none;
 
-                handler.useError(async function (_context, error) {
-                    return error;
-                });
+                // handler.useError(async function (_context) {
+                //     return error;
+                // });
 
                 server = createServer(handler.callback);
             });
@@ -285,9 +251,7 @@ describe('RequestHandler', function () {
                     return view({ value: true });
                 });
 
-                const { text } = await request(server)
-                    .get('/')
-                    .expect(500);
+                const { text } = await request(server).get('/').expect(500);
                 expect(text).toBe(errorTemplate(new NonStringViewError({ value: true })));
             });
         });
@@ -300,24 +264,25 @@ describe('RequestHandler', function () {
                 handler = new RequestHandler();
                 handler.logging = LogLevel.none;
 
-                handler.useError(async function (_context, error) {
-                    return error;
-                });
+                // handler.useError(async function (_context, error) {
+                //     return error;
+                // });
 
-                handler.useView(async function (context, data) {
+                handler.useView(async function (context) {
+                    const { view } = context;
                     const templates: Record<string, Function> = {
                         index: function (data: { value: boolean }) {
                             return `index: value = ${data.value}`;
                         },
                         test: function (data: { value: boolean }) {
                             return `test: value = ${data.value}`;
-                        }
+                        },
                     };
                     const templateFunction = templates[context.template || ''];
                     if (!templateFunction) {
                         throw new NoViewTemplateError(context.template || '');
                     }
-                    return templateFunction(data);
+                    return templateFunction(view.value);
                 });
 
                 server = createServer(handler.callback);
@@ -327,29 +292,23 @@ describe('RequestHandler', function () {
                     return view({ value: true });
                 });
 
-                await request(server)
-                    .get('/')
-                    .expect(200, 'index: value = true');
+                await request(server).get('/').expect(200, 'index: value = true');
             });
 
             it('should send named view', async function () {
                 handler.use(async function () {
-                    return view({ value: true }, 'test');
+                    return view({ value: true }, { template: 'test' });
                 });
 
-                await request(server)
-                    .get('/')
-                    .expect(200, 'test: value = true');
+                await request(server).get('/').expect(200, 'test: value = true');
             });
 
             it('should throw NoViewTemplateError when no template is found', async function () {
                 handler.use(async function () {
-                    return view({ value: true }, 'other');
+                    return view({ value: true }, { template: 'other' });
                 });
 
-                const { text } = await request(server)
-                    .get('/')
-                    .expect(500);
+                const { text } = await request(server).get('/').expect(500);
                 expect(text).toBe(errorTemplate(new NoViewTemplateError('index')));
             });
         });
@@ -366,33 +325,24 @@ describe('RequestHandler', function () {
 
         it('should send text/plain', async function () {
             handler.use(async function (context) {
-                return new OutgoingMessage('true', 200, 'raw');
+                return raw('true');
             });
-            await request(server)
-                .get('/')
-                .expect('Content-Type', 'text/plain')
-                .expect(200, 'true');
+            await request(server).get('/').expect('Content-Type', 'text/plain').expect(200, 'true');
         });
 
         it('should send octet-stream', async function () {
             handler.use(async function (context) {
                 const buffer = Buffer.from('1234');
-                return new OutgoingMessage(buffer, 200, 'raw');
+                return raw(buffer);
             });
-            await request(server)
-                .get('/')
-                .expect('Content-Type', 'octet-stream')
-                .expect(200, '1234');
+            await request(server).get('/').expect('Content-Type', 'octet-stream').expect(200, '1234');
         });
 
         it('should send application/json', async function () {
             handler.use(async function (context) {
-                return new OutgoingMessage({ value: true }, 200, 'raw');
+                return raw({ value: true });
             });
-            await request(server)
-                .get('/')
-                .expect('Content-Type', 'application/json')
-                .expect(200, { value: true });
+            await request(server).get('/').expect('Content-Type', 'application/json').expect(200, { value: true });
         });
     });
 
@@ -404,59 +354,56 @@ describe('RequestHandler', function () {
             handler = new RequestHandler();
             handler.logging = LogLevel.none;
 
-            handler.useView(async function (context, data) {
+            handler.useView(async function (context) {
+                const { view } = context;
                 const templates: Record<string, Function> = {
                     index: function (data: string) {
                         return `index: error = ${data}`;
                     },
                     error: function (data: string) {
                         return `error: error = ${data}`;
-                    }
-                }
+                    },
+                };
                 const templateFunction = templates[context.template || ''];
                 if (!templateFunction) {
                     throw new NoViewTemplateError(context.template || '');
                 }
-                return templateFunction(data);
+                return templateFunction(view.value);
             });
 
             server = createServer(handler.callback);
         });
         it('should not run error by default', async function () {
-            const errorHandler = jest.fn(async function (_context, error) {
-                return error;
-            });
+            const errorHandler = jest.fn(async function () {});
             handler.useError(errorHandler);
 
             handler.use(async function () {
                 return true;
             });
 
-            await request(server)
-                .get('/')
-                .expect(200, JSON.stringify(true));
+            await request(server).get('/').expect(200, JSON.stringify(true));
             expect(errorHandler.mock.calls.length).toBe(0);
         });
 
         it('should run error on error', async function () {
-            const errorHandler = jest.fn(async function (_context, error) {
-                return error;
-            });
-            handler.useError(errorHandler);
+            let errorHandler;
+            handler.useError(
+                (errorHandler = jest.fn(async function (context) {
+                    return context.error;
+                }))
+            );
 
             handler.use(async function () {
                 throw 'error thrown';
             });
 
-            await request(server)
-                .get('/')
-                .expect(500, JSON.stringify("error thrown"));
+            await request(server).get('/').expect(500, JSON.stringify('error thrown'));
             expect(errorHandler.mock.calls.length).toBe(1);
         });
 
-        it('should run error with OutgoingMessage', async function () {
-            const errorHandler = jest.fn(async function (_context, error) {
-                return new OutgoingMessage(error, 404);
+        it('should run error with ResponseDirective', async function () {
+            const errorHandler = jest.fn(async function (context) {
+                return json(context.error.message, { status: 404 });
             });
             handler.useError(errorHandler);
 
@@ -464,15 +411,13 @@ describe('RequestHandler', function () {
                 throw 'error thrown';
             });
 
-            await request(server)
-                .get('/')
-                .expect(404, JSON.stringify("error thrown"));
+            await request(server).get('/').expect(404, JSON.stringify('error thrown'));
             expect(errorHandler.mock.calls.length).toBe(1);
         });
 
         it('should run error with View', async function () {
-            const errorHandler = jest.fn(async function (_context, error) {
-                return view(error);
+            const errorHandler = jest.fn(async function (context) {
+                return view(context.error.message);
             });
             handler.useError(errorHandler);
 
@@ -480,15 +425,13 @@ describe('RequestHandler', function () {
                 throw 'error thrown';
             });
 
-            await request(server)
-                .get('/')
-                .expect(200, 'index: error = error thrown');
+            await request(server).get('/').expect(200, 'index: error = error thrown');
             expect(errorHandler.mock.calls.length).toBe(1);
         });
 
         it('should run error with View by Accept header', async function () {
-            const errorHandler = jest.fn(async function (_context, error) {
-                return error;
+            const errorHandler = jest.fn(async function (context) {
+                return error(context.error);
             });
             handler.useError(errorHandler);
 
@@ -496,16 +439,13 @@ describe('RequestHandler', function () {
                 throw 'error thrown';
             });
 
-            const { text } = await request(server)
-                .get('/')
-                .set('Accept', 'text/html')
-                .expect(500);
+            const { text } = await request(server).get('/').set('Accept', 'text/html').expect(500);
             expect(text).toBe('error: error = error thrown');
             expect(errorHandler.mock.calls.length).toBe(1);
         });
 
         it('should handle error in error', async function () {
-            const errorHandler = jest.fn(async function (_context, error) {
+            const errorHandler = jest.fn(async function () {
                 throw 'inner error thrown';
             });
             handler.useError(errorHandler);
@@ -514,9 +454,7 @@ describe('RequestHandler', function () {
                 throw 'error thrown';
             });
 
-            await request(server)
-                .get('/')
-                .expect(500, JSON.stringify("inner error thrown"));
+            await request(server).get('/').expect(500, JSON.stringify('inner error thrown'));
             expect(errorHandler.mock.calls.length).toBe(1);
         });
     });

@@ -1,13 +1,13 @@
 import { CaptureDirective, DirectiveType, exit, Directive } from './directive';
-import { Middleware } from './Middleware';
+import { Middleware, MiddlewareContext, MiddlewareReturn } from './Middleware';
 
 /**
  * The `Pipeline` class runs a series of `Middleware` async functions.
  */
-export class Pipeline<CONTEXT, RESULT, DIRECTIVE extends Directive<RESULT> = Directive<RESULT>> {
+export class Pipeline<CONTEXT = {}, RESULT = void> {
     middlewares: Middleware<any, any>[] = [];
 
-    async run(context: CONTEXT): Promise<DIRECTIVE> {
+    async run(context: CONTEXT): Promise<Directive<RESULT>> {
         const captures: CaptureDirective[] = [];
         let result: any;
         for (let index = 0, length = this.middlewares.length; index < length; index++) {
@@ -26,7 +26,7 @@ export class Pipeline<CONTEXT, RESULT, DIRECTIVE extends Directive<RESULT> = Dir
             }
         }
         if (!(result instanceof Directive)) {
-            result = exit(context);
+            result = exit(result);
         }
         for (let capture of captures.reverse()) {
             result = await capture.value(result);
@@ -38,9 +38,16 @@ export class Pipeline<CONTEXT, RESULT, DIRECTIVE extends Directive<RESULT> = Dir
      * Adds a `Middleware` function to the `Pipeline`
      * @param middleware - a Middleware function to add
      */
-    use<NEW_CONTEXT, NEW_RESULT>(middleware: Middleware<CONTEXT & NEW_CONTEXT, NEW_RESULT>) {
+    // TODO: Should `NEW_CONTEXT` be `Partial<NEW_CONTEXT>`?
+    use<NEW_CONTEXT, NEW_RESULT = RESULT>(
+        middleware: Middleware<CONTEXT & NEW_CONTEXT, NEW_RESULT>
+    ): Pipeline<CONTEXT & NEW_CONTEXT, NEW_RESULT>;
+    use<MIDDLEWARE extends Middleware<any, any>>(
+        middleware: MIDDLEWARE
+    ): Pipeline<CONTEXT & MiddlewareContext<MIDDLEWARE>, MiddlewareReturn<MIDDLEWARE>>;
+    use(middleware: Middleware<any, any>): Pipeline<CONTEXT & RESULT> {
         this.middlewares.push(middleware);
-        return (this as unknown) as Pipeline<CONTEXT & NEW_CONTEXT, NEW_RESULT>;
+        return this as any;
     }
 
     /**

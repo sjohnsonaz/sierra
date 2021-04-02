@@ -6,3 +6,7 @@
  *
  */
 export type Middleware<CONTEXT, RESULT> = (context: CONTEXT) => Promise<RESULT>;
+
+export type MiddlewareContext<T> = T extends Middleware<infer U, any> ? U : never;
+
+export type MiddlewareReturn<T> = T extends Middleware<any, infer U> ? U : never;

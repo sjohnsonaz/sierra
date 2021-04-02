@@ -7,10 +7,10 @@ export class ResponseDirective<T> extends Directive<T> {
     constructor(
         type: ResponseDirectiveType,
         value: T,
-        { header = {}, status = 200 }: Partial<ResponseDirectiveOptions> = {}
+        { header = {}, status = 200, ...rest }: Partial<ResponseDirectiveOptions> = {}
     ) {
         super(type, value);
-        this.options = { header, status };
+        this.options = { header, status, ...rest };
     }
 }
 
