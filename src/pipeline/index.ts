@@ -1,1 +1,2 @@
-export { Pipeline, PipelineExit, exit, Middleware } from './Pipeline';
+export * from './Middleware';
+export { Pipeline, PipelineExit, exit } from './Pipeline';
