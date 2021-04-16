@@ -1,6 +1,9 @@
 import { DirectiveType } from './DirectiveType';
 import { Directive } from './Directive';
 
+/**
+ * This Directive indicates an early exit from the Pipeline.
+ */
 export class ExitDirective<T> extends Directive<T> {
     constructor(value: T) {
         super(DirectiveType.Exit, value);

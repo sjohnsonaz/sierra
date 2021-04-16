@@ -109,10 +109,14 @@ export class Route<VALUE, RESULT, PARAMS extends {}> {
         context.template = context.template || this.template;
         context.data.params = this.getParams(match);
         const result = await this.pipeline.run(context, value);
-        if (result.type === DirectiveType.Exit) {
-            return this.method(context, result.value);
-        } else {
-            return result;
+        // TODO: Should we continue with both End and Exit?
+        // We could treat Exit as another version of Error.
+        switch (result.type) {
+            case DirectiveType.End:
+            case DirectiveType.Exit:
+                return this.method(context, result.value);
+            default:
+                return result;
         }
     }
 }

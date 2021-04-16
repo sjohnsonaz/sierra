@@ -1,3 +1,4 @@
-export * from './DirectiveType';
-export * from './ExitDirective';
 export * from './Directive';
+export * from './DirectiveType';
+export * from './EndDirective';
+export * from './ExitDirective';

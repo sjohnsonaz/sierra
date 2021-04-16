@@ -1,7 +1,14 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
 import { Color } from '../utils/ConsoleUtil';
-import { Directive, Middleware, MiddlewareContext, MiddlewareReturn, Pipeline } from '../pipeline';
+import {
+    Directive,
+    DirectiveType,
+    Middleware,
+    MiddlewareContext,
+    MiddlewareReturn,
+    Pipeline,
+} from '../pipeline';
 
 import { Context } from './Context';
 import {
@@ -61,12 +68,19 @@ export class RequestHandler<CONTEXT extends Context = Context, RESULT = void> {
             if (this.errorPipeline.middlewares.length) {
                 try {
                     let result = await this.errorPipeline.run(errorContext, e);
-                    if (result.type === 'exit') {
-                        const e =
-                            result.value instanceof Error ? result.value : new Error(result.value);
-                        this.sendError(errorContext, error(e, { status: errorStatus }));
-                    } else {
-                        this.send(errorContext, result);
+                    switch (result.type) {
+                        case DirectiveType.End:
+                        case DirectiveType.End: {
+                            const e =
+                                result.value instanceof Error
+                                    ? result.value
+                                    : new Error(result.value);
+                            this.sendError(errorContext, error(e, { status: errorStatus }));
+                            break;
+                        }
+                        default:
+                            this.send(errorContext, result);
+                            break;
                     }
                 } catch (e) {
                     if (!(e instanceof Error)) {

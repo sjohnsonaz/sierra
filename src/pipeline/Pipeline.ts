@@ -1,4 +1,4 @@
-import { Directive, exit } from './directive';
+import { Directive, end } from './directive';
 import { Middleware, MiddlewareContext, MiddlewareReturn } from './Middleware';
 
 /**
@@ -16,7 +16,7 @@ export class Pipeline<CONTEXT = {}, VALUE = undefined, RESULT = void> {
             }
         }
         if (!(result instanceof Directive)) {
-            result = exit(result);
+            result = end(result);
         }
         return result;
     }
