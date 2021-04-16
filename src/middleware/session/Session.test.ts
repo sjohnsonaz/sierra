@@ -19,7 +19,7 @@ describe('Session', function () {
                 getId: async () => '',
                 load: async () => '',
                 save: async () => true,
-                destroy: async () => true
+                destroy: async () => true,
             };
             const session = new Session(context, gateway);
             expect(session.context).toBe(context);
@@ -44,7 +44,7 @@ describe('Session', function () {
                 getId: async () => '',
                 load: async () => '',
                 save: jest.fn(async () => true),
-                destroy: async () => true
+                destroy: async () => true,
             };
             const session = new Session(context, gateway);
             await session.save();
@@ -71,7 +71,7 @@ describe('Session', function () {
                 getId: jest.fn(async () => ''),
                 load: jest.fn(async () => ''),
                 save: async () => true,
-                destroy: async () => true
+                destroy: async () => true,
             };
             const session = new Session(context, gateway);
             await session.init();
@@ -86,7 +86,7 @@ describe('Session', function () {
                 getId: jest.fn(async () => ''),
                 load: jest.fn(async () => ''),
                 save: async () => true,
-                destroy: async () => true
+                destroy: async () => true,
             };
             const session = new Session(context, gateway);
             await session.init();
@@ -114,7 +114,7 @@ describe('Session', function () {
                 getId: async () => '',
                 load: async () => '',
                 save: async () => true,
-                destroy: jest.fn(async () => true)
+                destroy: jest.fn(async () => true),
             };
             const session = new Session(context, gateway);
             session.id = 'id';
@@ -140,7 +140,7 @@ describe('Session', function () {
                 getId: jest.fn(async () => 'id'),
                 load: jest.fn(async () => ''),
                 save: async () => true,
-                destroy: jest.fn(async () => true)
+                destroy: jest.fn(async () => true),
             };
             const session = new Session(context, gateway);
             session.id = 'id';
@@ -162,13 +162,13 @@ describe('Session', function () {
                 getId: async () => '',
                 load: async () => '',
                 save: async () => true,
-                destroy: async () => true
+                destroy: async () => true,
             };
             const session = new Session(context, gateway);
             const updatedCookie = session.touch();
             expect(updatedCookie?.maxAge).toBeUndefined();
         });
-    })
+    });
 
     describe('load', function () {
         it('should call gateway.load', async function () {
@@ -180,9 +180,9 @@ describe('Session', function () {
                 getId: jest.fn(async () => ''),
                 load: jest.fn(async () => ''),
                 save: async () => true,
-                destroy: async () => true
+                destroy: async () => true,
             };
-            await Session.load(context, gateway);
+            await Session.load(context as any, gateway);
             expect(gateway.getId.mock.calls.length).toBe(0);
             expect(gateway.load.mock.calls.length).toBe(1);
         });
@@ -194,9 +194,9 @@ describe('Session', function () {
                 getId: jest.fn(async () => ''),
                 load: async () => '',
                 save: async () => true,
-                destroy: async () => true
+                destroy: async () => true,
             };
-            await Session.load(context, gateway);
+            await Session.load(context as any, gateway);
             expect(gateway.getId.mock.calls.length).toBe(1);
         });
     });

@@ -6,19 +6,18 @@ describe('Application', function () {
     describe('use', function () {
         it('should add middleware', function () {
             const application = new Application();
-            const middleware = async () => { };
+            const middleware = async () => {};
             application.use(middleware);
             expect(application.requestHandler.pipeline.middlewares.length).toBe(1);
             expect(application.requestHandler.pipeline.middlewares[0]).toBe(middleware);
         });
     });
 
-
     describe('view', function () {
         it('should set view middleware', function () {
             const application = new Application();
             const middleware = async () => '';
-            application.view(middleware);
+            application.useView(middleware);
             expect(application.requestHandler.viewPipeline.middlewares).toContain(middleware);
         });
     });
@@ -26,8 +25,8 @@ describe('Application', function () {
     describe('error', function () {
         it('should set error middleware', function () {
             const application = new Application();
-            const middleware = async () => { };
-            application.error(middleware);
+            const middleware = async () => {};
+            application.useError(middleware);
             expect(application.requestHandler.errorPipeline.middlewares).toContain(middleware);
         });
     });
@@ -68,7 +67,6 @@ describe('Application', function () {
             expect(application.logging).toBe(LogLevel.verbose);
         });
     });
-
 
     describe('addController', function () {
         it('should add a Controller', function () {

@@ -14,57 +14,55 @@ describe('ConnectMiddleware', () => {
         application.use(async () => {
             return 'returned';
         });
-        application.error(async () => {
+        application.useError(async () => {
             return 'errored';
         });
         application.init();
     });
 
     it('should continue on next()', async () => {
-        application.use(ConnectMiddleware((_req, _res, next) => {
-            next();
-        }));
+        application.use(
+            ConnectMiddleware((_req, _res, next) => {
+                next();
+            })
+        );
 
-        await request(application.server)
-            .get('')
-            .expect(200, JSON.stringify('returned'));
+        await request(application.server).get('').expect(200, JSON.stringify('returned'));
     });
 
     it('should throw on next(err)', async () => {
-        application.use(ConnectMiddleware((_req, _res, next) => {
-            next('throw error');
-        }));
+        application.use(
+            ConnectMiddleware((_req, _res, next) => {
+                next('throw error');
+            })
+        );
         jest.advanceTimersByTime(1000);
 
-        await request(application.server)
-            .get('')
-            .expect(500, JSON.stringify('errored'));
+        await request(application.server).get('').expect(500, JSON.stringify('errored'));
     });
 
     // TODO: Confirm this calls interval
     it('should end on send()', async () => {
-        application.use(ConnectMiddleware((_req, res) => {
-            res.write(JSON.stringify('returned'));
-            res.end();
-        }));
-        application.use(async () => {
+        application.use(
+            ConnectMiddleware((_req, res) => {
+                res.write(JSON.stringify('returned'));
+                res.end();
+            })
+        );
+        application.use(async () => {});
 
-        });
-
-        await request(application.server)
-            .get('')
-            .expect(200, JSON.stringify('returned'));
+        await request(application.server).get('').expect(200, JSON.stringify('returned'));
     });
 
     it('should end on done()', async () => {
-        application.use(ConnectMiddleware((_req, res, _next, done) => {
-            res.write(JSON.stringify('returned'));
-            res.end();
-            done();
-        }));
+        application.use(
+            ConnectMiddleware((_req, res, _next, done) => {
+                res.write(JSON.stringify('returned'));
+                res.end();
+                done();
+            })
+        );
 
-        await request(application.server)
-            .get('')
-            .expect(200, JSON.stringify('returned'));
+        await request(application.server).get('').expect(200, JSON.stringify('returned'));
     });
 });

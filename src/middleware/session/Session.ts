@@ -1,4 +1,3 @@
-
 import { Context, NoSessionGatewayError } from '../../server';
 
 import { ISessionGateway } from './ISessionGateway';
@@ -19,7 +18,11 @@ export class Session<T> {
     maxAge?: number;
     cookieIdentifier: string;
 
-    constructor(context: Context, gateway: ISessionGateway<T>, cookieIdentifier: string = SIERRA_ID) {
+    constructor(
+        context: Context,
+        gateway: ISessionGateway<T>,
+        cookieIdentifier: string = SIERRA_ID
+    ) {
         this.context = context;
         this.gateway = gateway;
         this.cookieIdentifier = cookieIdentifier;
@@ -33,7 +36,7 @@ export class Session<T> {
             await this.init();
         }
         // TODO: Verify this any
-        return await this.gateway.save(this.context, this.id as any, this.data || {} as any);
+        return await this.gateway.save(this.context, this.id as any, this.data || ({} as any));
     }
 
     async init(maxAge: number = 60) {
@@ -88,7 +91,7 @@ export class Session<T> {
     }
 
     static async load<T>(
-        context: Context,
+        context: Context<{ session: Session<T> }>,
         gateway: ISessionGateway<T>,
         {
             maxAge = 60,

@@ -16,24 +16,22 @@ describe('BodyMiddleware', function () {
         });
 
         it('should read "application/json" data', async function () {
-            handler.use(BodyMiddleware);
-            handler.use((context) => {
+            handler.use(BodyMiddleware).use((context) => {
                 return context.data.body;
             });
 
             await request(server)
                 .post('/')
                 .send({
-                    value: true
+                    value: true,
                 })
                 .expect(200, {
-                    value: true
+                    value: true,
                 });
         });
 
         it('should handle badly formed "application/json" data', async function () {
-            handler.use(BodyMiddleware);
-            handler.use((context) => {
+            handler.use(BodyMiddleware).use((context) => {
                 return context.data.body;
             });
 
@@ -56,22 +54,17 @@ describe('BodyMiddleware', function () {
         });
 
         it('should read "multipart/form-data" data', async function () {
-            handler.use(BodyMiddleware);
-            handler.use((context) => {
+            handler.use(BodyMiddleware).use((context) => {
                 return context.data.body;
             });
 
-            await request(server)
-                .post('/')
-                .field('value', true)
-                .expect(200, {
-                    value: 'true'
-                });
+            await request(server).post('/').field('value', true).expect(200, {
+                value: 'true',
+            });
         });
 
         it.skip('should handle badly formed "multipart/form-data" data', async function () {
-            handler.use(BodyMiddleware);
-            handler.use((context) => {
+            handler.use(BodyMiddleware).use((context) => {
                 return context.data.body;
             });
 
@@ -81,7 +74,7 @@ describe('BodyMiddleware', function () {
                 .send('value=true')
                 .expect(200);
             expect(text).toBe({
-                value: 'true'
+                value: 'true',
             });
         });
     });
@@ -96,8 +89,7 @@ describe('BodyMiddleware', function () {
         });
 
         it('should read "application/x-www-form-urlencoded" data', async function () {
-            handler.use(BodyMiddleware);
-            handler.use((context) => {
+            handler.use(BodyMiddleware).use((context) => {
                 return context.data.body;
             });
 
@@ -105,15 +97,13 @@ describe('BodyMiddleware', function () {
                 .post('/')
                 .type('form')
                 .send({
-                    value: true
+                    value: true,
                 })
                 .expect(200, {
-                    value: 'true'
+                    value: 'true',
                 });
         });
 
-        it.skip('should handle badly formed "application/x-www-form-urlencoded" data', async function () {
-
-        });
+        it.skip('should handle badly formed "application/x-www-form-urlencoded" data', async function () {});
     });
 });

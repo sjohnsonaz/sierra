@@ -1,11 +1,9 @@
-export interface DecodedQuery {
-    [index: string]: DecodeValue;
-    [index: number]: DecodeValue;
-}
-
-type DecodeValue = string | DecodeValue[] | DecodedQuery;
-
-export function decode(queryString: string) {
+export function decode<
+    T = {
+        [index: string]: string;
+        [index: number]: string;
+    }
+>(queryString: string): T {
     const graphEntries = createEntries(queryString);
     const graphNode = createNodes(graphEntries);
     return graphNode.decode();
@@ -31,7 +29,7 @@ function createEntries(query: string) {
 
 function createNodes(graphEntries: GraphEntry[]) {
     const root = new GraphNode();
-    graphEntries.forEach(entry => {
+    graphEntries.forEach((entry) => {
         root.addEntry(entry);
     });
     return root;
@@ -51,14 +49,16 @@ class GraphEntry {
     static regex = /[a-zA-Z0-9\-\_\.\!\~\*\'\(\)\%]+|\[\]/g;
     private parseKey(key: string) {
         const matches = key.match(GraphEntry.regex);
-        return matches?.map(match => {
-            switch (match) {
-                case '[]':
-                    return '';
-                default:
-                    return match;
-            }
-        }) || [];
+        return (
+            matches?.map((match) => {
+                switch (match) {
+                    case '[]':
+                        return '';
+                    default:
+                        return match;
+                }
+            }) || []
+        );
     }
 }
 
@@ -80,7 +80,7 @@ class GraphNode {
             node = new GraphNode();
             this.children[key] = node;
         }
-        index++
+        index++;
         if (graphEntry.keys.length === index) {
             node.addValue(graphEntry.value);
         } else {
@@ -88,16 +88,16 @@ class GraphNode {
         }
     }
 
-    decode() {
-        const output: DecodedQuery = this.createOutput() as any;
+    decode<T>() {
+        const output: T = this.createOutput() as any;
         return output;
     }
 
-    createOutput() {
+    createOutput<T>(): T {
         const keys = Object.keys(this.children);
-        const outputObject: DecodedQuery = {};
-        const outputArray: DecodeValue[] = [];
-        keys.forEach(key => {
+        const outputObject: Record<string, any> = {};
+        const outputArray: any[] = [];
+        keys.forEach((key) => {
             const entry = this.children[key];
             if (key === '') {
                 outputArray.push(entry.createOutput());
@@ -105,7 +105,7 @@ class GraphNode {
                 outputObject[key] = entry.createOutput();
             }
         });
-        this.values.forEach(value => {
+        this.values.forEach((value) => {
             outputArray.push(value);
         });
         if (outputArray.length) {
@@ -115,7 +115,7 @@ class GraphNode {
                 return outputArray.length > 1 ? outputArray : outputArray[0];
             }
         } else {
-            return outputObject;
+            return outputObject as T;
         }
     }
 }

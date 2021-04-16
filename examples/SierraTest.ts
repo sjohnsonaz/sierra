@@ -8,7 +8,7 @@ let testApplication = new Sierra();
 
 // View
 HandlebarsView.viewRoot = './examples/views/';
-testApplication.view(HandlebarsView.handle);
+testApplication.useView(HandlebarsView.handle);
 
 // Body
 testApplication.use(QueryStringMiddleware);
@@ -37,8 +37,7 @@ const port = 3001;
 
         await testApplication.close();
         console.log('Stopped');
-    }
-    catch (e) {
+    } catch (e) {
         console.error(e);
     }
 })();

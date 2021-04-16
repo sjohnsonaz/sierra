@@ -25,8 +25,8 @@ import { Header } from './header';
 const DEFAULT_TEMPLATE = 'index';
 const ERROR_TEMPLATE = 'error';
 
-type ViewContext<CONTEXT extends Context, VALUE> = CONTEXT & { view: ViewDirective<VALUE> };
-type ErrorContext<CONTEXT extends Context> = CONTEXT & { error: Error };
+export type ViewContext<CONTEXT extends Context, VALUE> = CONTEXT & { view: ViewDirective<VALUE> };
+export type ErrorContext<CONTEXT extends Context> = CONTEXT & { error: Error };
 
 export class RequestHandler<CONTEXT extends Context = Context, RESULT = void> {
     pipeline: Pipeline<CONTEXT, undefined, RESULT> = new Pipeline();

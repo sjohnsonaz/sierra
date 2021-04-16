@@ -10,7 +10,7 @@ export class SessionMiddleware<T> {
         this.gateway = gateway;
     }
 
-    handle = async (context: Context) => {
+    handle = async (context: Context<{ session: Session<T> }>) => {
         await Session.load(context, this.gateway);
-    }
+    };
 }

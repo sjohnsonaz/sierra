@@ -1,18 +1,18 @@
-import { Context, Verb } from "../../server";
+import { Context, Verb } from '../../server';
 
 import { createRequest } from '../../utils/TestUtil';
-import { Controller } from "./controller";
+import { Controller } from './controller';
 
-import { Route } from "./Route";
-import { RouteMiddleware, sortRoutes } from "./RouteMiddleware";
+import { Route } from './Route';
+import { RouteMiddleware, sortRoutes } from './RouteMiddleware';
 
 describe('RouteMiddleware', function () {
     describe('init', function () {
         it('should sort Routes', function () {
             const routerMiddleware = new RouteMiddleware();
-            const routeA = new Route(Verb.Get, 'a', async () => { });
-            const routeB = new Route(Verb.Get, 'a/:b', async () => { });
-            const routeRegex = new Route(Verb.Get, /regex/, async () => { });
+            const routeA = new Route(Verb.Get, 'a', async () => {});
+            const routeB = new Route(Verb.Get, 'a/:b', async () => {});
+            const routeRegex = new Route(Verb.Get, /regex/, async () => {});
             routerMiddleware.add(routeB);
             routerMiddleware.add(routeA);
             routerMiddleware.add(routeRegex);
@@ -31,7 +31,7 @@ describe('RouteMiddleware', function () {
         it('should match routes', async function () {
             const routerMiddleware = new RouteMiddleware();
             const route = new Route(Verb.Get, 'test', async () => {
-                return true
+                return true;
             });
             routerMiddleware.add(route);
             routerMiddleware.init();
@@ -40,8 +40,8 @@ describe('RouteMiddleware', function () {
                 method: 'get',
                 url: 'http://localhost/test',
                 headers: {
-                    'accept': 'application/json',
-                    'content-type': 'application/json'
+                    accept: 'application/json',
+                    'content-type': 'application/json',
                 },
             });
             const context = new Context(request, response);
@@ -53,11 +53,15 @@ describe('RouteMiddleware', function () {
         it('should match parameterized routes', async function () {
             const routerMiddleware = new RouteMiddleware();
             const testRoute = new Route(Verb.Get, 'test', async () => {
-                return true
+                return true;
             });
-            const paramRoute = new Route(Verb.Get, 'test/:param', async ({ data }) => {
-                return data.params?.param;
-            });
+            const paramRoute = new Route<any, any, { param: any }>(
+                Verb.Get,
+                'test/:param',
+                async ({ data }) => {
+                    return data.params?.param;
+                }
+            );
             routerMiddleware.add(testRoute);
             routerMiddleware.add(paramRoute);
             routerMiddleware.init();
@@ -66,8 +70,8 @@ describe('RouteMiddleware', function () {
                 method: 'get',
                 url: 'http://localhost/test/1',
                 headers: {
-                    'accept': 'application/json',
-                    'content-type': 'application/json'
+                    accept: 'application/json',
+                    'content-type': 'application/json',
                 },
             });
             const context = new Context(request, response);
@@ -79,13 +83,9 @@ describe('RouteMiddleware', function () {
 
     describe('Controller', function () {
         describe.skip('init', function () {
-            it('should build Routes from Controllers', function () {
+            it('should build Routes from Controllers', function () {});
 
-            });
-
-            it('should sort Routes from Controllers', function () {
-
-            });
+            it('should sort Routes from Controllers', function () {});
         });
 
         describe('addController', function () {
@@ -120,8 +120,7 @@ describe('RouteMiddleware', function () {
 });
 
 describe('sortRoutes', function () {
-    it('routes are sorted by RegExp, then location or first \':\', then alphabetical', () => {
-
+    it("routes are sorted by RegExp, then location or first ':', then alphabetical", () => {
         let routesPaths = [
             '/',
             '/:id',
@@ -132,11 +131,11 @@ describe('sortRoutes', function () {
             '/getsomething/:id/:name',
             '/getsomething/:name/:id',
             '/getsomething/:another/:id',
-            '/getsomething/:id/fixed'
+            '/getsomething/:id/fixed',
         ];
 
-        const routes = routesPaths.map(routePath => {
-            return new Route([Verb.Get], routePath, async () => { });
+        const routes = routesPaths.map((routePath) => {
+            return new Route([Verb.Get], routePath, async () => {});
         });
         routes.sort(sortRoutes);
 
