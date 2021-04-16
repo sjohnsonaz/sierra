@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import { Middleware, Pipeline } from '../../pipeline';
+import { DirectiveType, Middleware, Pipeline } from '../../pipeline';
 import { Context, Verb } from '../../server';
 
 export class Route<VALUE, RESULT, PARAMS extends {}> {
@@ -109,7 +109,11 @@ export class Route<VALUE, RESULT, PARAMS extends {}> {
         context.template = context.template || this.template;
         context.data.params = this.getParams(match);
         const result = await this.pipeline.run(context, value);
-        return this.method(context, result);
+        if (result.type === DirectiveType.Exit) {
+            return this.method(context, result.value);
+        } else {
+            return result;
+        }
     }
 }
 

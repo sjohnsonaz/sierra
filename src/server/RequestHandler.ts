@@ -62,7 +62,9 @@ export class RequestHandler<CONTEXT extends Context = Context, RESULT = void> {
                 try {
                     let result = await this.errorPipeline.run(errorContext, e);
                     if (result.type === 'exit') {
-                        this.sendError(errorContext, error(result.value, { status: errorStatus }));
+                        const e =
+                            result.value instanceof Error ? result.value : new Error(result.value);
+                        this.sendError(errorContext, error(e, { status: errorStatus }));
                     } else {
                         this.send(errorContext, result);
                     }
