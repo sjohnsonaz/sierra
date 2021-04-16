@@ -1,2 +1,3 @@
+export * from './directive';
 export * from './Middleware';
-export { Pipeline, PipelineExit, exit } from './Pipeline';
+export { Pipeline } from './Pipeline';

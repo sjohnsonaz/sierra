@@ -1,38 +1,29 @@
+import { Directive, exit } from './directive';
 import { Middleware, MiddlewareContext, MiddlewareReturn } from './Middleware';
 
 /**
- * The PipelineExit class, when returned from a Middleware function, signals that the Pipeline should exit.
- */
-export class PipelineExit {}
-
-/**
- * Returns a PipelineExit object
- */
-export function exit() {
-    return new PipelineExit();
-}
-
-/**
- * The Pipeline class runs a series of Middleware async functions.
+ * The `Pipeline` class runs a series of `Middleware` async functions.
  */
 export class Pipeline<CONTEXT = {}, VALUE = undefined, RESULT = void> {
     middlewares: Middleware<any, any, any>[] = [];
 
-    // TODO: Should value be optional?
-    async run(context: CONTEXT, value: VALUE) {
-        let result: RESULT = value as any;
+    async run(context: CONTEXT, value: VALUE): Promise<Directive<RESULT>> {
+        let result: any = value;
         for (let index = 0, length = this.middlewares.length; index < length; index++) {
             result = await this.middlewares[index](context, result);
-            if (result instanceof PipelineExit) {
+            if (result instanceof Directive) {
                 break;
             }
+        }
+        if (!(result instanceof Directive)) {
+            result = exit(result);
         }
         return result;
     }
 
     /**
-     * Adds a Middleware function to the Pipeline
-     * @param middleware - a Middleware function to add
+     * Adds a `Middleware` function to the `Pipeline`
+     * @param middleware - a `Middleware` function to add
      */
     use<NEW_CONTEXT, NEW_RESULT = RESULT>(
         middleware: Middleware<CONTEXT & NEW_CONTEXT, RESULT, NEW_RESULT>
@@ -46,10 +37,10 @@ export class Pipeline<CONTEXT = {}, VALUE = undefined, RESULT = void> {
     }
 
     /**
-     * Removes a Middleware function from the Pipeline
-     * @param middleware - a Middleware function to remove
+     * Removes a `Middleware` function from the `Pipeline`
+     * @param middleware - a `Middleware` function to remove
      */
-    remove(middleware: Middleware<CONTEXT, any, any>) {
+    remove(middleware: Middleware<any, any, any>) {
         let index = this.middlewares.indexOf(middleware);
         if (index >= 0) {
             return this.middlewares.splice(index, 1);

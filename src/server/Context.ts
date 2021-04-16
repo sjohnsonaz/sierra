@@ -3,13 +3,12 @@ import { URL } from 'url';
 
 import { ContentType } from './ContentType';
 import { CookieRegistry } from './cookie';
-import { OutgoingMessage, OutputType } from './OutgoingMessage';
 import { getVerb, Verb } from './Verb';
 
 /**
  * The Context object for the RequestHandler Pipeline
  */
-export class Context {
+export class Context<DATA extends {} = {}> {
     /** The IncomingMessage object */
     request: IncomingMessage;
     /** The ServerResponse object */
@@ -24,7 +23,7 @@ export class Context {
     /** HTTP Accept Header */
     accept: string[];
 
-    data: Record<string, any> = {};
+    data: DATA;
 
     /** The CookieRegistry object.  Holds Cookie data */
     cookies: CookieRegistry;
@@ -37,9 +36,10 @@ export class Context {
      * @param request - an incoming request
      * @param response - an outgoing response
      */
-    constructor(request: IncomingMessage, response: ServerResponse) {
+    constructor(request: IncomingMessage, response: ServerResponse, initialData: DATA = {} as any) {
         this.request = request;
         this.response = response;
+        this.data = initialData;
 
         // Method
         this.method = getMethod(request);
@@ -54,18 +54,6 @@ export class Context {
         this.accept = getAccept(request);
 
         this.cookies = new CookieRegistry(request);
-    }
-
-    /**
-     * Creates an OutgoingMessage object.
-     * @param data - the data to send
-     * @param status - the status code
-     * @param type - the type of output
-     * @param template - the template name if sending a View
-     * @param contentType - the Content-Type header
-     */
-    send<U>(data: U, status?: number, type?: OutputType, template?: string, contentType?: string) {
-        return new OutgoingMessage(data, status, type, template, contentType);
     }
 }
 
@@ -103,7 +91,7 @@ export function getAccept(request: IncomingMessage) {
     const accept = request.headers['accept'];
     if (accept) {
         let types = accept.split(',');
-        return types.map(type => {
+        return types.map((type) => {
             let parts = type.split(';');
             return parts[0];
         });

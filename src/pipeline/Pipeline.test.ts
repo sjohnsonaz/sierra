@@ -1,5 +1,5 @@
+import { exit, ExitDirective } from './directive';
 import { Pipeline } from './Pipeline';
-import { exit, PipelineExit } from './Pipeline';
 
 describe('Pipeline', function () {
     describe('run', function () {
@@ -7,9 +7,8 @@ describe('Pipeline', function () {
             let pipeline = new Pipeline().use(async () => {
                 return true;
             });
-            // TODO: Fix optional parameters
-            let result = await pipeline.run({}, undefined);
-            expect(result).toBe(true);
+            let { value } = await pipeline.run({}, undefined);
+            expect(value).toBe(true);
         });
 
         it('should run middleware in order', async function () {
@@ -22,25 +21,19 @@ describe('Pipeline', function () {
                 .use(async (_context, value: string) => {
                     return value + 'c';
                 });
-            let result = await pipeline.run({}, 'a');
-            expect(result).toBe('abc');
+            let { value } = await pipeline.run({}, 'a');
+            expect(value).toBe('abc');
         });
 
         it('should throw exceptions', async function () {
-            let pipeline = new Pipeline<any, string, string>();
-            pipeline.use(async (context, value) => {
-                throw 'exception';
-            });
-            pipeline.use(async (context, value) => {
-                return 'success';
-            });
-            let result: string;
-            try {
-                result = await pipeline.run({}, 'a');
-            } catch (e) {
-                result = e;
-            }
-            expect(result).toBe('exception');
+            let pipeline = new Pipeline<any, string, string>()
+                .use(async () => {
+                    throw 'exception';
+                })
+                .use(async () => {
+                    return 'success';
+                });
+            await expect(pipeline.run({}, 'a')).rejects.toMatch('exception');
         });
     });
 
@@ -72,11 +65,11 @@ describe('Pipeline', function () {
     });
 });
 
-describe('PipelineExit', function () {
+describe('ExitDirective', function () {
     describe('exit', function () {
-        it('should create a new PipelineExit', function () {
-            const pipelineExit = exit();
-            expect(pipelineExit).toBeInstanceOf(PipelineExit);
+        it('should create a new ExitDirective', function () {
+            const directive = exit();
+            expect(directive).toBeInstanceOf(ExitDirective);
         });
     });
 });

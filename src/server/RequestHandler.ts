@@ -1,37 +1,54 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
 import { Color } from '../utils/ConsoleUtil';
-import { Middleware, Pipeline } from '../pipeline';
+import { Directive, Middleware, MiddlewareContext, MiddlewareReturn, Pipeline } from '../pipeline';
 
 import { Context } from './Context';
-import { OutgoingMessage, OutputType } from './OutgoingMessage';
+import {
+    auto,
+    AutoDirective,
+    error,
+    ErrorDirective,
+    json,
+    JsonDirective,
+    RawDirective,
+    ResponseDirective,
+    ResponseDirectiveType,
+    TextDirective,
+    view,
+    ViewDirective,
+} from './response-directive';
 import { LogLevel } from './LogLevel';
 import { ErrorMessage, NonStringViewError, NoViewTemplateError, SierraError } from './Errors';
+import { Header } from './header';
 
 const DEFAULT_TEMPLATE = 'index';
 const ERROR_TEMPLATE = 'error';
 
-export class RequestHandler {
-    pipeline: Pipeline<Context, any, any> = new Pipeline();
-    errorPipeline: Pipeline<Context, any, any> = new Pipeline();
-    viewPipeline: Pipeline<Context, any, any> = new Pipeline();
+type ViewContext<CONTEXT extends Context, VALUE> = CONTEXT & { view: ViewDirective<VALUE> };
+type ErrorContext<CONTEXT extends Context> = CONTEXT & { error: Error };
+
+export class RequestHandler<CONTEXT extends Context = Context, RESULT = void> {
+    pipeline: Pipeline<CONTEXT, undefined, RESULT> = new Pipeline();
+    errorPipeline: Pipeline<ErrorContext<CONTEXT>, any, any> = new Pipeline();
+    viewPipeline: Pipeline<ViewContext<CONTEXT, RESULT>, RESULT, any> = new Pipeline();
     logging: LogLevel = LogLevel.errors;
     defaultTemplate = DEFAULT_TEMPLATE;
 
     callback = async (request: IncomingMessage, response: ServerResponse) => {
         let context = new Context(request, response);
         try {
-            let result = await this.pipeline.run(context, undefined);
+            let result = await this.pipeline.run(context as any, undefined);
             // If Headers have already sent, we cannot send.
             if (!context.response.headersSent && !context.response.writableEnded) {
-                if (result instanceof OutgoingMessage) {
-                    this.send(context, result.data, result.status, result.type, result.template, result.contentType);
-                } else {
-                    this.send(context, result);
-                }
+                this.send(context as CONTEXT, result);
             }
-        }
-        catch (e) {
+        } catch (e) {
+            const errorContext: ErrorContext<CONTEXT> = context as any;
+            if (!(e instanceof Error)) {
+                e = Error(e);
+            }
+            errorContext.error = e;
             let errorStatus = 500;
             if (e instanceof SierraError) {
                 switch (e.message) {
@@ -43,150 +60,237 @@ export class RequestHandler {
             }
             if (this.errorPipeline.middlewares.length) {
                 try {
-                    let result = await this.errorPipeline.run(context, e);
-                    if (result instanceof OutgoingMessage) {
-                        this.send(context, result.data, result.status, result.type, result.template, result.contentType);
+                    let result = await this.errorPipeline.run(errorContext, e);
+                    if (result.type === 'exit') {
+                        this.sendError(errorContext, error(result.value, { status: errorStatus }));
                     } else {
-                        this.send(context, result, errorStatus, 'auto', ERROR_TEMPLATE);
+                        this.send(errorContext, result);
                     }
-                }
-                catch (e) {
-                    this.sendError(context, e, errorStatus);
+                } catch (e) {
+                    if (!(e instanceof Error)) {
+                        e = Error(e);
+                    }
+                    errorContext.error = e;
+                    this.sendError(errorContext, error(e, { status: errorStatus }));
                 }
             } else {
-                this.sendError(context, e, errorStatus);
+                this.sendError(errorContext, error(e, { status: errorStatus }));
             }
         }
     };
 
-    sendJson<T>(context: Context, data: T, status: number = 200) {
-        this.log(context, data, status);
-        context.response.statusCode = status;
-        context.response.setHeader('Content-Type', 'application/json');
-        context.response.write(JSON.stringify(data ?? null));
-        context.response.end();
-    }
+    private async write<T>(context: Context, value: T, status: number, header: Header) {
+        const { response } = context;
+        response.statusCode = status;
 
-    sendRaw<T>(context: Context, data: T, status: number = 200, contentType?: string) {
-        this.log(context, data, status);
-        context.response.statusCode = status;
-        if (typeof data === 'string') {
-            context.response.setHeader('Content-Type', contentType ?? 'text/plain');
-            context.response.write(data);
-        } else if (Buffer.isBuffer(data)) {
-            context.response.setHeader('Content-Type', contentType ?? 'octet-stream');
-            context.response.write(data);
-        } else {
-            context.response.setHeader('Content-Type', contentType ?? 'application/json');
-            context.response.write(JSON.stringify(data ?? null));
-        }
-        context.response.end();
-    }
+        Object.keys(header).forEach((headerName) => {
+            const value = header[headerName as never] as string;
+            response.setHeader(headerName, value);
+        });
 
-    async sendView<T>(context: Context, data: T, status: number = 200, template?: string) {
         try {
-            context.template = context.template ?? template ?? this.defaultTemplate;
-            let output = await this.viewPipeline.run(context, data);
-            // Ensure output is a string
-            if (typeof output !== 'string') {
-                throw new NonStringViewError(output);
-            }
-            this.log(context, data, status);
-            context.response.statusCode = status;
-            context.response.setHeader('Content-Type', 'text/html');
-            context.response.write(output);
-            context.response.end();
+            const result = await new Promise<boolean>((resolve, reject) => {
+                const result = response.write(value, (error) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(result);
+                    }
+                });
+            });
+            return result;
+        } catch (e) {
+            throw e;
+        } finally {
+            await new Promise<void>((resolve) => {
+                response.end(() => resolve());
+            });
         }
-        catch (e) {
-            this.log(context, data, 500);
-            context.response.statusCode = 500;
-            context.response.setHeader('Content-Type', 'text/html');
-            context.response.write(errorTemplate(e));
-            context.response.end();
+    }
+
+    sendJson<T = RESULT>(context: CONTEXT, directive: JsonDirective<T>) {
+        const { value, options } = directive;
+
+        this.log(context, options.status);
+
+        return this.write(context, JSON.stringify(value ?? null), options.status, {
+            'Content-Type': 'application/json',
+            ...options.header,
+        });
+    }
+
+    sendRaw<T = RESULT>(context: CONTEXT, directive: RawDirective<T>) {
+        const { value, options } = directive;
+
+        this.log(context, options.status);
+
+        if (typeof value === 'string') {
+            return this.write(context, value, options.status, {
+                'Content-Type': options.contentType ?? 'text/plain',
+                ...options.header,
+            });
+        } else if (Buffer.isBuffer(value)) {
+            return this.write(context, value, options.status, {
+                'Content-Type': options.contentType ?? 'octet-stream',
+                ...options.header,
+            });
+        } else {
+            return this.write(context, JSON.stringify(value ?? null), options.status, {
+                'Content-Type': options.contentType ?? 'application/json',
+                ...options.header,
+            });
+        }
+    }
+
+    sendText<T = RESULT>(context: CONTEXT, directive: TextDirective<T>) {
+        const { value, options } = directive;
+
+        this.log(context, options.status);
+
+        let output: string;
+
+        if (typeof value === 'object') {
+            output = JSON.stringify(value ?? null);
+        } else {
+            output = `${value ?? ''}`;
+        }
+
+        return this.write(context, output, options.status, {
+            'Content-Type': 'text/plain',
+            ...options.header,
+        });
+    }
+
+    async sendView(context: CONTEXT, directive: ViewDirective<RESULT>) {
+        const { options } = directive;
+
+        try {
+            context.template = options.template ?? context.template ?? this.defaultTemplate;
+            const viewContext: ViewContext<CONTEXT, RESULT> = context as any;
+            viewContext.view = directive;
+            let { value } = await this.viewPipeline.run(viewContext, directive.value);
+            // Ensure output is a string
+            if (typeof value !== 'string') {
+                throw new NonStringViewError(value);
+            }
+
+            this.log(context, options.status);
+
+            return this.write(context, value, options.status, {
+                'Content-Type': 'text/html',
+                ...options.header,
+            });
+        } catch (e) {
+            this.log(context, 500);
+
+            const result = await this.write(context, errorTemplate(e), 500, {
+                'Content-Type': 'text/html',
+                ...options.header,
+            });
+
             if (this.logging >= LogLevel.errors) {
                 console.error(e);
             }
+            return result;
         }
     }
 
-    send<T>(context: Context, data: T, status: number = 200, type: OutputType = 'auto', template?: string, contentType?: string) {
-        context.cookies.setCookies(context.response);
-        let accept = context.accept;
-        switch (type) {
-            case 'auto':
-                if (this.viewPipeline.middlewares.length && accept && accept.indexOf('text/html') > -1) {
-                    this.sendView(context, data, status, template);
-                } else if (accept && accept.indexOf('application/json')) {
-                    this.sendJson(context, data, status);
-                } else {
-                    this.sendRaw(context, data, status, contentType);
-                }
-                break;
-            case 'json':
-                this.sendJson(context, data, status);
-                break;
-            case 'raw':
-                this.sendRaw(context, data, status, contentType);
-                break;
-            case 'text':
-                this.sendRaw(context, data, status, 'text/plain');
-                break;
-            case 'view':
-                this.sendView(context, data, status, template);
-                break;
-            default:
-                this.sendRaw(context, data, status, contentType);
-                break;
+    async sendAuto(context: CONTEXT, directive: AutoDirective<RESULT>) {
+        const { accept } = context;
+        if (this.viewPipeline.middlewares.length && accept && accept.indexOf('text/html') > -1) {
+            const { value, options } = directive;
+            this.sendView(context, view(value, options));
+        } else if (accept && accept.indexOf('application/json')) {
+            this.sendJson(context, directive);
+        } else {
+            this.sendRaw(context, directive);
         }
     }
 
-    async sendError<T>(context: Context, data: Error, status: number = 500) {
+    async sendError<T extends Error>(context: CONTEXT, directive: ErrorDirective<T>) {
         const { accept } = context.request.headers;
-        if (!(data instanceof Error)) {
-            data = new Error(data);
-        }
+        const { value, options } = directive;
+        const { status, header } = options;
         if (Math.floor(status / 100) === 5) {
             if (this.logging >= LogLevel.errors) {
-                console.error(data);
+                console.error(value);
             }
         }
         try {
-            if (this.viewPipeline.middlewares.length && accept && accept.indexOf('text/html') > -1) {
-                await this.sendView(context, data, status, ERROR_TEMPLATE);
+            if (
+                this.viewPipeline.middlewares.length &&
+                accept &&
+                accept.indexOf('text/html') > -1
+            ) {
+                // TODO: Fix sendView for Error
+                await this.sendView(
+                    context,
+                    view(value.message, { status, header, template: ERROR_TEMPLATE }) as any
+                );
             } else {
-                this.sendJson(context, data.message ?? data.name, status);
+                this.sendJson(context, json(value.message ?? value.name, { status, header }));
             }
-        }
-        catch (e) {
+        } catch (e) {
             if (this.logging >= LogLevel.errors) {
                 console.error(e);
             }
+        }
+    }
+
+    send(context: CONTEXT, directive: Directive<RESULT>) {
+        if (directive instanceof ResponseDirective) {
+            if (directive instanceof JsonDirective) {
+                return this.sendJson(context, directive);
+            } else if (directive instanceof RawDirective) {
+                return this.sendRaw(context, directive);
+            } else if (directive instanceof ViewDirective) {
+                return this.sendView(context, directive);
+            } else if (directive instanceof AutoDirective) {
+                return this.sendAuto(context, directive);
+            } else if (directive instanceof TextDirective) {
+                return this.sendText(context, directive);
+            } else if (directive instanceof ErrorDirective) {
+                return this.sendError(context, directive);
+            } else {
+                return this.sendAuto(context, directive);
+            }
+        } else {
+            // TODO: Should this be Json or Auto?
+            return this.sendAuto(context, auto(directive.value));
         }
     }
 
     // TODO: Remove data parameter
-    log<T>(context: Context, _data: T, status: number = 500) {
+    log<T>(context: CONTEXT, _data: T, status: number = 500) {
         if (this.logging >= LogLevel.verbose) {
             console.log(context.request.method, context.request.url, colorStatus(status));
         }
     }
 
-    use<T, U>(middlware: Middleware<Context, T, U>) {
-        this.pipeline.use(middlware);
+    use<NEW_DATA, NEW_RESULT = RESULT>(
+        middleware: Middleware<CONTEXT & Context<NEW_DATA>, RESULT, NEW_RESULT>
+    ): RequestHandler<CONTEXT & Context<NEW_DATA>, NEW_RESULT>;
+    use<MIDDLEWARE extends Middleware<any, any, any>>(
+        middleware: MIDDLEWARE
+    ): RequestHandler<CONTEXT & MiddlewareContext<MIDDLEWARE>, MiddlewareReturn<MIDDLEWARE>>;
+    use(middleware: Middleware<any, any, any>): any {
+        this.pipeline.use(middleware);
+        return this as any;
     }
 
-    useError<T, U>(middlware: Middleware<Context, T, U>) {
-        this.errorPipeline.use(middlware);
+    useError<NEW_RESULT>(middlware: Middleware<ErrorContext<CONTEXT>, Error, NEW_RESULT>) {
+        return this.errorPipeline.use<ErrorContext<CONTEXT>, NEW_RESULT>(middlware);
     }
 
-    useView<T, U>(middlware: Middleware<Context, T, U>) {
-        this.viewPipeline.use(middlware);
+    useView<NEW_RESULT>(
+        middlware: Middleware<ViewContext<CONTEXT, NEW_RESULT>, RESULT, NEW_RESULT>
+    ) {
+        return this.viewPipeline.use(middlware);
     }
 }
 
 export function errorTemplate(error: any) {
-    return (
-        `<!DOCTYPE html>
+    return `<!DOCTYPE html>
 <html>
     <head>
         <title>Sierra Error</title>
@@ -195,8 +299,7 @@ export function errorTemplate(error: any) {
         <h1>Sierra Error</h1>
         <pre><code>${error}</code></pre>
     </body>
-</html>`
-    );
+</html>`;
 }
 
 export function colorStatus(status: number) {
