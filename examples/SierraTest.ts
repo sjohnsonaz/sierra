@@ -4,22 +4,21 @@ import HandlebarsView from './HandlebarsView';
 import HomeController from './HomeController';
 import SessionGateway from './SessionGateway';
 
-let testApplication = new Sierra();
+let testApplication = new Sierra()
+
+    // Body
+    .use(QueryStringMiddleware)
+    .use(BodyMiddleware)
+
+    // Session
+    .use(new SessionMiddleware(new SessionGateway()).handle);
+
+// Controllers
+testApplication.addController(new HomeController());
 
 // View
 HandlebarsView.viewRoot = './examples/views/';
 testApplication.useView(HandlebarsView.handle);
-
-// Body
-testApplication.use(QueryStringMiddleware);
-testApplication.use(BodyMiddleware);
-
-// Session
-let sessionMiddleware = new SessionMiddleware(new SessionGateway());
-testApplication.use(sessionMiddleware.handle.bind(sessionMiddleware));
-
-// Controllers
-testApplication.addController(new HomeController());
 
 // Init
 testApplication.init();
