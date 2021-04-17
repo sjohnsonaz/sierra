@@ -7,7 +7,7 @@ async function SimpleMiddleware() {
 export function TestController() {
     const group = new RouteGroup();
 
-    group.route(
+    group.endpoint(
         Verb.Get,
         '',
         [
@@ -21,7 +21,7 @@ export function TestController() {
         }
     );
 
-    group.route(Verb.Post, '', async (context) => {
+    group.endpoint(Verb.Post, '', async (context) => {
         return {};
     });
 

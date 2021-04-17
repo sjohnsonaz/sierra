@@ -16,9 +16,9 @@ describe('RouteMiddleware', function () {
             routerMiddleware.add(routeB);
             routerMiddleware.add(routeA);
             routerMiddleware.add(routeRegex);
-            expect(routerMiddleware.routes[0]).toBe(routeB);
-            expect(routerMiddleware.routes[1]).toBe(routeA);
-            expect(routerMiddleware.routes[2]).toBe(routeRegex);
+            expect(routerMiddleware.endpoints[0]).toBe(routeB);
+            expect(routerMiddleware.endpoints[1]).toBe(routeA);
+            expect(routerMiddleware.endpoints[2]).toBe(routeRegex);
 
             routerMiddleware.init();
             expect(routerMiddleware.allRoutes[0]).toBe(routeRegex);

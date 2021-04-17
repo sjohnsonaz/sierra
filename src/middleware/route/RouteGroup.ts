@@ -7,7 +7,7 @@ import { Endpoint } from './Endpoint';
 
 export class RouteGroup {
     base: string;
-    routes: Endpoint<any, any, any>[] = [];
+    endpoints: Endpoint<any, any, any>[] = [];
     routeGroups: RouteGroup[] = [];
 
     constructor(base: string = '') {
@@ -15,40 +15,40 @@ export class RouteGroup {
     }
 
     // TODO: Change to non-overload
-    route(
+    endpoint(
         verbs: Verb | Verb[],
         name: string | RegExp,
         method: Middleware<Context, any, any>
     ): Endpoint<any, any, any>;
-    route(
+    endpoint(
         verbs: Verb | Verb[],
         name: string | RegExp,
         middleware: Middleware<Context, any, any>[],
         method: Middleware<Context, any, any>
     ): Endpoint<any, any, any>;
-    route(verbs: Verb | Verb[], name: string | RegExp, a: any, b?: any) {
+    endpoint(verbs: Verb | Verb[], name: string | RegExp, a: any, b?: any) {
         let route = new Endpoint(verbs, name, a, b);
-        this.routes.push(route);
+        this.endpoints.push(route);
         return route;
     }
 
-    add(route: Endpoint<any, any, any>) {
-        this.routes.push(route);
+    add(endpoint: Endpoint<any, any, any>) {
+        this.endpoints.push(endpoint);
     }
 
-    remove(route: Endpoint<any, any, any>) {
-        const index = this.routes.indexOf(route);
+    remove(endpoint: Endpoint<any, any, any>) {
+        const index = this.endpoints.indexOf(endpoint);
         if (index >= 0) {
-            return !!this.routes.splice(index, 1).length;
+            return !!this.endpoints.splice(index, 1).length;
         } else {
             return false;
         }
     }
 
     removeByName(name: string | RegExp) {
-        const index = this.routes.findIndex((route) => route.name === name);
+        const index = this.endpoints.findIndex((endpoint) => endpoint.name === name);
         if (index >= 0) {
-            return !!this.routes.splice(index, 1).length;
+            return !!this.endpoints.splice(index, 1).length;
         } else {
             return false;
         }
@@ -70,7 +70,7 @@ export class RouteGroup {
     init(parentBase: string = '/') {
         const base = path.posix.join(parentBase, this.base);
         const routes: Endpoint<any, any, any>[] = [];
-        for (let route of this.routes) {
+        for (let route of this.endpoints) {
             route.init(base);
             routes.push(route);
         }

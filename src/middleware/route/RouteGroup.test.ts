@@ -9,7 +9,7 @@ describe('RouteGroup', function () {
             const routerMiddleware = new RouteGroup();
             const route = new Endpoint(Verb.Get, 'test', async () => {});
             routerMiddleware.add(route);
-            expect(routerMiddleware.routes).toContain(route);
+            expect(routerMiddleware.endpoints).toContain(route);
         });
     });
 
@@ -19,7 +19,7 @@ describe('RouteGroup', function () {
             const route = new Endpoint(Verb.Get, 'test', async () => {});
             routerMiddleware.add(route);
             routerMiddleware.remove(route);
-            expect(routerMiddleware.routes).not.toContain(route);
+            expect(routerMiddleware.endpoints).not.toContain(route);
         });
     });
 
