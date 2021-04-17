@@ -3,16 +3,16 @@ import { Context, Verb } from '../../server';
 import { createRequest } from '../../utils/TestUtil';
 import { Controller } from './controller';
 
-import { Route } from './Route';
+import { Endpoint } from './Endpoint';
 import { RouteMiddleware, sortRoutes } from './RouteMiddleware';
 
 describe('RouteMiddleware', function () {
     describe('init', function () {
         it('should sort Routes', function () {
             const routerMiddleware = new RouteMiddleware();
-            const routeA = new Route(Verb.Get, 'a', async () => {});
-            const routeB = new Route(Verb.Get, 'a/:b', async () => {});
-            const routeRegex = new Route(Verb.Get, /regex/, async () => {});
+            const routeA = new Endpoint(Verb.Get, 'a', async () => {});
+            const routeB = new Endpoint(Verb.Get, 'a/:b', async () => {});
+            const routeRegex = new Endpoint(Verb.Get, /regex/, async () => {});
             routerMiddleware.add(routeB);
             routerMiddleware.add(routeA);
             routerMiddleware.add(routeRegex);
@@ -30,7 +30,7 @@ describe('RouteMiddleware', function () {
     describe('handle', function () {
         it('should match routes', async function () {
             const routerMiddleware = new RouteMiddleware();
-            const route = new Route(Verb.Get, 'test', async () => {
+            const route = new Endpoint(Verb.Get, 'test', async () => {
                 return true;
             });
             routerMiddleware.add(route);
@@ -52,10 +52,10 @@ describe('RouteMiddleware', function () {
 
         it('should match parameterized routes', async function () {
             const routerMiddleware = new RouteMiddleware();
-            const testRoute = new Route(Verb.Get, 'test', async () => {
+            const testRoute = new Endpoint(Verb.Get, 'test', async () => {
                 return true;
             });
-            const paramRoute = new Route<any, any, { param: any }>(
+            const paramRoute = new Endpoint<any, any, { param: any }>(
                 Verb.Get,
                 'test/:param',
                 async ({ data }) => {
@@ -135,7 +135,7 @@ describe('sortRoutes', function () {
         ];
 
         const routes = routesPaths.map((routePath) => {
-            return new Route([Verb.Get], routePath, async () => {});
+            return new Endpoint([Verb.Get], routePath, async () => {});
         });
         routes.sort(sortRoutes);
 

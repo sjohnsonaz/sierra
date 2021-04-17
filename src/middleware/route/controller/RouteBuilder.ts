@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import { Context, NoMethodError, Verb } from '../../../server';
 import { Middleware } from '../../../pipeline';
 
-import { Route } from '../Route';
+import { Endpoint } from '../Endpoint';
 
 import { Controller } from './Controller';
 import { RouteDefinition, RouteMethod } from './RouteDefinition';
@@ -30,12 +30,7 @@ export class RouteBuilder {
         this.routeDefinitions[methodName].middleware.unshift(middleware);
     }
 
-    addRoute(
-        methodName: string,
-        verbs: Verb[],
-        name: string | RegExp,
-        template?: string,
-    ) {
+    addRoute(methodName: string, verbs: Verb[], name: string | RegExp, template?: string) {
         if (!this.routeDefinitions[methodName]) {
             this.routeDefinitions[methodName] = new RouteDefinition();
         }
@@ -46,12 +41,18 @@ export class RouteBuilder {
         if (this.parent) {
             // Merge with existing RouteDefinitions
             let routeDefinitions = this.routeDefinitions;
-            let parentRouteDefinitions: Record<string, RouteDefinition<Middleware<Context, any, any>>> = this.parent.getRouteDefinitions();
+            let parentRouteDefinitions: Record<
+                string,
+                RouteDefinition<Middleware<Context, any, any>>
+            > = this.parent.getRouteDefinitions();
 
             // Create merged object with values from this RouteBuilder
-            let mergedRouteDefinitions: Record<string, RouteDefinition<Middleware<Context, any, any>>> = {};
+            let mergedRouteDefinitions: Record<
+                string,
+                RouteDefinition<Middleware<Context, any, any>>
+            > = {};
             let keys: string[] = RouteBuilder.getKeys(parentRouteDefinitions, routeDefinitions);
-            keys.forEach(index => {
+            keys.forEach((index) => {
                 let routeDefinition = routeDefinitions[index];
                 let parentRouteDefinition = parentRouteDefinitions[index];
 
@@ -60,10 +61,15 @@ export class RouteBuilder {
                     let routeDefinition = new RouteDefinition();
                     if (routeDefinition.method) {
                         routeDefinition.method = routeDefinition.method;
-                        routeDefinition.middleware = routeDefinition.middleware.concat(routeDefinition.middleware);
+                        routeDefinition.middleware = routeDefinition.middleware.concat(
+                            routeDefinition.middleware
+                        );
                     } else {
                         routeDefinition.method = parentRouteDefinition.method;
-                        routeDefinition.middleware = routeDefinition.middleware.concat(routeDefinition.middleware, parentRouteDefinition.middleware);
+                        routeDefinition.middleware = routeDefinition.middleware.concat(
+                            routeDefinition.middleware,
+                            parentRouteDefinition.middleware
+                        );
                     }
                     mergedRouteDefinitions[index] = routeDefinition;
                 } else {
@@ -78,12 +84,14 @@ export class RouteBuilder {
 
     build<T extends Controller>(controller: T) {
         const routeDefinitions = this.getRouteDefinitions();
-        return Object.keys(routeDefinitions).map(definitionName => {
+        return Object.keys(routeDefinitions).map((definitionName) => {
             const methodName: keyof T = definitionName as any;
             const routeDefinition = routeDefinitions[definitionName];
 
             // Get method
-            let method: Middleware<Context, unknown, unknown> = controller[definitionName as keyof typeof controller] as any;
+            let method: Middleware<Context, unknown, unknown> = controller[
+                definitionName as keyof typeof controller
+            ] as any;
             if (!method) {
                 throw new NoMethodError(definitionName);
             } else {
@@ -115,8 +123,8 @@ export class RouteBuilder {
         let keyHash: {
             [index: string]: string;
         } = {};
-        objects.forEach(obj => {
-            Object.keys(obj).forEach(key => {
+        objects.forEach((obj) => {
+            Object.keys(obj).forEach((key) => {
                 keyHash[key] = key;
             });
         });

@@ -3,7 +3,7 @@ import * as path from 'path';
 import { DirectiveType, Middleware, Pipeline } from '../../pipeline';
 import { Context, Verb } from '../../server';
 
-export class Route<VALUE, RESULT, PARAMS extends {}> {
+export class Endpoint<VALUE, RESULT, PARAMS extends {}> {
     pipeline: Pipeline<Context<{ params: PARAMS }>, VALUE, RESULT> = new Pipeline();
     readonly verbs: Verb[];
     readonly name: string | RegExp;

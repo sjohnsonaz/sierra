@@ -1,10 +1,10 @@
 import { Context, NoRouteFoundError } from '../../server';
 import { Controller } from './controller';
-import { Route } from './Route';
+import { Endpoint } from './Endpoint';
 import { RouteGroup } from './RouteGroup';
 
 export class RouteMiddleware extends RouteGroup {
-    allRoutes: Route<any, any, any>[] = [];
+    allRoutes: Endpoint<any, any, any>[] = [];
     controllers: Controller[] = [];
 
     init() {
@@ -24,7 +24,7 @@ export class RouteMiddleware extends RouteGroup {
     handle = async (context: Context, value?: any) => {
         const pathname = getPathname(context);
         // Find a matching route
-        let route: Route<any, any, any> | undefined = undefined;
+        let route: Endpoint<any, any, any> | undefined = undefined;
         // Store match array
         let match: null | RegExpMatchArray = null;
         for (let _route of this.allRoutes) {
@@ -68,7 +68,7 @@ export class RouteMiddleware extends RouteGroup {
  * @param routeA - the first Route
  * @param routeB - the second Route
  */
-export function sortRoutes(routeA: Route<any, any, any>, routeB: Route<any, any, any>) {
+export function sortRoutes(routeA: Endpoint<any, any, any>, routeB: Endpoint<any, any, any>) {
     return (routeA.config?.firstParamIndex || 0) - (routeB.config?.firstParamIndex || 0);
 }
 

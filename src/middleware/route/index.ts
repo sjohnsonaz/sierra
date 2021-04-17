@@ -1,4 +1,4 @@
 export * from './controller';
-export { Route } from './Route';
+export { Endpoint as Route } from './Endpoint';
 export { RouteGroup } from './RouteGroup';
 export { RouteMiddleware } from './RouteMiddleware';

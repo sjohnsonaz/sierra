@@ -3,11 +3,11 @@ import * as path from 'path';
 import { Middleware } from '../../pipeline';
 import { Context, Verb } from '../../server';
 
-import { Route } from './Route';
+import { Endpoint } from './Endpoint';
 
 export class RouteGroup {
     base: string;
-    routes: Route<any, any, any>[] = [];
+    routes: Endpoint<any, any, any>[] = [];
     routeGroups: RouteGroup[] = [];
 
     constructor(base: string = '') {
@@ -19,24 +19,24 @@ export class RouteGroup {
         verbs: Verb | Verb[],
         name: string | RegExp,
         method: Middleware<Context, any, any>
-    ): Route<any, any, any>;
+    ): Endpoint<any, any, any>;
     route(
         verbs: Verb | Verb[],
         name: string | RegExp,
         middleware: Middleware<Context, any, any>[],
         method: Middleware<Context, any, any>
-    ): Route<any, any, any>;
+    ): Endpoint<any, any, any>;
     route(verbs: Verb | Verb[], name: string | RegExp, a: any, b?: any) {
-        let route = new Route(verbs, name, a, b);
+        let route = new Endpoint(verbs, name, a, b);
         this.routes.push(route);
         return route;
     }
 
-    add(route: Route<any, any, any>) {
+    add(route: Endpoint<any, any, any>) {
         this.routes.push(route);
     }
 
-    remove(route: Route<any, any, any>) {
+    remove(route: Endpoint<any, any, any>) {
         const index = this.routes.indexOf(route);
         if (index >= 0) {
             return !!this.routes.splice(index, 1).length;
@@ -69,7 +69,7 @@ export class RouteGroup {
 
     init(parentBase: string = '/') {
         const base = path.posix.join(parentBase, this.base);
-        const routes: Route<any, any, any>[] = [];
+        const routes: Endpoint<any, any, any>[] = [];
         for (let route of this.routes) {
             route.init(base);
             routes.push(route);

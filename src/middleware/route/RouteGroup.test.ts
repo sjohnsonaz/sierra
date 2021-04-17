@@ -1,13 +1,13 @@
-import { Verb } from "../../server";
+import { Verb } from '../../server';
 
-import { Route } from "./Route";
-import { RouteGroup } from "./RouteGroup";
+import { Endpoint } from './Endpoint';
+import { RouteGroup } from './RouteGroup';
 
 describe('RouteGroup', function () {
     describe('add', function () {
         it('should add a Route', function () {
             const routerMiddleware = new RouteGroup();
-            const route = new Route(Verb.Get, 'test', async () => { });
+            const route = new Endpoint(Verb.Get, 'test', async () => {});
             routerMiddleware.add(route);
             expect(routerMiddleware.routes).toContain(route);
         });
@@ -16,7 +16,7 @@ describe('RouteGroup', function () {
     describe('remove', function () {
         it('should remove a Route', function () {
             const routerMiddleware = new RouteGroup();
-            const route = new Route(Verb.Get, 'test', async () => { });
+            const route = new Endpoint(Verb.Get, 'test', async () => {});
             routerMiddleware.add(route);
             routerMiddleware.remove(route);
             expect(routerMiddleware.routes).not.toContain(route);
@@ -24,7 +24,6 @@ describe('RouteGroup', function () {
     });
 
     describe.skip('init', function () {
-        it('should init all Routes', function () {
-        });
+        it('should init all Routes', function () {});
     });
 });

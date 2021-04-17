@@ -1,24 +1,31 @@
 import { Middleware } from '../../../pipeline';
 import { Context, NoMethodError, Verb } from '../../../server';
-import { Route } from '../Route';
+import { Endpoint } from '../Endpoint';
 
 export class RouteMethod {
     verbs: Verb[];
     name: string | RegExp;
     template?: string;
 
-    constructor(
-        verbs: Verb[],
-        name: string | RegExp,
-        template?: string,
-    ) {
+    constructor(verbs: Verb[], name: string | RegExp, template?: string) {
         this.verbs = verbs;
         this.name = name;
         this.template = template;
     }
 
-    createRoute(definitionName: string, method: Middleware<Context, any, any>, middleware: Middleware<Context, any, any>[], template: string) {
-        return new Route(this.verbs, this.name || definitionName, middleware, method, this.template || template);
+    createRoute(
+        definitionName: string,
+        method: Middleware<Context, any, any>,
+        middleware: Middleware<Context, any, any>[],
+        template: string
+    ) {
+        return new Endpoint(
+            this.verbs,
+            this.name || definitionName,
+            middleware,
+            method,
+            this.template || template
+        );
     }
 }
 
