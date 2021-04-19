@@ -1,4 +1,5 @@
 import * as http from 'http';
+
 import { createRequest, wait } from './TestUtil';
 
 describe('TestUtil', function () {
@@ -18,10 +19,10 @@ describe('TestUtil', function () {
         it('should copy properties from RequestInfo', function () {
             const [request] = createRequest({
                 method: 'get',
-                url: 'http://localhost'
+                url: 'http://localhost',
             });
             expect(request.method).toBe('get');
             expect(request.url).toBe('http://localhost');
         });
-    })
+    });
 });

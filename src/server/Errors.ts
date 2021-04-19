@@ -1,12 +1,12 @@
 export enum ErrorMessage {
-    neverStarted = 'Server has never been started',
-    noMethod = 'No method defined for this route',
-    noRouteFound = 'no route found',
-    notFound = 'not found',
-    noSessionGateway = 'no session gateway',
-    noViewMiddleware = 'No view middleware',
-    noViewTemplate = 'no view template',
-    nonStringView = 'non string view'
+    NeverStarted = 'Server has never been started',
+    NoMethod = 'No method defined for this route',
+    NoRouteFound = 'no route found',
+    NotFound = 'not found',
+    NoSessionGateway = 'no session gateway',
+    NoViewMiddleware = 'No view middleware',
+    NoViewTemplate = 'no view template',
+    NonStringView = 'non string view',
 }
 
 export class SierraError extends Error {
@@ -18,33 +18,33 @@ export class SierraError extends Error {
 export class NoMethodError extends SierraError {
     method: string;
     constructor(method: string) {
-        super(ErrorMessage.noMethod);
+        super(ErrorMessage.NoMethod);
         this.method = method;
     }
 }
 
 export class NoRouteFoundError extends SierraError {
     constructor() {
-        super(ErrorMessage.noRouteFound);
+        super(ErrorMessage.NoRouteFound);
     }
 }
 
 export class NotFoundError extends SierraError {
     constructor() {
-        super(ErrorMessage.notFound);
+        super(ErrorMessage.NotFound);
     }
 }
 
 export class NoSessionGatewayError extends SierraError {
     constructor() {
-        super(ErrorMessage.noSessionGateway);
+        super(ErrorMessage.NoSessionGateway);
     }
 }
 
 export class NoViewTemplateError extends SierraError {
     template: string;
     constructor(template: string) {
-        super(ErrorMessage.noViewTemplate);
+        super(ErrorMessage.NoViewTemplate);
         this.template = template;
     }
 }
@@ -52,7 +52,7 @@ export class NoViewTemplateError extends SierraError {
 export class NonStringViewError extends SierraError {
     output: any;
     constructor(output: any) {
-        super(ErrorMessage.nonStringView);
+        super(ErrorMessage.NonStringView);
         this.output = output;
     }
 }

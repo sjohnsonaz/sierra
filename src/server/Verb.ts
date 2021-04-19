@@ -1,4 +1,4 @@
-import { lookupValue } from "../utils/enum";
+import { lookupValue } from '../utils/enum';
 
 export enum Verb {
     All = 'all',
@@ -8,7 +8,7 @@ export enum Verb {
     Delete = 'delete',
     Patch = 'patch',
     Options = 'options',
-    Head = 'head'
+    Head = 'head',
 }
 
 export function getVerb(value?: string) {

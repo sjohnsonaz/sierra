@@ -1,4 +1,5 @@
 import { IncomingMessage, ServerResponse } from 'http';
+
 import {
     Directive,
     DirectiveType,
@@ -9,7 +10,6 @@ import {
 } from '@cardboardrobots/pipeline';
 import { Color } from '@cardboardrobots/console-style';
 
-import { Context } from './Context';
 import {
     auto,
     AutoDirective,
@@ -22,10 +22,12 @@ import {
     TextDirective,
     view,
     ViewDirective,
-} from './response-directive';
+} from '../response-directive';
+import { Header } from '../header';
+
+import { Context } from './Context';
 import { LogLevel } from './LogLevel';
 import { ErrorMessage, NonStringViewError, NoViewTemplateError, SierraError } from './Errors';
-import { Header } from './header';
 
 const DEFAULT_TEMPLATE = 'index';
 const ERROR_TEMPLATE = 'error';
@@ -37,90 +39,60 @@ export class RequestHandler<CONTEXT extends Context = Context, RESULT = void> {
     pipeline: Pipeline<CONTEXT, undefined, RESULT> = new Pipeline();
     errorPipeline: Pipeline<ErrorContext<CONTEXT>, any, any> = new Pipeline();
     viewPipeline: Pipeline<ViewContext<CONTEXT, RESULT>, RESULT, any> = new Pipeline();
-    logging: LogLevel = LogLevel.errors;
+    logging: LogLevel = LogLevel.Errors;
     defaultTemplate = DEFAULT_TEMPLATE;
 
     callback = async (request: IncomingMessage, response: ServerResponse) => {
-        let context = new Context(request, response);
+        const context = new Context(request, response);
         try {
-            let result = await this.pipeline.run(context as any, undefined);
+            const result = await this.pipeline.run(context as any, undefined);
             // If Headers have already sent, we cannot send.
             if (!context.response.headersSent && !context.response.writableEnded) {
                 this.send(context as CONTEXT, result);
             }
-        } catch (e) {
+        } catch (err) {
             const errorContext: ErrorContext<CONTEXT> = context as any;
-            if (!(e instanceof Error)) {
-                e = Error(e);
-            }
-            errorContext.error = e;
+            const wrappedError = err instanceof Error ? err : new Error(err);
+            errorContext.error = wrappedError;
             let errorStatus = 500;
-            if (e instanceof SierraError) {
-                switch (e.message) {
-                    case ErrorMessage.noRouteFound:
-                    case ErrorMessage.notFound:
+            if (wrappedError instanceof SierraError) {
+                switch (wrappedError.message) {
+                    case ErrorMessage.NoRouteFound:
+                    case ErrorMessage.NotFound:
                         errorStatus = 404;
                         break;
                 }
             }
             if (this.errorPipeline.middlewares.length) {
                 try {
-                    let result = await this.errorPipeline.run(errorContext, e);
+                    const result = await this.errorPipeline.run(errorContext, wrappedError);
                     switch (result.type) {
-                        case DirectiveType.End:
+                        case DirectiveType.Exit:
                         case DirectiveType.End: {
-                            const e =
+                            const wrappedError =
                                 result.value instanceof Error
                                     ? result.value
                                     : new Error(result.value);
-                            this.sendError(errorContext, error(e, { status: errorStatus }));
+                            this.sendError(
+                                errorContext,
+                                error(wrappedError, { status: errorStatus })
+                            );
                             break;
                         }
                         default:
                             this.send(errorContext, result);
                             break;
                     }
-                } catch (e) {
-                    if (!(e instanceof Error)) {
-                        e = Error(e);
-                    }
-                    errorContext.error = e;
-                    this.sendError(errorContext, error(e, { status: errorStatus }));
+                } catch (err) {
+                    const wrappedWrror = err instanceof Error ? err : Error(err);
+                    errorContext.error = wrappedWrror;
+                    this.sendError(errorContext, error(wrappedWrror, { status: errorStatus }));
                 }
             } else {
-                this.sendError(errorContext, error(e, { status: errorStatus }));
+                this.sendError(errorContext, error(wrappedError, { status: errorStatus }));
             }
         }
     };
-
-    private async write<T>(context: Context, value: T, status: number, header: Header) {
-        const { response } = context;
-        response.statusCode = status;
-
-        Object.keys(header).forEach((headerName) => {
-            const value = header[headerName as never] as string;
-            response.setHeader(headerName, value);
-        });
-
-        try {
-            const result = await new Promise<boolean>((resolve, reject) => {
-                const result = response.write(value, (error) => {
-                    if (error) {
-                        reject(error);
-                    } else {
-                        resolve(result);
-                    }
-                });
-            });
-            return result;
-        } catch (e) {
-            throw e;
-        } finally {
-            await new Promise<void>((resolve) => {
-                response.end(() => resolve());
-            });
-        }
-    }
 
     sendJson<T = RESULT>(context: CONTEXT, directive: JsonDirective<T>) {
         const { value, options } = directive;
@@ -182,7 +154,7 @@ export class RequestHandler<CONTEXT extends Context = Context, RESULT = void> {
             context.template = options.template ?? context.template ?? this.defaultTemplate;
             const viewContext: ViewContext<CONTEXT, RESULT> = context as any;
             viewContext.view = directive;
-            let { value } = await this.viewPipeline.run(viewContext, directive.value);
+            const { value } = await this.viewPipeline.run(viewContext, directive.value);
             // Ensure output is a string
             if (typeof value !== 'string') {
                 throw new NonStringViewError(value);
@@ -194,16 +166,16 @@ export class RequestHandler<CONTEXT extends Context = Context, RESULT = void> {
                 'Content-Type': 'text/html',
                 ...options.header,
             });
-        } catch (e) {
+        } catch (err) {
             this.log(context, 500);
 
-            const result = await this.write(context, errorTemplate(e), 500, {
+            const result = await this.write(context, errorTemplate(err), 500, {
                 'Content-Type': 'text/html',
                 ...options.header,
             });
 
-            if (this.logging >= LogLevel.errors) {
-                console.error(e);
+            if (this.logging >= LogLevel.Errors) {
+                console.error(err);
             }
             return result;
         }
@@ -226,7 +198,7 @@ export class RequestHandler<CONTEXT extends Context = Context, RESULT = void> {
         const { value, options } = directive;
         const { status, header } = options;
         if (Math.floor(status / 100) === 5) {
-            if (this.logging >= LogLevel.errors) {
+            if (this.logging >= LogLevel.Errors) {
                 console.error(value);
             }
         }
@@ -244,9 +216,9 @@ export class RequestHandler<CONTEXT extends Context = Context, RESULT = void> {
             } else {
                 this.sendJson(context, json(value.message ?? value.name, { status, header }));
             }
-        } catch (e) {
-            if (this.logging >= LogLevel.errors) {
-                console.error(e);
+        } catch (err) {
+            if (this.logging >= LogLevel.Errors) {
+                console.error(err);
             }
         }
     }
@@ -275,31 +247,58 @@ export class RequestHandler<CONTEXT extends Context = Context, RESULT = void> {
     }
 
     // TODO: Remove data parameter
-    log<T>(context: CONTEXT, _data: T, status: number = 500) {
-        if (this.logging >= LogLevel.verbose) {
+    log<T>(context: CONTEXT, _data: T, status = 500) {
+        if (this.logging >= LogLevel.Verbose) {
             console.log(context.request.method, context.request.url, colorStatus(status));
         }
     }
 
-    use<NEW_DATA, NEW_RESULT = RESULT>(
-        middleware: Middleware<CONTEXT & Context<NEW_DATA>, RESULT, NEW_RESULT>
-    ): RequestHandler<CONTEXT & Context<NEW_DATA>, NEW_RESULT>;
+    use<NEWDATA, NEWRESULT = RESULT>(
+        middleware: Middleware<CONTEXT & Context<NEWDATA>, RESULT, NEWRESULT>
+    ): RequestHandler<CONTEXT & Context<NEWDATA>, NEWRESULT>;
+
     use<MIDDLEWARE extends Middleware<any, any, any>>(
         middleware: MIDDLEWARE
     ): RequestHandler<CONTEXT & MiddlewareContext<MIDDLEWARE>, MiddlewareReturn<MIDDLEWARE>>;
+
     use(middleware: Middleware<any, any, any>): any {
         this.pipeline.use(middleware);
         return this as any;
     }
 
-    useError<NEW_RESULT>(middlware: Middleware<ErrorContext<CONTEXT>, Error, NEW_RESULT>) {
-        return this.errorPipeline.use<ErrorContext<CONTEXT>, NEW_RESULT>(middlware);
+    useError<NEWRESULT>(middlware: Middleware<ErrorContext<CONTEXT>, Error, NEWRESULT>) {
+        return this.errorPipeline.use<ErrorContext<CONTEXT>, NEWRESULT>(middlware);
     }
 
-    useView<NEW_RESULT>(
-        middlware: Middleware<ViewContext<CONTEXT, NEW_RESULT>, RESULT, NEW_RESULT>
-    ) {
+    useView<NEWRESULT>(middlware: Middleware<ViewContext<CONTEXT, NEWRESULT>, RESULT, NEWRESULT>) {
         return this.viewPipeline.use(middlware);
+    }
+
+    private async write<T>(context: Context, value: T, status: number, header: Header) {
+        const { response } = context;
+        response.statusCode = status;
+
+        Object.keys(header).forEach((headerName) => {
+            const value = header[headerName as never] as string;
+            response.setHeader(headerName, value);
+        });
+
+        try {
+            const result = await new Promise<boolean>((resolve, reject) => {
+                const result = response.write(value, (error) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(result);
+                    }
+                });
+            });
+            return result;
+        } finally {
+            await new Promise<void>((resolve) => {
+                response.end(() => resolve());
+            });
+        }
     }
 }
 

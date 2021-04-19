@@ -1,8 +1,9 @@
 import { createServer, Server } from 'http';
 import { ListenOptions } from 'net';
+
 import { Middleware, MiddlewareContext, MiddlewareReturn } from '@cardboardrobots/pipeline';
 
-import { RequestHandler, LogLevel, Context, ViewContext, ErrorContext } from './server';
+import { RequestHandler, LogLevel, Context, ViewContext, ErrorContext } from '../server';
 
 /**
  * A Sierra Application
@@ -36,12 +37,14 @@ export class Application<CONTEXT extends Context = Context, RESULT = void> {
      * Adds a Middleware to the Pipeline.
      * @param middleware - the Middleware to add
      */
-    use<NEW_DATA, NEW_RESULT = RESULT>(
-        middleware: Middleware<CONTEXT & Context<NEW_DATA>, RESULT, NEW_RESULT>
-    ): Application<CONTEXT & Context<NEW_DATA>, NEW_RESULT>;
+    use<NEWDATA, NEWRESULT = RESULT>(
+        middleware: Middleware<CONTEXT & Context<NEWDATA>, RESULT, NEWRESULT>
+    ): Application<CONTEXT & Context<NEWDATA>, NEWRESULT>;
+
     use<MIDDLEWARE extends Middleware<any, any, any>>(
         middleware: MIDDLEWARE
     ): Application<CONTEXT & MiddlewareContext<MIDDLEWARE>, MiddlewareReturn<MIDDLEWARE>>;
+
     use(middleware: Middleware<any, any, any>): any {
         this.requestHandler.use(middleware);
         return this as any;
@@ -51,9 +54,7 @@ export class Application<CONTEXT extends Context = Context, RESULT = void> {
      * Sets View Middleware.  Only one is enabled at a time.
      * @param middlware - the View Middleware
      */
-    useView<NEW_RESULT>(
-        middlware: Middleware<ViewContext<CONTEXT, NEW_RESULT>, RESULT, NEW_RESULT>
-    ) {
+    useView<NEWRESULT>(middlware: Middleware<ViewContext<CONTEXT, NEWRESULT>, RESULT, NEWRESULT>) {
         this.requestHandler.useView(middlware);
     }
 
@@ -61,7 +62,7 @@ export class Application<CONTEXT extends Context = Context, RESULT = void> {
      * Sets Error Middleware.  Only one is enabled at a time.
      * @param middlware - the Error Middleware
      */
-    useError<NEW_RESULT>(middlware: Middleware<ErrorContext<CONTEXT>, Error, NEW_RESULT>) {
+    useError<NEWRESULT>(middlware: Middleware<ErrorContext<CONTEXT>, Error, NEWRESULT>) {
         this.requestHandler.useError(middlware);
     }
 
@@ -78,7 +79,9 @@ export class Application<CONTEXT extends Context = Context, RESULT = void> {
         backlog?: number,
         listeningListener?: () => void
     ): Promise<Server>;
+
     listen(port?: number, hostname?: string, listeningListener?: () => void): Promise<Server>;
+    // eslint-disable-next-line @typescript-eslint/unified-signatures
     listen(port?: number, backlog?: number, listeningListener?: () => void): Promise<Server>;
     listen(port?: number, listeningListener?: () => void): Promise<Server>;
 
@@ -96,6 +99,7 @@ export class Application<CONTEXT extends Context = Context, RESULT = void> {
      * @param options - a options object
      * @param listeningListener - a callback for the "listening" event
      */
+    // eslint-disable-next-line @typescript-eslint/unified-signatures
     listen(options: ListenOptions, listeningListener?: () => void): Promise<Server>;
 
     /**
@@ -104,9 +108,11 @@ export class Application<CONTEXT extends Context = Context, RESULT = void> {
      * @param backlog - the Backlog number
      * @param listeningListener - a callback for the "listening" event
      */
+    // eslint-disable-next-line @typescript-eslint/unified-signatures
     listen(handle: any, backlog?: number, listeningListener?: () => void): Promise<Server>;
+    // eslint-disable-next-line @typescript-eslint/unified-signatures
     listen(handle: any, listeningListener?: () => void): Promise<Server>;
-    listen(a: any, b?: any, c?: any, d?: any): Promise<Server> {
+    listen(paramA: any, paramB?: any, paramC?: any, paramD?: any): Promise<Server> {
         return new Promise((resolve, reject) => {
             const startup = () => {
                 this.server.on('error', onError);
@@ -125,7 +131,7 @@ export class Application<CONTEXT extends Context = Context, RESULT = void> {
                 cleanup();
             };
             startup();
-            this.server.listen(a, b, c, d);
+            this.server.listen(paramA, paramB, paramC, paramD);
         });
     }
 

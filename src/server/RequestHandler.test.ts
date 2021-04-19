@@ -1,10 +1,12 @@
+/* eslint-disable no-throw-literal */
 import { createServer, Server } from 'http';
 
 import * as request from 'supertest';
 import { Color } from '@cardboardrobots/console-style';
 
+import { auto, error, json, raw, text, view } from '../response-directive';
+
 import { RequestHandler, errorTemplate, colorStatus } from './RequestHandler';
-import { auto, error, json, raw, text, view } from './response-directive';
 import {
     NotFoundError,
     NoRouteFoundError,
@@ -32,7 +34,7 @@ describe('RequestHandler', function () {
                     data.value += 'b';
                 })
                 .use(async ({ data }) => {
-                    return data.value + 'c';
+                    return `${data.value}c`;
                 });
             await request(server).get('/').expect(200, JSON.stringify('abc'));
         });
@@ -44,7 +46,7 @@ describe('RequestHandler', function () {
 
         beforeEach(async function () {
             handler = new RequestHandler();
-            handler.logging = LogLevel.none;
+            handler.logging = LogLevel.None;
             server = createServer(handler.callback);
         });
 
@@ -91,7 +93,7 @@ describe('RequestHandler', function () {
             handler.useView(async function (context) {
                 const { view } = context;
                 const templates: Record<string, (...args: any) => string> = {
-                    index: function (data: { value: boolean }) {
+                    index(data: { value: boolean }) {
                         return `index: value = ${data.value}`;
                     },
                 };
@@ -169,7 +171,7 @@ describe('RequestHandler', function () {
                     .get('/')
                     .expect('Content-Type', 'text/plain')
                     .type('text/plain')
-                    .expect(200); //, { value: true });
+                    .expect(200);
                 expect(_text).toBe(JSON.stringify({ value: true }));
             });
         });
@@ -247,7 +249,7 @@ describe('RequestHandler', function () {
 
             beforeEach(async function () {
                 handler = new RequestHandler();
-                handler.logging = LogLevel.none;
+                handler.logging = LogLevel.None;
 
                 // handler.useError(async function (_context) {
                 //     return error;
@@ -272,7 +274,7 @@ describe('RequestHandler', function () {
 
             beforeEach(async function () {
                 handler = new RequestHandler();
-                handler.logging = LogLevel.none;
+                handler.logging = LogLevel.None;
 
                 // handler.useError(async function (_context, error) {
                 //     return error;
@@ -280,11 +282,11 @@ describe('RequestHandler', function () {
 
                 handler.useView(async function (context) {
                     const { view } = context;
-                    const templates: Record<string, Function> = {
-                        index: function (data: { value: boolean }) {
+                    const templates: Record<string, (...args: any) => any> = {
+                        index(data: { value: boolean }) {
                             return `index: value = ${data.value}`;
                         },
-                        test: function (data: { value: boolean }) {
+                        test(data: { value: boolean }) {
                             return `test: value = ${data.value}`;
                         },
                     };
@@ -368,15 +370,15 @@ describe('RequestHandler', function () {
 
         beforeEach(async function () {
             handler = new RequestHandler();
-            handler.logging = LogLevel.none;
+            handler.logging = LogLevel.None;
 
             handler.useView(async function (context) {
                 const { view } = context;
-                const templates: Record<string, Function> = {
-                    index: function (data: string) {
+                const templates: Record<string, (...args: any) => any> = {
+                    index(data: string) {
                         return `index: error = ${data}`;
                     },
-                    error: function (data: string) {
+                    error(data: string) {
                         return `error: error = ${data}`;
                     },
                 };

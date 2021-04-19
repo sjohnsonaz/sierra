@@ -1,10 +1,18 @@
-import { ErrorMessage, NoMethodError, NonStringViewError, NoRouteFoundError, NoSessionGatewayError, NotFoundError, NoViewTemplateError } from './Errors';
+import {
+    ErrorMessage,
+    NoMethodError,
+    NonStringViewError,
+    NoRouteFoundError,
+    NoSessionGatewayError,
+    NotFoundError,
+    NoViewTemplateError,
+} from './Errors';
 
 describe('Errors', function () {
     describe('NoMethodError', function () {
         it('should use an ErrorMessage', function () {
             const error = new NoMethodError('method');
-            expect(error.message).toBe(ErrorMessage.noMethod);
+            expect(error.message).toBe(ErrorMessage.NoMethod);
             expect(error.method).toBe('method');
         });
     });
@@ -12,28 +20,28 @@ describe('Errors', function () {
     describe('NoRouteFoundError', function () {
         it('should use an ErrorMessage', function () {
             const error = new NoRouteFoundError();
-            expect(error.message).toBe(ErrorMessage.noRouteFound);
+            expect(error.message).toBe(ErrorMessage.NoRouteFound);
         });
     });
 
     describe('NotFoundError', function () {
         it('should use an ErrorMessage', function () {
             const error = new NotFoundError();
-            expect(error.message).toBe(ErrorMessage.notFound);
+            expect(error.message).toBe(ErrorMessage.NotFound);
         });
     });
 
     describe('NoSessionGatewayError', function () {
         it('should use an ErrorMessage', function () {
             const error = new NoSessionGatewayError();
-            expect(error.message).toBe(ErrorMessage.noSessionGateway);
+            expect(error.message).toBe(ErrorMessage.NoSessionGateway);
         });
     });
 
     describe('NoViewTemplateError', function () {
         it('should use an ErrorMessage', function () {
             const error = new NoViewTemplateError('template');
-            expect(error.message).toBe(ErrorMessage.noViewTemplate);
+            expect(error.message).toBe(ErrorMessage.NoViewTemplate);
             expect(error.template).toBe('template');
         });
     });
@@ -41,7 +49,7 @@ describe('Errors', function () {
     describe('NonStringViewError', function () {
         it('should use an ErrorMessage', function () {
             const error = new NonStringViewError('output');
-            expect(error.message).toBe(ErrorMessage.nonStringView);
+            expect(error.message).toBe(ErrorMessage.NonStringView);
             expect(error.output).toBe('output');
         });
     });

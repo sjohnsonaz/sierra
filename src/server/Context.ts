@@ -7,7 +7,7 @@ import { getVerb, Verb } from './Verb';
 /**
  * The Context object for the RequestHandler Pipeline
  */
-export class Context<DATA extends {} = {}> {
+export class Context<DATA extends Record<string, any> = Record<string, unknown>> {
     /** The IncomingMessage object */
     request: IncomingMessage;
     /** The ServerResponse object */
@@ -63,7 +63,7 @@ export function getContentType(request: IncomingMessage) {
     const contentTypeHeader = request.headers['content-type'];
     const contentType: ContentType = {};
     if (contentTypeHeader) {
-        let parts = contentTypeHeader.split('; ');
+        const parts = contentTypeHeader.split('; ');
         contentType.mediaType = parts[0].trim().toLowerCase();
         if (parts.length > 1) {
             const hash: Record<string, any> = {};
@@ -74,19 +74,19 @@ export function getContentType(request: IncomingMessage) {
                     hash[hashParts[0].trim()] = hashParts[1].trim();
                 }
             }
-            contentType.charset = hash['charset'];
-            contentType.boundary = hash['boundary'];
+            contentType.charset = hash.charset;
+            contentType.boundary = hash.boundary;
         }
     }
     return contentType;
 }
 
 export function getAccept(request: IncomingMessage) {
-    const accept = request.headers['accept'];
+    const accept = request.headers.accept;
     if (accept) {
-        let types = accept.split(',');
+        const types = accept.split(',');
         return types.map((type) => {
-            let parts = type.split(';');
+            const parts = type.split(';');
             return parts[0];
         });
     } else {

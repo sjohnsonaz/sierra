@@ -1,22 +1,22 @@
 export type HeaderName =
-    /// # Authentication
+    // / # Authentication
 
-    /**Defines the authentication method that should be used to access a resource. */
+    /** Defines the authentication method that should be used to access a resource. */
     | 'WWW-Authenticate'
-    /**Contains the credentials to authenticate a user-agent with a server. */
+    /** Contains the credentials to authenticate a user-agent with a server. */
     | 'Authorization'
-    /**Defines the authentication method that should be used to access a resource behind a proxy server. */
+    /** Defines the authentication method that should be used to access a resource behind a proxy server. */
     | 'Proxy-Authenticate'
-    /**Contains the credentials to authenticate a user agent with a proxy server. */
+    /** Contains the credentials to authenticate a user agent with a proxy server. */
     | 'Proxy-Authorization'
 
-    /// # Caching
+    // / # Caching
 
-    /**The time, in seconds, that the object has been in a proxy cache. */
+    /** The time, in seconds, that the object has been in a proxy cache. */
     | 'Age'
-    /**Directives for caching mechanisms in both requests and responses. */
+    /** Directives for caching mechanisms in both requests and responses. */
     | 'Cache-Control'
-    /**Clears browsing data (e.g. cookies, storage, cache) associated with the requesting website. */
+    /** Clears browsing data (e.g. cookies, storage, cache) associated with the requesting website. */
     | 'Clear-Site-Data'
     /** The date/time after which the response is considered stale. */
     | 'Expires'
@@ -25,9 +25,9 @@ export type HeaderName =
     /** General warning information about possible problems. */
     | 'Warning'
 
-    /// # Client hints
+    // / # Client hints
 
-    /// HTTP Client hints are a work in progress. Actual documentation can be found on the website of the HTTP working group.
+    // / HTTP Client hints are a work in progress. Actual documentation can be found on the website of the HTTP working group.
     /** Servers can advertise support for Client Hints using the Accept-CH header field or an equivalent HTML <meta> element with http-equiv attribute ([HTML5]). */
     | 'Accept-CH'
     /** Servers can ask the client to remember the set of Client Hints that the server supports for a specified period of time, to enable delivery of Client Hints on subsequent requests to the server’s origin ([RFC6454]). */
@@ -44,12 +44,12 @@ export type HeaderName =
     | 'Save-Data'
     /** A number that indicates the layout viewport width in CSS pixels. The provided pixel value is a number rounded to the smallest following integer (i.e. ceiling value). */
     | 'Viewport-Width'
-    /// If Viewport-Width occurs in a message more than once, the last value overrides all previous occurrences.
+    // / If Viewport-Width occurs in a message more than once, the last value overrides all previous occurrences.
     /** The Width request header field is a number that indicates the desired resource width in physical pixels (i.e. intrinsic size of an image). The provided pixel value is a number rounded to the smallest following integer (i.e. ceiling value). */
     | 'Width'
-    /// If the desired resource width is not known at the time of the request or the resource does not have a display width, the Width header field can be omitted. If Width occurs in a message more than once, the last value overrides all previous occurrences
+    // / If the desired resource width is not known at the time of the request or the resource does not have a display width, the Width header field can be omitted. If Width occurs in a message more than once, the last value overrides all previous occurrences
 
-    /// # Conditionals
+    // / # Conditionals
 
     /** The last modification date of the resource, used to compare several versions of the same resource. It is less accurate than ETag, but easier to calculate in some environments. Conditional requests using If-Modified-Since and If-Unmodified-Since use this value to change the behavior of the request. */
     | 'Last-Modified'
@@ -66,14 +66,14 @@ export type HeaderName =
     /** Determines how to match request headers to decide whether a cached response can be used rather than requesting a fresh one from the origin server. */
     | 'Vary'
 
-    /// # Connection management
+    // / # Connection management
 
     /** Controls whether the network connection stays open after the current transaction finishes. */
     | 'Connection'
     /** Controls how long a persistent connection should stay open. */
     | 'Keep-Alive'
 
-    /// # Content negotiation
+    // / # Content negotiation
 
     /** Informs the server about the types of data that can be sent back. */
     | 'Accept'
@@ -84,14 +84,14 @@ export type HeaderName =
     /** Informs the server about the human language the server is expected to send back. This is a hint and is not necessarily under the full control of the user: the server should always pay attention not to override an explicit user choice (like selecting a language from a dropdown). */
     | 'Accept-Language'
 
-    /// # Controls
+    // / # Controls
 
     /** Indicates expectations that need to be fulfilled by the server to properly handle the request. */
     | 'Expect'
     /**  */
     | 'Max-Forwards'
 
-    /// # Cookies
+    // / # Cookies
 
     /** Contains stored HTTP cookies previously sent by the server with the Set-Cookie header. */
     | 'Cookie'
@@ -102,7 +102,7 @@ export type HeaderName =
     /** Sends cookies from the server to the user-agent, but has been obsoleted. Use Set-Cookie instead. */
     | 'Set-Cookie2'
 
-    /// # CORS
+    // / # CORS
 
     /** Indicates whether the response can be shared. */
     | 'Access-Control-Allow-Origin'
@@ -125,19 +125,19 @@ export type HeaderName =
     /** Specifies origins that are allowed to see values of attributes retrieved via features of the Resource Timing API, which would otherwise be reported as zero due to cross-origin restrictions. */
     | 'Timing-Allow-Origin'
 
-    /// # Do Not Track
+    // / # Do Not Track
 
     /** Expresses the user's tracking preference. */
     | 'DNT'
     /** Indicates the tracking status of the corresponding response. */
     | 'Tk'
 
-    /// # Downloads
+    // / # Downloads
 
     /** Indicates if the resource transmitted should be displayed inline (default behavior without the header), or if it should be handled like a download and the browser should present a “Save As” dialog. */
     | 'Content-Disposition'
 
-    /// # Message body information
+    // / # Message body information
 
     /** The size of the resource, in decimal number of bytes. */
     | 'Content-Length'
@@ -150,7 +150,7 @@ export type HeaderName =
     /** Indicates an alternate location for the returned data. */
     | 'Content-Location'
 
-    /// # Proxies
+    // / # Proxies
 
     /** Contains information from the client-facing side of proxy servers that is altered or lost when a proxy is involved in the path of the request. */
     | 'Forwarded'
@@ -163,12 +163,12 @@ export type HeaderName =
     /** Added by proxies, both forward and reverse proxies, and can appear in the request headers and the response headers. */
     | 'Via'
 
-    /// # Redirects
+    // / # Redirects
 
     /** Indicates the URL to redirect a page to. */
     | 'Location'
 
-    /// # Request context
+    // / # Request context
 
     /** Contains an Internet email address for a human user who controls the requesting user agent. */
     | 'From'
@@ -181,14 +181,14 @@ export type HeaderName =
     /** Contains a characteristic string that allows the network protocol peers to identify the application type, operating system, software vendor or software version of the requesting software user agent. See also the Firefox user agent string reference. */
     | 'User-Agent'
 
-    /// # Response context
+    // / # Response context
 
     /** Lists the set of HTTP request methods support by a resource. */
     | 'Allow'
     /** Contains information about the software used by the origin server to handle the request. */
     | 'Server'
 
-    /// # Range requests
+    // / # Range requests
 
     /** Indicates if the server supports range requests, and if so in which unit the range can be expressed. */
     | 'Accept-Ranges'
@@ -199,7 +199,7 @@ export type HeaderName =
     /** Indicates where in a full body message a partial message belongs. */
     | 'Content-Range'
 
-    /// # Security
+    // / # Security
 
     /** Allows a server to declare an embedder policy for a given document. */
     | 'Cross-Origin-Embedder-Policy'
@@ -236,7 +236,7 @@ export type HeaderName =
     /** Enables cross-site scripting filtering. */
     | 'X-XSS-Protection'
 
-    /// # Server-sent events
+    // / # Server-sent events
 
     /** ... */
     | 'Last-Event-ID'
@@ -249,7 +249,7 @@ export type HeaderName =
     /** Used to specify a server endpoint for the browser to send warning and error reports to. */
     | 'Report-To'
 
-    /// # Transfer coding
+    // / # Transfer coding
 
     /** Specifies the form of encoding used to safely transfer the entity to the user. */
     | 'Transfer-Encoding'
@@ -258,7 +258,7 @@ export type HeaderName =
     /** Allows the sender to include additional fields at the end of chunked message. */
     | 'Trailer'
 
-    /// # WebSockets
+    // / # WebSockets
 
     /** ... */
     | 'Sec-WebSocket-Key'
@@ -271,7 +271,7 @@ export type HeaderName =
     /** ... */
     | 'Sec-WebSocket-Version'
 
-    /// # Other
+    // / # Other
 
     /** A client can express the desired push policy for a request by sending an Accept-Push-Policy header field in the request. */
     | 'Accept-Push-Policy'

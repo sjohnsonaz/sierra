@@ -1,5 +1,6 @@
+import { LogLevel } from '../server';
+
 import { Application } from './Application';
-import { LogLevel } from './server/LogLevel';
 
 describe('Application', function () {
     describe('use', function () {
@@ -59,11 +60,11 @@ describe('Application', function () {
     describe('logging', function () {
         it('should use getter and setter for RequestHandler.logging', function () {
             const application = new Application();
-            expect(application.requestHandler.logging).toBe(LogLevel.errors);
-            expect(application.logging).toBe(LogLevel.errors);
-            application.logging = LogLevel.verbose;
-            expect(application.requestHandler.logging).toBe(LogLevel.verbose);
-            expect(application.logging).toBe(LogLevel.verbose);
+            expect(application.requestHandler.logging).toBe(LogLevel.Errors);
+            expect(application.logging).toBe(LogLevel.Errors);
+            application.logging = LogLevel.Verbose;
+            expect(application.requestHandler.logging).toBe(LogLevel.Verbose);
+            expect(application.logging).toBe(LogLevel.Verbose);
         });
     });
 });
