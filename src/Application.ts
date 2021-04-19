@@ -1,8 +1,8 @@
 import { createServer, Server } from 'http';
 import { ListenOptions } from 'net';
+import { Middleware, MiddlewareContext, MiddlewareReturn } from '@cardboardrobots/pipeline';
 
 import { RequestHandler, LogLevel, Context, ViewContext, ErrorContext } from './server';
-import { Middleware, MiddlewareContext, MiddlewareReturn } from './pipeline';
 
 /**
  * A Sierra Application

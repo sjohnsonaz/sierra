@@ -1,5 +1,6 @@
+import { Directive } from '@cardboardrobots/pipeline';
+
 import { Header } from '../header';
-import { Directive } from '../../pipeline/directive';
 import { ResponseDirectiveType } from './ResponseDirectiveType';
 
 export class ResponseDirective<T> extends Directive<T> {

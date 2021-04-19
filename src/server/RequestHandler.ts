@@ -1,6 +1,4 @@
 import { IncomingMessage, ServerResponse } from 'http';
-
-import { Color } from '../utils/ConsoleUtil';
 import {
     Directive,
     DirectiveType,
@@ -8,7 +6,8 @@ import {
     MiddlewareContext,
     MiddlewareReturn,
     Pipeline,
-} from '../pipeline';
+} from '@cardboardrobots/pipeline';
+import { Color } from '@cardboardrobots/console-style';
 
 import { Context } from './Context';
 import {
@@ -20,7 +19,6 @@ import {
     JsonDirective,
     RawDirective,
     ResponseDirective,
-    ResponseDirectiveType,
     TextDirective,
     view,
     ViewDirective,
