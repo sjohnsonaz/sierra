@@ -1,8 +1,7 @@
 import { createServer, Server } from 'http';
 
 import * as request from 'supertest';
-
-import { Color } from '../utils/ConsoleUtil';
+import { Color } from '@cardboardrobots/console-style';
 
 import { RequestHandler, errorTemplate, colorStatus } from './RequestHandler';
 import { auto, error, json, raw, text, view } from './response-directive';
