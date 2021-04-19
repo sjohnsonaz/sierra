@@ -2,7 +2,6 @@ import { createServer, Server } from 'http';
 import { ListenOptions } from 'net';
 
 import { RequestHandler, LogLevel, Context, ViewContext, ErrorContext } from './server';
-import { Controller, RouteMiddleware } from './middleware/route';
 import { Middleware, MiddlewareContext, MiddlewareReturn } from './pipeline';
 
 /**
@@ -11,9 +10,6 @@ import { Middleware, MiddlewareContext, MiddlewareReturn } from './pipeline';
 export class Application<CONTEXT extends Context = Context, RESULT = void> {
     /** The RequestHandler object */
     requestHandler: RequestHandler<CONTEXT, RESULT> = new RequestHandler();
-
-    /** The RouteMiddleware object */
-    routeMiddleware: RouteMiddleware = new RouteMiddleware();
 
     /** The Server object */
     server: Server = createServer(this.requestHandler.callback);
@@ -33,30 +29,7 @@ export class Application<CONTEXT extends Context = Context, RESULT = void> {
      * @returns Promise<void>
      */
     async init() {
-        const routes = this.routeMiddleware.init();
-
-        // Add RouteMiddleware if we have Routes.
-        if (routes.length) {
-            this.requestHandler.use(this.routeMiddleware.handle);
-        }
-
         return this.requestHandler;
-    }
-
-    /**
-     * Adds a Controller to RouteMiddleware
-     * @param controller - the Controller to add
-     */
-    addController(controller: Controller) {
-        return this.routeMiddleware.addController(controller);
-    }
-
-    /**
-     * Removes a Controller from RouteMiddleware
-     * @param controller - the Controller to remove
-     */
-    removeController(controller: Controller) {
-        return this.routeMiddleware.removeController(controller);
     }
 
     /**

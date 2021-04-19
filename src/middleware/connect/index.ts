@@ -1,1 +1,0 @@
-export { ConnectMiddleware } from './ConnectMiddleware';

@@ -1,6 +1,5 @@
 import { Application } from './Application';
 import { LogLevel } from './server/LogLevel';
-import { Controller } from './middleware/route';
 
 describe('Application', function () {
     describe('use', function () {
@@ -65,35 +64,6 @@ describe('Application', function () {
             application.logging = LogLevel.verbose;
             expect(application.requestHandler.logging).toBe(LogLevel.verbose);
             expect(application.logging).toBe(LogLevel.verbose);
-        });
-    });
-
-    describe('addController', function () {
-        it('should add a Controller', function () {
-            const application = new Application();
-            expect(application.routeMiddleware.controllers.length).toBe(0);
-            const controller = new Controller();
-            application.addController(controller);
-            expect(application.routeMiddleware.controllers.length).toBe(1);
-            expect(application.routeMiddleware.controllers).toContain(controller);
-        });
-    });
-
-    describe('removeController', function () {
-        it('should remove a Controller', function () {
-            const application = new Application();
-            const controller = new Controller();
-            application.addController(controller);
-            expect(application.routeMiddleware.controllers.length).toBe(1);
-            application.removeController(controller);
-            expect(application.routeMiddleware.controllers.length).toBe(0);
-        });
-
-        it('should not remove a Controller that is not present', function () {
-            const application = new Application();
-            const controller = new Controller();
-            application.removeController(controller);
-            expect(application.routeMiddleware.controllers.length).toBe(0);
         });
     });
 });

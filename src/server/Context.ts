@@ -2,7 +2,6 @@ import { IncomingMessage, ServerResponse } from 'http';
 import { URL } from 'url';
 
 import { ContentType } from './ContentType';
-import { CookieRegistry } from './cookie';
 import { getVerb, Verb } from './Verb';
 
 /**
@@ -24,9 +23,6 @@ export class Context<DATA extends {} = {}> {
     accept: string[];
 
     data: DATA;
-
-    /** The CookieRegistry object.  Holds Cookie data */
-    cookies: CookieRegistry;
 
     /** View template */
     template?: string;
@@ -52,13 +48,11 @@ export class Context<DATA extends {} = {}> {
 
         // Accept Type
         this.accept = getAccept(request);
-
-        this.cookies = new CookieRegistry(request);
     }
 }
 
 export function getUrl(request: IncomingMessage) {
-    return new URL(request.url || '', `http://${request.headers.host}`);
+    return new URL(request.url ?? '', `http://${request.headers.host}`);
 }
 
 export function getMethod(request: IncomingMessage) {
