@@ -6,7 +6,7 @@ import { Color } from '@cardboardrobots/console-style';
 
 import { auto, error, json, raw, ResponseDirective, text, view } from '../directive';
 
-import { RequestHandler, errorTemplate, colorStatus } from './RequestHandler';
+import { Handler, errorTemplate, colorStatus } from './Handler';
 import {
     NotFoundError,
     NoRouteFoundError,
@@ -15,13 +15,13 @@ import {
 } from './Errors';
 import { LogLevel } from './LogLevel';
 
-describe('RequestHandler', function () {
+describe('Handler', function () {
     describe('pipeline', function () {
         let server: Server;
-        let handler: RequestHandler;
+        let handler: Handler;
 
         beforeEach(async function () {
-            handler = new RequestHandler();
+            handler = new Handler();
             server = createServer(handler.callback);
         });
 
@@ -42,10 +42,10 @@ describe('RequestHandler', function () {
 
     describe('status', function () {
         let server: Server;
-        let handler: RequestHandler;
+        let handler: Handler;
 
         beforeEach(async function () {
-            handler = new RequestHandler();
+            handler = new Handler();
             handler.logging = LogLevel.None;
             server = createServer(handler.callback);
         });
@@ -81,10 +81,10 @@ describe('RequestHandler', function () {
 
     describe('send', function () {
         let server: Server;
-        let handler: RequestHandler;
+        let handler: Handler;
 
         beforeEach(async function () {
-            handler = new RequestHandler();
+            handler = new Handler();
 
             // handler.useError(async function (_context) {
             //     return error;
@@ -210,10 +210,10 @@ describe('RequestHandler', function () {
 
     describe('sendJson', function () {
         let server: Server;
-        let handler: RequestHandler;
+        let handler: Handler;
 
         beforeEach(async function () {
-            handler = new RequestHandler();
+            handler = new Handler();
             server = createServer(handler.callback);
         });
 
@@ -256,10 +256,10 @@ describe('RequestHandler', function () {
     describe('sendView', function () {
         describe('no middleware', function () {
             let server: Server;
-            let handler: RequestHandler;
+            let handler: Handler;
 
             beforeEach(async function () {
-                handler = new RequestHandler();
+                handler = new Handler();
                 handler.logging = LogLevel.None;
 
                 // handler.useError(async function (_context) {
@@ -281,10 +281,10 @@ describe('RequestHandler', function () {
 
         describe('middleware available', function () {
             let server: Server;
-            let handler: RequestHandler;
+            let handler: Handler;
 
             beforeEach(async function () {
-                handler = new RequestHandler();
+                handler = new Handler();
                 handler.logging = LogLevel.None;
 
                 // handler.useError(async function (_context, error) {
@@ -340,10 +340,10 @@ describe('RequestHandler', function () {
 
     describe('sendAuto', function () {
         let server: Server;
-        let handler: RequestHandler;
+        let handler: Handler;
 
         beforeEach(async function () {
-            handler = new RequestHandler();
+            handler = new Handler();
             handler.logging = LogLevel.None;
 
             handler.useView(async function (context) {
@@ -395,10 +395,10 @@ describe('RequestHandler', function () {
 
     describe('sendRaw', function () {
         let server: Server;
-        let handler: RequestHandler;
+        let handler: Handler;
 
         beforeEach(async function () {
-            handler = new RequestHandler();
+            handler = new Handler();
             server = createServer(handler.callback);
         });
 
@@ -433,10 +433,10 @@ describe('RequestHandler', function () {
 
     describe('error', function () {
         let server: Server;
-        let handler: RequestHandler;
+        let handler: Handler;
 
         beforeEach(async function () {
-            handler = new RequestHandler();
+            handler = new Handler();
             handler.logging = LogLevel.None;
 
             handler.useView(async function (context) {

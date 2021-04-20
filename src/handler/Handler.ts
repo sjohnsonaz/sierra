@@ -35,7 +35,7 @@ const ERROR_TEMPLATE = 'error';
 export type ViewContext<CONTEXT extends Context, VALUE> = CONTEXT & { view: ViewDirective<VALUE> };
 export type ErrorContext<CONTEXT extends Context> = CONTEXT & { error: Error };
 
-export class RequestHandler<CONTEXT extends Context = Context, RESULT = void> {
+export class Handler<CONTEXT extends Context = Context, RESULT = void> {
     pipeline: Pipeline<Context, void, CONTEXT, RESULT> = new Pipeline();
     errorPipeline: Pipeline<ErrorContext<CONTEXT>, any, any, any> = new Pipeline();
     viewPipeline: Pipeline<ViewContext<CONTEXT, RESULT>, RESULT, any, any> = new Pipeline();
@@ -257,11 +257,11 @@ export class RequestHandler<CONTEXT extends Context = Context, RESULT = void> {
     use(middleware: Middleware<CONTEXT, RESULT, RESULT>): this;
     use<NEWDATA extends Record<string, unknown>, NEWRESULT = RESULT>(
         middleware: Middleware<CONTEXT & Context<Partial<NEWDATA>>, RESULT, NEWRESULT>
-    ): RequestHandler<CONTEXT & Context<NEWDATA>, NEWRESULT>;
+    ): Handler<CONTEXT & Context<NEWDATA>, NEWRESULT>;
 
     use<MIDDLEWARE extends Middleware<any, any, any>>(
         middleware: MIDDLEWARE
-    ): RequestHandler<CONTEXT & MiddlewareContext<MIDDLEWARE>, MiddlewareReturn<MIDDLEWARE>>;
+    ): Handler<CONTEXT & MiddlewareContext<MIDDLEWARE>, MiddlewareReturn<MIDDLEWARE>>;
 
     use(middleware: Middleware<any, any, any>): any {
         this.pipeline.use(middleware);

@@ -1,6 +1,6 @@
 import * as request from 'supertest';
 
-import { createHandler } from './request-handler';
+import { createHandler } from './handler';
 import { createServer } from './server';
 
 describe('Sierra', function () {

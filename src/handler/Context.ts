@@ -5,7 +5,7 @@ import { ContentType } from './ContentType';
 import { getVerb, Verb } from './Verb';
 
 /**
- * The Context object for the RequestHandler Pipeline
+ * The Context object for the Handler Pipeline
  */
 // eslint-disable-next-line @typescript-eslint/ban-types
 export class Context<DATA extends Record<string, unknown> = {}> {

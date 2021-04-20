@@ -19,7 +19,7 @@ let sierra = new Sierra();
 Initialize Sierra builds all of the middleware and routes.
 
 ```` TypeScript
-Sierra.prototype.init(): RequestHandler;
+Sierra.prototype.init(): Handler;
 ````
 
 Now Sierra is ready to listen.  Start it by calling.

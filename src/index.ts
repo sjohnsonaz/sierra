@@ -1,3 +1,3 @@
 export * from './directive';
-export * from './request-handler';
+export * from './handler';
 export * from './server';

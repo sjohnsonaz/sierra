@@ -1,6 +1,6 @@
 import { Context } from './Context';
-import { RequestHandler } from './RequestHandler';
+import { Handler } from './Handler';
 
 export function createHandler<CONTEXT extends Context = Context, RESULT = void>() {
-    return new RequestHandler<CONTEXT, RESULT>();
+    return new Handler<CONTEXT, RESULT>();
 }
