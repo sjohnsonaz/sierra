@@ -1,6 +1,6 @@
 import * as request from 'supertest';
 
-import { LogLevel } from '../server';
+import { LogLevel } from '../request-handler';
 
 import { Application } from './Application';
 

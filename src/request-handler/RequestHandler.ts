@@ -22,7 +22,7 @@ import {
     TextDirective,
     view,
     ViewDirective,
-} from '../response-directive';
+} from '../directive';
 import { Header } from '../header';
 
 import { Context } from './Context';
