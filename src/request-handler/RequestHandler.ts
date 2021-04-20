@@ -23,11 +23,11 @@ import {
     view,
     ViewDirective,
 } from '../directive';
-import { Header } from '../header';
 
 import { Context } from './Context';
-import { LogLevel } from './LogLevel';
 import { ErrorMessage, NonStringViewError, SierraError } from './Errors';
+import { Header } from './Header';
+import { LogLevel } from './LogLevel';
 
 const DEFAULT_TEMPLATE = 'index';
 const ERROR_TEMPLATE = 'error';

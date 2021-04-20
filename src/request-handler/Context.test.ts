@@ -1,4 +1,4 @@
-import { createRequest } from '../utils/TestUtil';
+import { createRequest } from '../utils/test';
 
 import { Context } from './Context';
 
