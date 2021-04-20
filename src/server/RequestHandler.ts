@@ -27,7 +27,7 @@ import { Header } from '../header';
 
 import { Context } from './Context';
 import { LogLevel } from './LogLevel';
-import { ErrorMessage, NonStringViewError, NoViewTemplateError, SierraError } from './Errors';
+import { ErrorMessage, NonStringViewError, SierraError } from './Errors';
 
 const DEFAULT_TEMPLATE = 'index';
 const ERROR_TEMPLATE = 'error';
@@ -36,9 +36,9 @@ export type ViewContext<CONTEXT extends Context, VALUE> = CONTEXT & { view: View
 export type ErrorContext<CONTEXT extends Context> = CONTEXT & { error: Error };
 
 export class RequestHandler<CONTEXT extends Context = Context, RESULT = void> {
-    pipeline: Pipeline<CONTEXT, undefined, RESULT> = new Pipeline();
-    errorPipeline: Pipeline<ErrorContext<CONTEXT>, any, any> = new Pipeline();
-    viewPipeline: Pipeline<ViewContext<CONTEXT, RESULT>, RESULT, any> = new Pipeline();
+    pipeline: Pipeline<Context, void, CONTEXT, RESULT> = new Pipeline();
+    errorPipeline: Pipeline<ErrorContext<CONTEXT>, any, any, any> = new Pipeline();
+    viewPipeline: Pipeline<ViewContext<CONTEXT, RESULT>, RESULT, any, any> = new Pipeline();
     logging: LogLevel = LogLevel.Errors;
     defaultTemplate = DEFAULT_TEMPLATE;
 
@@ -238,7 +238,9 @@ export class RequestHandler<CONTEXT extends Context = Context, RESULT = void> {
             } else if (directive instanceof ErrorDirective) {
                 return this.sendError(context, directive);
             } else {
-                return this.sendAuto(context, directive);
+                // TODO: Should this be Json or Auto?
+                // This case should not happen
+                return this.sendAuto(context, auto(directive.value));
             }
         } else {
             // TODO: Should this be Json or Auto?
@@ -246,15 +248,15 @@ export class RequestHandler<CONTEXT extends Context = Context, RESULT = void> {
         }
     }
 
-    // TODO: Remove data parameter
-    log<T>(context: CONTEXT, _data: T, status = 500) {
+    log(context: Context, status = 500) {
         if (this.logging >= LogLevel.Verbose) {
             console.log(context.request.method, context.request.url, colorStatus(status));
         }
     }
 
-    use<NEWDATA, NEWRESULT = RESULT>(
-        middleware: Middleware<CONTEXT & Context<NEWDATA>, RESULT, NEWRESULT>
+    use(middleware: Middleware<CONTEXT, RESULT, RESULT>): this;
+    use<NEWDATA extends Record<string, unknown>, NEWRESULT = RESULT>(
+        middleware: Middleware<CONTEXT & Context<Partial<NEWDATA>>, RESULT, NEWRESULT>
     ): RequestHandler<CONTEXT & Context<NEWDATA>, NEWRESULT>;
 
     use<MIDDLEWARE extends Middleware<any, any, any>>(

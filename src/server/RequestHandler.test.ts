@@ -4,7 +4,7 @@ import { createServer, Server } from 'http';
 import * as request from 'supertest';
 import { Color } from '@cardboardrobots/console-style';
 
-import { auto, error, json, raw, text, view } from '../response-directive';
+import { auto, error, json, raw, ResponseDirective, text, view } from '../response-directive';
 
 import { RequestHandler, errorTemplate, colorStatus } from './RequestHandler';
 import {
@@ -30,7 +30,7 @@ describe('RequestHandler', function () {
                 .use<{ value: string }>(async ({ data }) => {
                     data.value = 'a';
                 })
-                .use<{ value: string }>(async ({ data }) => {
+                .use(async ({ data }) => {
                     data.value += 'b';
                 })
                 .use(async ({ data }) => {
@@ -127,7 +127,7 @@ describe('RequestHandler', function () {
 
                     await request(server)
                         .get('/')
-                        .set('Accept', 'application/json')
+                        .accept('application/json')
                         .expect(200, { value: true });
                 });
 
@@ -195,6 +195,17 @@ describe('RequestHandler', function () {
                 await request(server).get('/').expect(200, { value: true });
             });
         });
+
+        // This case should not happen
+        describe('ResponseDirective type: unknown', function () {
+            it('should send raw', async function () {
+                handler.use(async () => {
+                    return new ResponseDirective('unknown' as any, { value: true }, {});
+                });
+
+                await request(server).get('/').expect(200, { value: true });
+            });
+        });
     });
 
     describe('sendJson', function () {
@@ -207,28 +218,28 @@ describe('RequestHandler', function () {
         });
 
         it('should handle HTTP requests', async function () {
-            handler.use(async function (context) {
+            handler.use(async () => {
                 return true;
             });
             await request(server).get('/').expect(200, 'true');
         });
 
         it('should send false responses', async function () {
-            handler.use(async function (context) {
+            handler.use(async () => {
                 return false;
             });
             await request(server).get('/').expect(200, 'false');
         });
 
         it('should send null responses', async function () {
-            handler.use(async function (context) {
+            handler.use(async () => {
                 return null;
             });
             await request(server).get('/').expect(200, 'null');
         });
 
         it('should cast undefined responses to null', async function () {
-            handler.use(async function (context) {
+            handler.use(async () => {
                 return undefined;
             });
             await request(server).get('/').expect(200, null);
@@ -299,6 +310,7 @@ describe('RequestHandler', function () {
 
                 server = createServer(handler.callback);
             });
+
             it('should send index view by default', async function () {
                 handler.use(async function () {
                     return view({ value: true });
@@ -326,6 +338,61 @@ describe('RequestHandler', function () {
         });
     });
 
+    describe('sendAuto', function () {
+        let server: Server;
+        let handler: RequestHandler;
+
+        beforeEach(async function () {
+            handler = new RequestHandler();
+            handler.logging = LogLevel.None;
+
+            handler.useView(async function (context) {
+                const { view } = context;
+                const templates: Record<string, (...args: any) => any> = {
+                    index(data: { value: boolean }) {
+                        return `index: value = ${data.value}`;
+                    },
+                    test(data: { value: boolean }) {
+                        return `test: value = ${data.value}`;
+                    },
+                };
+                const templateFunction = templates[context.template || ''];
+                if (!templateFunction) {
+                    throw new NoViewTemplateError(context.template || '');
+                }
+                return templateFunction(view.value);
+            });
+
+            server = createServer(handler.callback);
+        });
+
+        it('should send JSON', async function () {
+            handler.use(async function () {
+                return auto({ value: true });
+            });
+            const { body } = await request(server).get('/').expect(200);
+            expect(body).toStrictEqual({ value: true });
+        });
+
+        it('should send index view by default', async function () {
+            handler.use(async function () {
+                return auto({ value: true });
+            });
+
+            const { text } = await request(server).get('/').accept('text/html').expect(200);
+            expect(text).toBe('index: value = true');
+        });
+
+        it('should send named view', async function () {
+            handler.use(async function () {
+                return auto({ value: true }, { template: 'test' });
+            });
+
+            const { text } = await request(server).get('/').accept('text/html').expect(200);
+            expect(text).toBe('test: value = true');
+        });
+    });
+
     describe('sendRaw', function () {
         let server: Server;
         let handler: RequestHandler;
@@ -336,14 +403,14 @@ describe('RequestHandler', function () {
         });
 
         it('should send text/plain', async function () {
-            handler.use(async function (context) {
+            handler.use(async () => {
                 return raw('true');
             });
             await request(server).get('/').expect('Content-Type', 'text/plain').expect(200, 'true');
         });
 
         it('should send octet-stream', async function () {
-            handler.use(async function (context) {
+            handler.use(async () => {
                 const buffer = Buffer.from('1234');
                 return raw(buffer);
             });
@@ -354,7 +421,7 @@ describe('RequestHandler', function () {
         });
 
         it('should send application/json', async function () {
-            handler.use(async function (context) {
+            handler.use(async () => {
                 return raw({ value: true });
             });
             await request(server)

@@ -1,3 +1,5 @@
+import * as request from 'supertest';
+
 import { LogLevel } from '../server';
 
 import { Application } from './Application';
@@ -10,6 +12,20 @@ describe('Application', function () {
             application.use(middleware);
             expect(application.requestHandler.pipeline.middlewares.length).toBe(1);
             expect(application.requestHandler.pipeline.middlewares[0]).toBe(middleware);
+        });
+
+        it('should support chaining', async function () {
+            const application = new Application()
+                .use<{ value: string }>(async ({ data }) => {
+                    data.value = 'a';
+                })
+                .use(async ({ data }) => {
+                    data.value += 'b';
+                })
+                .use(async ({ data }) => {
+                    return `${data.value}c`;
+                });
+            await request(application.server).get('/').expect(200, JSON.stringify('abc'));
         });
     });
 

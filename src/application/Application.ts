@@ -26,19 +26,13 @@ export class Application<CONTEXT extends Context = Context, RESULT = void> {
     }
 
     /**
-     * Initializes Middleware and builds Controllers
-     * @returns Promise<void>
-     */
-    async init() {
-        return this.requestHandler;
-    }
-
-    /**
      * Adds a Middleware to the Pipeline.
      * @param middleware - the Middleware to add
      */
-    use<NEWDATA, NEWRESULT = RESULT>(
-        middleware: Middleware<CONTEXT & Context<NEWDATA>, RESULT, NEWRESULT>
+    use(middleware: Middleware<CONTEXT, RESULT, RESULT>): this;
+
+    use<NEWDATA extends Record<string, unknown>, NEWRESULT = RESULT>(
+        middleware: Middleware<CONTEXT & Context<Partial<NEWDATA>>, RESULT, NEWRESULT>
     ): Application<CONTEXT & Context<NEWDATA>, NEWRESULT>;
 
     use<MIDDLEWARE extends Middleware<any, any, any>>(

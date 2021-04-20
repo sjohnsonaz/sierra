@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@cardboardrobots/console-style": "0.0.1",
-    "@cardboardrobots/pipeline": "0.0.1",
+    "@cardboardrobots/pipeline": "0.0.3",
     "reflect-metadata": "0.1.13"
   },
   "devDependencies": {

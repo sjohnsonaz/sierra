@@ -7,7 +7,8 @@ import { getVerb, Verb } from './Verb';
 /**
  * The Context object for the RequestHandler Pipeline
  */
-export class Context<DATA extends Record<string, any> = Record<string, unknown>> {
+// eslint-disable-next-line @typescript-eslint/ban-types
+export class Context<DATA extends Record<string, unknown> = {}> {
     /** The IncomingMessage object */
     request: IncomingMessage;
     /** The ServerResponse object */
