@@ -5,8 +5,8 @@
   "repository": "https://www.github.com/sjohnsonaz/sierra.git",
   "license": "MIT",
   "author": "Sean Johnson <sjohnson@sjohnsonaz.com>",
-  "main": "dist/src/index.js",
-  "typings": "dist/src/index.d.ts",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "start": "tsc-watch --onSuccess \"node --inspect=0.0.0.0 ./dist/examples/SierraTest.js\"",
     "build": "tsc",
