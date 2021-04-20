@@ -10,6 +10,7 @@ import {
 } from '@cardboardrobots/pipeline';
 import { Color } from '@cardboardrobots/console-style';
 
+import { Context } from '../context';
 import {
     auto,
     AutoDirective,
@@ -23,10 +24,9 @@ import {
     view,
     ViewDirective,
 } from '../directive';
+import { Header } from '../header';
 
-import { Context } from './Context';
 import { ErrorMessage, NonStringViewError, SierraError } from './Errors';
-import { Header } from './Header';
 import { LogLevel } from './LogLevel';
 
 const DEFAULT_TEMPLATE = 'index';
