@@ -7,12 +7,7 @@ import { Color } from '@cardboardrobots/console-style';
 import { auto, error, json, raw, ResponseDirective, text, view } from '../directive';
 
 import { Handler, errorTemplate, colorStatus } from './Handler';
-import {
-    NotFoundError,
-    NoRouteFoundError,
-    NoViewTemplateError,
-    NonStringViewError,
-} from './Errors';
+import { NotFoundError, NoViewTemplateError, NonStringViewError } from './Errors';
 import { LogLevel } from './LogLevel';
 
 describe('Handler', function () {
@@ -36,7 +31,21 @@ describe('Handler', function () {
                 .use(async ({ data }) => {
                     return `${data.value}c`;
                 });
-            await request(server).get('/').expect(200, JSON.stringify('abc'));
+            const { body } = await request(server).get('/').expect(200);
+            expect(body).toBe('abc');
+        });
+
+        it('should support context interfaces', async function () {
+            interface ValueContext {
+                value: string;
+            }
+            handler
+                .use<ValueContext>(async ({ data }) => {
+                    data.value = 'test';
+                })
+                .use(async ({ data }) => data.value);
+            const { body } = await request(server).get('/').expect(200);
+            expect(body).toBe('test');
         });
     });
 
@@ -60,13 +69,6 @@ describe('Handler', function () {
         it('should send 404 on not found', async function () {
             handler.use(async () => {
                 throw new NotFoundError();
-            });
-            await request(server).get('/').expect(404);
-        });
-
-        it('should send 404 on no route found', async function () {
-            handler.use(async () => {
-                throw new NoRouteFoundError();
             });
             await request(server).get('/').expect(404);
         });

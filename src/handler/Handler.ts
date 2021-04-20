@@ -57,7 +57,6 @@ export class Handler<CONTEXT extends Context = Context, RESULT = void> {
             let errorStatus = 500;
             if (wrappedError instanceof SierraError) {
                 switch (wrappedError.message) {
-                    case ErrorMessage.NoRouteFound:
                     case ErrorMessage.NotFound:
                         errorStatus = 404;
                         break;
@@ -255,7 +254,7 @@ export class Handler<CONTEXT extends Context = Context, RESULT = void> {
     }
 
     use(middleware: Middleware<CONTEXT, RESULT, RESULT>): this;
-    use<NEWDATA extends Record<string, unknown>, NEWRESULT = RESULT>(
+    use<NEWDATA extends Record<string, any>, NEWRESULT = RESULT>(
         middleware: Middleware<CONTEXT & Context<Partial<NEWDATA>>, RESULT, NEWRESULT>
     ): Handler<CONTEXT & Context<NEWDATA>, NEWRESULT>;
 
