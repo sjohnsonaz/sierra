@@ -1,3 +1,5 @@
+import { createHandler } from '../handler';
+
 import { PromiseServer } from './PromiseServer';
 
 describe('PromiseServer', function () {
@@ -5,9 +7,9 @@ describe('PromiseServer', function () {
     describe('listen', function () {
         it('should throw if port is in use', async function () {
             const port = 3456;
-            const server0 = new PromiseServer();
+            const server0 = new PromiseServer(createHandler());
             await server0.start(port);
-            const server1 = new PromiseServer();
+            const server1 = new PromiseServer(createHandler());
             await expect(async () => {
                 await server1.start(port);
             }).rejects.toThrow();
@@ -18,7 +20,7 @@ describe('PromiseServer', function () {
     describe('close', function () {
         it('should throw an error if server is not listening', async function () {
             const port = 3456;
-            const server = new PromiseServer();
+            const server = new PromiseServer(createHandler());
             await server.start(port);
             await server.exit();
             await expect(async () => {

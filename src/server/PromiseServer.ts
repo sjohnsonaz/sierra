@@ -1,7 +1,16 @@
 import { Server } from 'http';
 import { ListenOptions } from 'net';
 
-export class PromiseServer extends Server {
+import { Handler } from '../handler';
+
+export class PromiseServer<HANDLER extends Handler<any, any>> extends Server {
+    handler: HANDLER;
+
+    constructor(handler: HANDLER) {
+        super(handler.callback);
+        this.handler = handler;
+    }
+
     /**
      * Opens the `http.Server` to listen on the specified Port.
      * @param port - the Port to open
