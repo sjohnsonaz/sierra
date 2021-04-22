@@ -99,9 +99,9 @@ describe('Handler', function () {
                         return `index: value = ${data.value}`;
                     },
                 };
-                const templateFunction = templates[context.template || ''];
+                const templateFunction = templates[context.view.options.template || ''];
                 if (!templateFunction) {
-                    throw new NoViewTemplateError(context.template || '');
+                    throw new NoViewTemplateError(context.view.options.template || '');
                 }
                 return templateFunction(view.value);
             });
@@ -303,9 +303,9 @@ describe('Handler', function () {
                             return `test: value = ${data.value}`;
                         },
                     };
-                    const templateFunction = templates[context.template || ''];
+                    const templateFunction = templates[context.view.options.template || ''];
                     if (!templateFunction) {
-                        throw new NoViewTemplateError(context.template || '');
+                        throw new NoViewTemplateError(context.view.options.template || '');
                     }
                     return templateFunction(view.value);
                 });
@@ -358,9 +358,9 @@ describe('Handler', function () {
                         return `test: value = ${data.value}`;
                     },
                 };
-                const templateFunction = templates[context.template || ''];
+                const templateFunction = templates[context.view.options.template || ''];
                 if (!templateFunction) {
-                    throw new NoViewTemplateError(context.template || '');
+                    throw new NoViewTemplateError(context.view.options.template || '');
                 }
                 return templateFunction(view.value);
             });
@@ -451,9 +451,9 @@ describe('Handler', function () {
                         return `error: error = ${data}`;
                     },
                 };
-                const templateFunction = templates[context.template || ''];
+                const templateFunction = templates[context.view.options.template || ''];
                 if (!templateFunction) {
-                    throw new NoViewTemplateError(context.template || '');
+                    throw new NoViewTemplateError(context.view.options.template || '');
                 }
                 return templateFunction(view.value);
             });

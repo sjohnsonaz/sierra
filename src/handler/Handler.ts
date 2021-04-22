@@ -150,7 +150,6 @@ export class Handler<CONTEXT extends Context = Context, RESULT = void> {
         const { options } = directive;
 
         try {
-            context.template = options.template ?? context.template ?? this.defaultTemplate;
             const viewContext: ViewContext<CONTEXT, RESULT> = context as any;
             viewContext.view = directive;
             const { value } = await this.viewPipeline.run(viewContext, directive.value);
@@ -181,7 +180,7 @@ export class Handler<CONTEXT extends Context = Context, RESULT = void> {
     }
 
     async sendAuto(context: CONTEXT, directive: AutoDirective<RESULT>) {
-        const { accept } = context;
+        const accept = getAccept(context.request);
         if (this.viewPipeline.middlewares.length && accept && accept.indexOf('text/html') > -1) {
             const { value, options } = directive;
             this.sendView(context, view(value, options));
@@ -330,5 +329,18 @@ export function colorStatus(status: number) {
             return Color.red(status);
         default:
             return Color.brightBlack(status);
+    }
+}
+
+export function getAccept(request: IncomingMessage) {
+    const accept = request.headers.accept;
+    if (accept) {
+        const types = accept.split(',');
+        return types.map((type) => {
+            const parts = type.split(';');
+            return parts[0];
+        });
+    } else {
+        return [];
     }
 }

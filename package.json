@@ -24,6 +24,7 @@
     "reflect-metadata": "0.1.13"
   },
   "devDependencies": {
+    "@cardboardrobots/test-util": "0.0.0",
     "@shopify/eslint-plugin": "40.1.0",
     "@types/handlebars": "4.1.0",
     "@types/jest": "26.0.21",
