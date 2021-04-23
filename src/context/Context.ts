@@ -4,7 +4,7 @@ import { IncomingMessage, ServerResponse } from 'http';
  * The Context object for the Handler Pipeline
  */
 // eslint-disable-next-line @typescript-eslint/ban-types
-export class Context<DATA extends Record<string, unknown> = {}> {
+export class Context<DATA extends Record<string, any> = {}> {
     /** The IncomingMessage object */
     request: IncomingMessage;
     /** The ServerResponse object */
